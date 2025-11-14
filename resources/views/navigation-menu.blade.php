@@ -15,8 +15,8 @@
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <div class="flex items-center space-x-4 text-sm text-gray-500">
-                    <a href="{{ route('home') }}" class="hover:text-gray-900 transition">{{ __('Home') }}</a>
+                <div class="flex items-center space-x-4  text-gray-100">
+                    <a href="{{ route('home') }}" class="hover:text-prim transition">{{ __('Thus') }}</a>
                 </div>
             </div>
 
