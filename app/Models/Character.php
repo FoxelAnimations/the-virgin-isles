@@ -12,13 +12,14 @@ class Character extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'character_beast_id',
         'first_name',
         'last_name',
         'nick_name',
         'age',
         'job_id',
         'bio',
+        'profile_image_path',
+        'full_body_image_path',
         'deleted_at',
     ];
 

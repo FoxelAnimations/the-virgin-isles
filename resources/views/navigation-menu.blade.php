@@ -17,6 +17,11 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <div class="flex items-center space-x-4  text-gray-100">
                     <a href="{{ route('home') }}" class="hover:text-prim transition">{{ __('Thus') }}</a>
+                    <a href="{{ route('characters.index') }}" class="hover:text-prim transition">{{ __('Characters') }}</a>
+                    @auth
+                        <a href="{{ route('characters.create') }}" class="hover:text-prim transition">{{ __('Create Character') }}</a>
+                        <a href="{{ route('jobs.create') }}" class="hover:text-prim transition">{{ __('Create Job') }}</a>
+                    @endauth
                 </div>
             </div>
 
@@ -42,6 +47,15 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @auth
+                <x-responsive-nav-link href="{{ route('characters.create') }}" :active="request()->routeIs('characters.create')">
+                    {{ __('Create Character') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('jobs.create') }}" :active="request()->routeIs('jobs.create')">
+                    {{ __('Create Job') }}
+                </x-responsive-nav-link>
+            @endauth
         </div>
     </div>
 </nav>
