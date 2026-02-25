@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Livewire\Jobs;
+namespace App\Livewire\Admin;
 
 use App\Models\Job;
 use Livewire\Component;
 
-class Create extends Component
+class CreateJob extends Component
 {
     public $title = '';
     public $description = '';
@@ -31,6 +31,6 @@ class Create extends Component
 
     public function render()
     {
-        return view('livewire.jobs.create')->layout('layouts.app');
+        return view('livewire.admin.create-job')->layout('layouts.admin');
     }
 }

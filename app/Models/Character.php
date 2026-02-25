@@ -20,16 +20,13 @@ class Character extends Model
         'bio',
         'profile_image_path',
         'full_body_image_path',
-        'deleted_at',
+        'sort_order',
     ];
 
-    // add cast to pre convert  data to the eqiested  format 
-    // protected $casts = [
-    //     'starting_time' => 'datetime:H:i:s',
-    // ];
-
-    // add use \OwenIt\Auditing\Auditable;
-    // (this looks wor changes and who made the changes )
+    public function getFullNameAttribute(): string
+    {
+        return trim($this->first_name . ' ' . $this->last_name);
+    }
 
     public function job()
     {
@@ -39,5 +36,10 @@ class Character extends Model
     public function characterImages()
     {
         return $this->hasMany(CharacterImage::class);
+    }
+
+    public function episodes()
+    {
+        return $this->belongsToMany(Episode::class);
     }
 }

@@ -21,7 +21,8 @@
     },
     "dependencies": {
         "jquery": "^3.7.1",
-        "rollup": "^4.52.0"
+        "rollup": "^4.52.0",
+        "sortablejs": "^1.15.7"
     },
     "pnpm": {
         "patchedDependencies": {

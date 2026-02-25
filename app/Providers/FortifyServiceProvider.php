@@ -6,8 +6,11 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\SiteSetting;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -34,6 +37,42 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
+
+        Fortify::loginView(function () {
+            $settings = SiteSetting::first();
+            if ($settings && !$settings->login_enabled) {
+                abort(404);
+            }
+            return view('auth.login');
+        });
+
+        Fortify::registerView(function () {
+            $settings = SiteSetting::first();
+            if ($settings && !$settings->register_enabled) {
+                abort(404);
+            }
+            return view('auth.register');
+        });
+
+        Fortify::authenticateUsing(function (Request $request) {
+            $settings = SiteSetting::first();
+            if ($settings && !$settings->login_enabled) {
+                abort(404);
+            }
+
+            $user = User::where('email', $request->email)->first();
+
+            if ($user && Hash::check($request->password, $user->password)) {
+                if ($user->is_blocked) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        Fortify::username() => [__('Your account has been blocked.')],
+                    ]);
+                }
+                return $user;
+            }
+
+            return null;
+        });
 
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());

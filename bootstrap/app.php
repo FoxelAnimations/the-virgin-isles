@@ -11,8 +11,16 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withProviders([
+        App\Providers\AppServiceProvider::class,
+        App\Providers\AuthServiceProvider::class,
+        App\Providers\FortifyServiceProvider::class,
+        App\Providers\JetstreamServiceProvider::class,
+    ])
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->web(append: [
+            \App\Http\Middleware\RejectBlockedUsers::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

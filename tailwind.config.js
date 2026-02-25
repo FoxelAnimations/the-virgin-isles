@@ -14,10 +14,11 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Bebas Neue', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 prim: '#ff003b',
+                accent: '#E7FF57',
             },
         },
     },
