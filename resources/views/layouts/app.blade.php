@@ -36,6 +36,16 @@
             <main>
                 {{ $slot }}
             </main>
+
+            <!-- Footer -->
+            <footer class="bg-zinc-900 border-t border-zinc-800 text-zinc-500">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p class="text-sm tracking-wider">&copy; {{ date('Y') }} IN-CC. {{ __('Alle rechten voorbehouden.') }}</p>
+                        <p class="text-sm tracking-wider">Business contact: <a href="mailto:wuk@in-cc.be" class="text-accent hover:brightness-90 transition">wuk@in-cc.be</a></p>
+                    </div>
+                </div>
+            </footer>
         </div>
 
         @stack('modals')

@@ -74,7 +74,7 @@
          ============================================================ --}}
     <section id="characters" class="py-12 md:py-20 scroll-mt-16">
         <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold uppercase text-center tracking-wider mb-10">
-            Characters
+            Personages
         </h2>
 
         @if ($characters->isNotEmpty())
@@ -218,7 +218,7 @@
                 </template>
             </div>
         @else
-            <p class="text-center text-zinc-600 text-lg">No characters yet.</p>
+            <p class="text-center text-zinc-600 text-lg">Nog geen personages.</p>
         @endif
     </section>
 
@@ -228,7 +228,7 @@
     <section id="episodes" class="py-12 md:py-20 scroll-mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold uppercase text-center tracking-wider mb-10">
-                Episodes
+                Afleveringen
             </h2>
 
             @if ($latestEpisodes->isNotEmpty())
@@ -256,13 +256,13 @@
 
                 <div class="text-center mt-8">
                     <a href="{{ route('episodes.index') }}" class="inline-flex items-center bg-accent text-black px-6 py-3 text-lg font-bold uppercase tracking-wider transition hover:brightness-90">
-                        {{ __('View All Episodes') }}
+                        {{ __('Bekijk Alle Afleveringen') }}
                         <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                     </a>
                 </div>
             @else
                 <div class="border border-zinc-800 bg-zinc-900 rounded-sm p-8 md:p-16 flex items-center justify-center min-h-[200px]">
-                    <p class="text-zinc-600 text-xl uppercase tracking-widest">{{ __('Coming soon') }}</p>
+                    <p class="text-zinc-600 text-xl uppercase tracking-widest">{{ __('Binnenkort') }}</p>
                 </div>
             @endif
         </div>

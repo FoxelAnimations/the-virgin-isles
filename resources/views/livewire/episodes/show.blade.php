@@ -27,11 +27,11 @@
 >
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold uppercase text-center tracking-wider mb-10">
-            Episodes
+            Afleveringen
         </h1>
 
         @if ($episodes->isEmpty())
-            <p class="text-center text-zinc-600 text-lg">{{ __('No episodes yet.') }}</p>
+            <p class="text-center text-zinc-600 text-lg">{{ __('Nog geen afleveringen.') }}</p>
         @else
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($episodes as $episode)
