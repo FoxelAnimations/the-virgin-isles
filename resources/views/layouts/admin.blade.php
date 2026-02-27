@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" style="font-size: 19px;">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,6 +36,12 @@
                         <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest transition hover:text-accent">DASHBOARD</a>
                         <a href="{{ route('admin.characters') }}" class="{{ request()->routeIs('admin.characters') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest transition hover:text-accent">CHARACTERS</a>
                         <a href="{{ route('admin.episodes') }}" class="{{ request()->routeIs('admin.episodes') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest transition hover:text-accent">EPISODES</a>
+                        <a href="{{ route('admin.chats') }}" class="{{ request()->routeIs('admin.chats*') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest transition hover:text-accent relative">
+                            CHATS
+                            @if (($unreadChatCount ?? 0) > 0)
+                                <span class="absolute -top-1.5 -right-3 inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold bg-red-500 text-white rounded-full">{{ $unreadChatCount }}</span>
+                            @endif
+                        </a>
                         <a href="{{ route('admin.users') }}" class="{{ request()->routeIs('admin.users') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest transition hover:text-accent">USERS</a>
                     </div>
 
@@ -66,6 +72,12 @@
                     <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 {{ request()->routeIs('admin.dashboard') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest hover:text-accent transition">DASHBOARD</a>
                     <a href="{{ route('admin.characters') }}" class="block px-4 py-2 {{ request()->routeIs('admin.characters') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest hover:text-accent transition">CHARACTERS</a>
                     <a href="{{ route('admin.episodes') }}" class="block px-4 py-2 {{ request()->routeIs('admin.episodes') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest hover:text-accent transition">EPISODES</a>
+                    <a href="{{ route('admin.chats') }}" class="block px-4 py-2 {{ request()->routeIs('admin.chats*') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest hover:text-accent transition">
+                        CHATS
+                        @if (($unreadChatCount ?? 0) > 0)
+                            <span class="ml-1 inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold bg-red-500 text-white rounded-full">{{ $unreadChatCount }}</span>
+                        @endif
+                    </a>
                     <a href="{{ route('admin.users') }}" class="block px-4 py-2 {{ request()->routeIs('admin.users') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest hover:text-accent transition">USERS</a>
                     <form method="POST" action="{{ route('logout') }}" class="px-4 mt-2">
                         @csrf

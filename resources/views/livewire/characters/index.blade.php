@@ -11,8 +11,8 @@
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($characters as $character)
                     <div class="border border-zinc-800 bg-zinc-900 rounded-sm overflow-hidden group transition hover:border-accent">
-                        @if ($character->profile_image_path)
-                            <img src="{{ Storage::url($character->profile_image_path) }}" alt="{{ $character->first_name }}" class="h-72 w-full object-cover object-top transition group-hover:scale-105 duration-300">
+                        @if ($character->profile_photo_path || $character->profile_image_path)
+                            <img src="{{ Storage::url($character->profile_photo_path ?? $character->profile_image_path) }}" alt="{{ $character->first_name }}" class="h-72 w-full object-cover object-top transition group-hover:scale-105 duration-300">
                         @else
                             <div class="h-72 w-full bg-zinc-800 flex items-center justify-center text-zinc-600">
                                 <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>

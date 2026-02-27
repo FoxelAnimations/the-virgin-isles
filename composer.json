@@ -11,7 +11,8 @@
         "laravel/jetstream": "^5.3",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10",
-        "livewire/livewire": "^3.6"
+        "livewire/livewire": "^3.6",
+        "openai-php/laravel": "^0.18.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -82,6 +83,10 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "abandoned": "report",
+            "block-insecure": false
         }
     },
     "minimum-stability": "stable",

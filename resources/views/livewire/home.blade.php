@@ -119,9 +119,9 @@
                         >
                             <div class="h-full border border-zinc-800 bg-zinc-900 rounded-sm overflow-hidden transition hover:border-accent flex flex-col">
                                 {{-- Character Image --}}
-                                @if ($character->profile_image_path)
+                                @if ($character->profile_photo_path || $character->profile_image_path)
                                     <img
-                                        src="{{ Storage::url($character->profile_image_path) }}"
+                                        src="{{ Storage::url($character->profile_photo_path ?? $character->profile_image_path) }}"
                                         alt="{{ $character->full_name }}"
                                         class="w-full h-80 object-cover object-top transition group-hover:scale-105 duration-300"
                                     >

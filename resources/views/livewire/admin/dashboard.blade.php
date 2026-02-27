@@ -105,7 +105,7 @@
                                 <input type="url" wire:model="socialLinks.{{ $index }}.url" placeholder="https://..." class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm">
                             </div>
                             <button wire:click="removeSocialLink({{ $link['id'] }})" wire:confirm="Remove this social link?" class="text-red-400 hover:text-red-300 transition p-1 shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
                             </button>
                         </div>
                         @error("socialLinks.{$index}.label") <p class="text-red-400 text-xs ml-1">{{ $message }}</p> @enderror
@@ -187,6 +187,34 @@
 
                     <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
                         {{ __('Save Age Gate') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+        {{-- Chat Settings CMS --}}
+        <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden mt-6">
+            <div class="bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider">{{ __('Chat Settings') }}</div>
+            <div class="p-4">
+                <form wire:submit="saveChatSettings" class="space-y-4">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" wire:model.live="chatEnabled" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
+                        <span class="text-sm font-medium text-white">{{ __('Enable character chat') }}</span>
+                    </label>
+                    <p class="text-sm text-zinc-500">{{ __('When enabled, a chat bubble appears on the public site allowing visitors to chat with characters via GPT.') }}</p>
+
+                    <div class="{{ $chatEnabled ? '' : 'opacity-50 pointer-events-none' }}">
+                        <label class="block text-xs font-medium text-zinc-500 mb-1">{{ __('Default Character') }}</label>
+                        <select wire:model="defaultChatCharacterId" class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm">
+                            <option value="">{{ __('— No default —') }}</option>
+                            @foreach ($chatEnabledCharacters as $character)
+                                <option value="{{ $character->id }}">{{ $character->first_name }} {{ $character->last_name }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-zinc-600 mt-1">{{ __('Only characters with "Enable in chat" checked are shown here.') }}</p>
+                    </div>
+
+                    <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
+                        {{ __('Save Chat Settings') }}
                     </button>
                 </form>
             </div>

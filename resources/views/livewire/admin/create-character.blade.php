@@ -72,9 +72,9 @@
                     @enderror
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                     <div>
-                        <label class="block text-sm font-medium text-zinc-400">{{ __('Profile Image') }}</label>
+                        <label class="block text-sm font-medium text-zinc-400">{{ __('Face Image') }}</label>
                         <input type="file" wire:model="profile_image" class="mt-1 block w-full text-sm text-zinc-400 file:mr-4 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-zinc-700" />
                         @error('profile_image')
                             <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
@@ -82,13 +82,13 @@
 
                         @if ($profile_image)
                             <div class="mt-4 rounded-sm border border-zinc-700 p-2">
-                                <img src="{{ $profile_image->temporaryUrl() }}" alt="{{ __('Profile preview') }}" class="h-40 w-full object-cover">
+                                <img src="{{ $profile_image->temporaryUrl() }}" alt="{{ __('Face preview') }}" class="h-40 w-full object-cover">
                             </div>
                         @endif
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-zinc-400">{{ __('Full Body Image') }}</label>
+                        <label class="block text-sm font-medium text-zinc-400">{{ __('Body Image') }}</label>
                         <input type="file" wire:model="full_body_image" class="mt-1 block w-full text-sm text-zinc-400 file:mr-4 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-zinc-700" />
                         @error('full_body_image')
                             <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
@@ -96,7 +96,22 @@
 
                         @if ($full_body_image)
                             <div class="mt-4 rounded-sm border border-zinc-700 p-2">
-                                <img src="{{ $full_body_image->temporaryUrl() }}" alt="{{ __('Full body preview') }}" class="h-40 w-full object-cover">
+                                <img src="{{ $full_body_image->temporaryUrl() }}" alt="{{ __('Body preview') }}" class="h-40 w-full object-cover">
+                            </div>
+                        @endif
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-400">{{ __('Profile Photo') }}</label>
+                        <input type="file" wire:model="profile_photo" class="mt-1 block w-full text-sm text-zinc-400 file:mr-4 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-zinc-700" />
+                        <p class="mt-1 text-xs text-zinc-600">{{ __('Used in chat & slider.') }}</p>
+                        @error('profile_photo')
+                            <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                        @enderror
+
+                        @if ($profile_photo)
+                            <div class="mt-4 rounded-sm border border-zinc-700 p-2">
+                                <img src="{{ $profile_photo->temporaryUrl() }}" alt="{{ __('Profile photo preview') }}" class="h-40 w-full object-cover">
                             </div>
                         @endif
                     </div>
@@ -120,6 +135,58 @@
                         @endforeach
                     </div>
                 @endif
+
+                {{-- Chat Personality Section --}}
+                <div class="col-span-full rounded-sm bg-zinc-800/50 border border-zinc-700 overflow-hidden">
+                    <div class="bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between">
+                        <span>{{ __('Chat Personality (GPT)') }}</span>
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" wire:model.live="chat_online" class="rounded-sm border-zinc-600 bg-zinc-800 text-green-500 focus:ring-green-500">
+                                <span class="text-xs normal-case tracking-normal {{ $chat_online ? 'text-green-400' : 'text-zinc-500' }}">{{ $chat_online ? __('Online') : __('Offline') }}</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" wire:model.live="chat_enabled" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
+                                <span class="text-xs text-zinc-400 normal-case tracking-normal">{{ __('Enable in chat') }}</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="p-4 space-y-4 {{ $chat_enabled ? '' : 'opacity-50 pointer-events-none' }}">
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-400">{{ __('Chat Mode') }}</label>
+                            <select wire:model="chat_mode" class="mt-1 block w-full rounded-sm border-zinc-700 bg-zinc-800 text-white shadow-sm focus:border-accent focus:ring-accent">
+                                <option value="ai">{{ __('AI (GPT auto-responds)') }}</option>
+                                <option value="manual">{{ __('Manual (admin responds live)') }}</option>
+                            </select>
+                            <p class="mt-1 text-xs text-zinc-600">{{ __('In manual mode, visitor messages wait for an admin to reply as this character.') }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-400">{{ __('Personality') }}</label>
+                            <textarea wire:model="personality" rows="2" placeholder="Sarcastisch, loyaal, straatslim..."
+                                class="mt-1 block w-full rounded-sm border-zinc-700 bg-zinc-800 text-white shadow-sm focus:border-accent focus:ring-accent"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-400">{{ __('Speaking Style') }}</label>
+                            <textarea wire:model="speaking_style" rows="2" placeholder="Gebruikt veel straattaal, korte zinnen..."
+                                class="mt-1 block w-full rounded-sm border-zinc-700 bg-zinc-800 text-white shadow-sm focus:border-accent focus:ring-accent"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-400">{{ __('Backstory') }}</label>
+                            <textarea wire:model="backstory" rows="2" placeholder="Opgegroeid op straat in Antwerpen..."
+                                class="mt-1 block w-full rounded-sm border-zinc-700 bg-zinc-800 text-white shadow-sm focus:border-accent focus:ring-accent"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-400">{{ __('Example Phrases') }}</label>
+                            <textarea wire:model="example_phrases" rows="2" placeholder="Zet elke zin op een nieuwe regel..."
+                                class="mt-1 block w-full rounded-sm border-zinc-700 bg-zinc-800 text-white shadow-sm focus:border-accent focus:ring-accent"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-400">{{ __('Additional Chat Instructions') }}</label>
+                            <textarea wire:model="chat_instructions" rows="2" placeholder="Extra instructies voor GPT-gedrag..."
+                                class="mt-1 block w-full rounded-sm border-zinc-700 bg-zinc-800 text-white shadow-sm focus:border-accent focus:ring-accent"></textarea>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="flex justify-end">
                     <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90" wire:loading.attr="disabled">

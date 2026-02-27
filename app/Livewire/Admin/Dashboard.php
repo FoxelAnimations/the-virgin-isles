@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\AgeGate;
+use App\Models\Character;
 use App\Models\HeroContent;
 use App\Models\HeroVideo;
 use App\Models\SiteSetting;
@@ -27,6 +28,8 @@ class Dashboard extends Component
     public string $ageGateConfirmText = '';
     public string $ageGateDenyText = '';
     public string $ageGateDenyUrl = '';
+    public bool $chatEnabled = false;
+    public $defaultChatCharacterId = null;
 
     public function mount(): void
     {
@@ -34,6 +37,7 @@ class Dashboard extends Component
         $this->loadHeroContent();
         $this->loadAgeGate();
         $this->loadSiteSettings();
+        $this->loadChatSettings();
     }
 
     protected function loadHeroContent(): void
@@ -209,10 +213,31 @@ class Dashboard extends Component
         $this->redirect(route('admin.dashboard'));
     }
 
+    protected function loadChatSettings(): void
+    {
+        $settings = SiteSetting::first();
+        if ($settings) {
+            $this->chatEnabled = $settings->chat_enabled ?? false;
+            $this->defaultChatCharacterId = $settings->default_chat_character_id;
+        }
+    }
+
+    public function saveChatSettings(): void
+    {
+        SiteSetting::first()?->update([
+            'chat_enabled' => $this->chatEnabled,
+            'default_chat_character_id' => $this->defaultChatCharacterId ?: null,
+        ]);
+
+        session()->flash('status', 'Chat settings updated successfully.');
+        $this->redirect(route('admin.dashboard'));
+    }
+
     public function render()
     {
         return view('livewire.admin.dashboard', [
             'heroVideo' => HeroVideo::latest()->first(),
+            'chatEnabledCharacters' => Character::where('chat_enabled', true)->orderBy('first_name')->get(),
         ])->layout('layouts.admin');
     }
 }

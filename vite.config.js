@@ -13,9 +13,7 @@ export default defineConfig({
         port: 5173,
         strictPort: true,
         hmr: {
-            host: 'tvi-website.ddev.site',
-            protocol: 'wss',
-            clientPort: 5173,
+            host: 'localhost',
         },
     },
 });

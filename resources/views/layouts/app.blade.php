@@ -51,6 +51,7 @@
         @stack('modals')
 
         <x-age-gate />
+        <x-character-chat />
 
         @livewireScripts
     </body>
