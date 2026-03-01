@@ -11,9 +11,10 @@
 
             <!-- Center Navigation Links -->
             <div class="hidden sm:flex sm:items-center sm:space-x-10">
-                <a href="{{ route('home') }}" class="text-white text-lg tracking-widest transition hover:text-[#E7FF57]">THUS</a>
-                <a href="{{ route('episodes.index') }}" class="text-white text-lg tracking-widest transition hover:text-[#E7FF57]">AFLEVERINGEN</a>
-                <a href="{{ route('home') }}#characters" class="text-white text-lg tracking-widest transition hover:text-[#E7FF57]">PERSONAGES</a>
+                <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest transition hover:text-[#E7FF57]">THUS</a>
+                <a href="{{ route('episodes.index') }}" class="{{ request()->routeIs('episodes.index') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest transition hover:text-[#E7FF57]">AFLEVERINGEN</a>
+                <a href="{{ route('characters.index') }}" class="{{ request()->routeIs('characters.index') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest transition hover:text-[#E7FF57]">PERSONAGES</a>
+                <a href="{{ route('blog') }}" class="{{ request()->routeIs('blog') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest transition hover:text-[#E7FF57]">BLOG</a>
                 @auth
                     @can('access-admin')
                         <a href="{{ route('admin.dashboard') }}" class="text-[#E7FF57] text-lg tracking-widest transition hover:brightness-90">ADMIN</a>
@@ -53,9 +54,10 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-black">
         <div class="pt-2 pb-3 space-y-1">
-            <a href="{{ route('home') }}" class="block px-4 py-2 text-white text-lg tracking-widest hover:text-[#E7FF57] transition">THUS</a>
-            <a href="{{ route('episodes.index') }}" class="block px-4 py-2 text-white text-lg tracking-widest hover:text-[#E7FF57] transition">AFLEVERINGEN</a>
-            <a href="{{ route('home') }}#characters" class="block px-4 py-2 text-white text-lg tracking-widest hover:text-[#E7FF57] transition">PERSONAGES</a>
+            <a href="{{ route('home') }}" class="block px-4 py-2 {{ request()->routeIs('home') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest hover:text-[#E7FF57] transition">THUS</a>
+            <a href="{{ route('episodes.index') }}" class="block px-4 py-2 {{ request()->routeIs('episodes.index') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest hover:text-[#E7FF57] transition">AFLEVERINGEN</a>
+            <a href="{{ route('characters.index') }}" class="block px-4 py-2 {{ request()->routeIs('characters.index') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest hover:text-[#E7FF57] transition">PERSONAGES</a>
+            <a href="{{ route('blog') }}" class="block px-4 py-2 {{ request()->routeIs('blog') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest hover:text-[#E7FF57] transition">BLOG</a>
             @auth
                 @can('access-admin')
                     <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-[#E7FF57] text-lg tracking-widest hover:brightness-90 transition">ADMIN</a>

@@ -9,6 +9,7 @@
         sending: false,
         blocked: false,
         blockedInput: '',
+        blockedCooldown: false,
         notificationSoundUrl: null,
         blockedSoundUrl: null,
         defaultCharacterId: null,
@@ -372,6 +373,29 @@
             } catch (e) {}
         },
 
+        async sendBlockedAttempt() {
+            this.playBlockedSound();
+            this.blockedInput = '';
+            if (this.blockedCooldown || !this.activeCharacterId || !this.visitorUuid) return;
+            this.blockedCooldown = true;
+            setTimeout(() => { this.blockedCooldown = false; }, 10000);
+            try {
+                await fetch('/api/chat/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '',
+                    },
+                    body: JSON.stringify({
+                        character_id: this.activeCharacterId,
+                        message: '...',
+                        visitor_uuid: this.visitorUuid,
+                    }),
+                });
+            } catch (e) {}
+        },
+
         toggle() {
             this.open = !this.open;
             if (this.open) {
@@ -413,7 +437,7 @@
 
                     <div class="flex-1 min-w-0">
                         <select
-                            x-model="activeCharacterId"
+                            x-model.number="activeCharacterId"
                             @change="switchCharacter($event.target.value)"
                             class="w-full bg-zinc-700 border-0 text-white text-sm rounded-sm py-1 px-2 focus:ring-accent"
                         >
@@ -470,14 +494,14 @@
                     </template>
                     <div class="p-3">
                         <template x-if="blocked">
-                            <form @submit.prevent="if (blockedInput.trim()) { playBlockedSound(); blockedInput = ''; }" class="flex items-center gap-2">
+                            <form @submit.prevent="if (blockedInput.trim()) { sendBlockedAttempt(); }" class="flex items-center gap-2">
                                 <input
                                     x-model="blockedInput"
                                     type="text"
                                     maxlength="1000"
                                     placeholder="Typ een bericht..."
                                     class="flex-1 bg-zinc-800 border border-zinc-700 text-white text-sm rounded-sm px-3 py-2 focus:border-accent focus:ring-accent placeholder-zinc-500"
-                                    @keydown.enter.prevent="if (blockedInput.trim()) { playBlockedSound(); blockedInput = ''; }"
+                                    @keydown.enter.prevent="if (blockedInput.trim()) { sendBlockedAttempt(); }"
                                 >
                                 <button
                                     type="submit"

@@ -124,9 +124,12 @@
         </div>
 
         {{-- Site Settings CMS --}}
-        <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden mt-6">
-            <div class="bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider">{{ __('Site Settings') }}</div>
-            <div class="p-4">
+        <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden mt-6" x-data="{ open: false }">
+            <button type="button" @click="open = !open" class="w-full bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between hover:bg-zinc-700/50 transition">
+                <span>{{ __('Login Settings') }}</span>
+                <svg class="w-4 h-4 text-zinc-400 transition-transform" :class="open && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="p-4" x-show="open" x-transition>
                 <form wire:submit="saveSiteSettings" class="space-y-4">
                     <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" wire:model.live="loginEnabled" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
@@ -148,17 +151,19 @@
         </div>
 
         {{-- Age Gate CMS --}}
-        <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden mt-6">
-            <div class="bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider">{{ __('Age Gate (18+)') }}</div>
-            <div class="p-4">
+        <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden mt-6" x-data="{ open: false }">
+            <button type="button" @click="open = !open" class="w-full bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between hover:bg-zinc-700/50 transition">
+                <span>{{ __('Age Gate (18+)') }}</span>
+                <svg class="w-4 h-4 text-zinc-400 transition-transform" :class="open && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="p-4" x-show="open" x-transition>
                 <form wire:submit="saveAgeGate" class="space-y-4">
                     <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" wire:model.live="ageGateEnabled" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
-                        <span class="text-sm font-medium text-white">{{ __('Enable age verification') }}</span>
+                        <span class="text-sm font-medium text-white">{{ __('Enable age verification on the home & site') }}</span>
                     </label>
                     <p class="text-sm text-zinc-500">{{ __('When enabled, visitors must confirm they are 18+ before accessing the site.') }}</p>
 
-                    <div class="{{ $ageGateEnabled ? '' : 'opacity-50 pointer-events-none' }}">
                     <div>
                         <label class="block text-xs font-medium text-zinc-500 mb-1">{{ __('Message') }}</label>
                         <textarea wire:model="ageGateMessage" rows="3" class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm" placeholder="Ben je 18 of ouder?"></textarea>
@@ -183,7 +188,6 @@
                         <input type="url" wire:model="ageGateDenyUrl" class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm" placeholder="https://www.google.com">
                         @error('ageGateDenyUrl') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>
-                    </div>
 
                     <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
                         {{ __('Save Age Gate') }}
@@ -191,10 +195,14 @@
                 </form>
             </div>
         </div>
+
         {{-- Chat Settings CMS --}}
-        <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden mt-6">
-            <div class="bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider">{{ __('Chat Settings') }}</div>
-            <div class="p-4">
+        <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden mt-6" x-data="{ open: false }">
+            <button type="button" @click="open = !open" class="w-full bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between hover:bg-zinc-700/50 transition">
+                <span>{{ __('Chat Settings') }}</span>
+                <svg class="w-4 h-4 text-zinc-400 transition-transform" :class="open && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="p-4" x-show="open" x-transition>
                 <form wire:submit="saveChatSettings" class="space-y-4">
                     <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" wire:model.live="chatEnabled" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
@@ -202,7 +210,7 @@
                     </label>
                     <p class="text-sm text-zinc-500">{{ __('When enabled, a chat bubble appears on the public site allowing visitors to chat with characters via GPT.') }}</p>
 
-                    <div class="{{ $chatEnabled ? '' : 'opacity-50 pointer-events-none' }}">
+                    <div>
                         <label class="block text-xs font-medium text-zinc-500 mb-1">{{ __('Default Character') }}</label>
                         <select wire:model="defaultChatCharacterId" class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm">
                             <option value="">{{ __('— No default —') }}</option>

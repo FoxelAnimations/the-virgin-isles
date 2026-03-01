@@ -27,8 +27,13 @@ class Character extends Model
         'chat_mode',
         'chat_online',
         'profile_image_path',
+        'profile_image_hover_path',
         'full_body_image_path',
+        'full_body_image_hover_path',
         'profile_photo_path',
+        'profile_photo_hover_path',
+        'chat_image_path',
+        'background_image_path',
         'sort_order',
     ];
 

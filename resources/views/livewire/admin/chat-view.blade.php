@@ -128,6 +128,15 @@
                 @endif
 
                 @forelse ($messages as $msg)
+                    @if ($loop->first || !$msg->created_at->isSameDay($messages[$loop->index - 1]->created_at))
+                        <div class="flex justify-center py-2">
+                            <div class="flex items-center gap-3 w-[80%]">
+                                <div class="flex-1 h-px bg-accent/40"></div>
+                                <span class="text-[11px] uppercase tracking-wider text-accent/70 font-semibold whitespace-nowrap">{{ $msg->created_at->translatedFormat('j F Y') }}</span>
+                                <div class="flex-1 h-px bg-accent/40"></div>
+                            </div>
+                        </div>
+                    @endif
                     <div class="flex {{ $msg->sender === 'visitor' ? 'justify-start' : 'justify-end' }}">
                         <div class="{{ $msg->sender === 'visitor'
                             ? 'bg-zinc-800 text-white rounded-sm rounded-bl-none border border-zinc-700'

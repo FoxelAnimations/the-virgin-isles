@@ -31,15 +31,15 @@ class ChatController extends Controller
 
         $characters = Character::where('chat_enabled', true)
             ->orderBy('sort_order')
-            ->get(['id', 'first_name', 'last_name', 'nick_name', 'profile_image_path', 'profile_photo_path', 'chat_mode', 'chat_online']);
+            ->get(['id', 'first_name', 'last_name', 'nick_name', 'chat_image_path', 'profile_image_path', 'profile_photo_path', 'chat_mode', 'chat_online']);
 
         return response()->json([
             'characters' => $characters->map(fn ($c) => [
                 'id' => $c->id,
                 'name' => $c->full_name,
                 'first_name' => $c->first_name,
-                'profile_image_url' => ($c->profile_photo_path ?? $c->profile_image_path)
-                    ? asset('storage/' . ($c->profile_photo_path ?? $c->profile_image_path))
+                'profile_image_url' => ($c->chat_image_path ?? $c->profile_photo_path ?? $c->profile_image_path)
+                    ? asset('storage/' . ($c->chat_image_path ?? $c->profile_photo_path ?? $c->profile_image_path))
                     : null,
                 'chat_mode' => $c->chat_mode,
                 'chat_online' => (bool) $c->chat_online,
@@ -71,11 +71,15 @@ class ChatController extends Controller
         // Check if visitor is blocked
         $visitorIp = $request->ip();
         if (ChatBlock::isBlocked($visitorIp, $validated['visitor_uuid'])) {
-            // Record the blocked attempt so admin sees a ping
-            ChatConversation::where('visitor_uuid', $validated['visitor_uuid'])
-                ->where('character_id', $validated['character_id'])
-                ->where('status', 'open')
-                ->update(['blocked_attempt_at' => now()]);
+            // Rate-limit blocked attempt pings (once per 10s per visitor)
+            $blockedPingKey = 'chat_blocked_ping:' . $validated['visitor_uuid'];
+            if (!Cache::has($blockedPingKey)) {
+                Cache::put($blockedPingKey, true, 10);
+                ChatConversation::where('visitor_uuid', $validated['visitor_uuid'])
+                    ->where('character_id', $validated['character_id'])
+                    ->where('status', 'open')
+                    ->update(['blocked_attempt_at' => now()]);
+            }
 
             return response()->json(['error' => 'Je bent geblokkeerd voor de chat.'], 403);
         }

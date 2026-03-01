@@ -36,6 +36,7 @@
                         <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest transition hover:text-accent">DASHBOARD</a>
                         <a href="{{ route('admin.characters') }}" class="{{ request()->routeIs('admin.characters') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest transition hover:text-accent">CHARACTERS</a>
                         <a href="{{ route('admin.episodes') }}" class="{{ request()->routeIs('admin.episodes') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest transition hover:text-accent">EPISODES</a>
+                        <a href="{{ route('admin.content-blocks') }}" class="{{ request()->routeIs('admin.content-blocks') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest transition hover:text-accent">CONTENT</a>
                         <a href="{{ route('admin.chats') }}" class="{{ request()->routeIs('admin.chats*') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest transition hover:text-accent relative">
                             CHATS
                             @if (($unreadChatCount ?? 0) > 0)
@@ -72,6 +73,7 @@
                     <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 {{ request()->routeIs('admin.dashboard') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest hover:text-accent transition">DASHBOARD</a>
                     <a href="{{ route('admin.characters') }}" class="block px-4 py-2 {{ request()->routeIs('admin.characters') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest hover:text-accent transition">CHARACTERS</a>
                     <a href="{{ route('admin.episodes') }}" class="block px-4 py-2 {{ request()->routeIs('admin.episodes') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest hover:text-accent transition">EPISODES</a>
+                    <a href="{{ route('admin.content-blocks') }}" class="block px-4 py-2 {{ request()->routeIs('admin.content-blocks') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest hover:text-accent transition">CONTENT</a>
                     <a href="{{ route('admin.chats') }}" class="block px-4 py-2 {{ request()->routeIs('admin.chats*') ? 'text-accent' : 'text-zinc-400' }} text-lg tracking-widest hover:text-accent transition">
                         CHATS
                         @if (($unreadChatCount ?? 0) > 0)

@@ -82,90 +82,201 @@
                         <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
+            </div>
 
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {{-- Images Toggle --}}
+            <div x-data="{ open: false }" class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
+                <button @click="open = !open" type="button"
+                    class="w-full bg-zinc-800 px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between text-accent hover:bg-zinc-750 transition">
+                    <span>{{ __('Images') }}</span>
+                    <svg :class="open && 'rotate-180'" class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+                </button>
+                <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="p-4 space-y-5">
+
+                    {{-- Face Image --}}
                     <div>
-                        <label class="block text-sm font-medium text-zinc-400">{{ __('Face Image') }}</label>
-                        <input type="file" wire:model="profile_image"
-                            class="mt-1 block w-full text-sm text-zinc-400 file:mr-4 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-zinc-700" />
-                        @error('profile_image')
-                            <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
-                        @enderror
-
-                        @if ($profile_image)
-                            <div class="mt-4 rounded-sm border border-zinc-700 p-2">
-                                <img src="{{ $profile_image->temporaryUrl() }}" alt="{{ __('Face preview') }}"
-                                    class="h-40 w-full object-cover">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-accent mb-2">{{ __('Face Image') }}</p>
+                        <div class="h-px bg-accent/40 mb-3"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] uppercase tracking-wider text-zinc-500 mb-1">{{ __('Default') }}</label>
+                                <input type="file" wire:model="profile_image" class="block w-full text-xs text-zinc-400 file:mr-2 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-1.5 file:px-3 file:text-xs file:font-medium file:text-white hover:file:bg-zinc-700" />
+                                @error('profile_image') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @if ($profile_image)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ $profile_image->temporaryUrl() }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="$set('profile_image', null)" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @elseif($character->profile_image_path)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ Storage::url($character->profile_image_path) }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="removeImage('profile_image_path')" wire:confirm="{{ __('Remove this image?') }}" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @endif
                             </div>
-                        @elseif($character->profile_image_path)
-                            <div class="mt-4 rounded-sm border border-zinc-700 p-2">
-                                <img src="{{ Storage::url($character->profile_image_path) }}"
-                                    alt="{{ __('Current face image') }}" class="h-40 w-full object-cover">
+                            <div>
+                                <label class="block text-[11px] uppercase tracking-wider text-zinc-500 mb-1">{{ __('Hover') }}</label>
+                                <input type="file" wire:model="profile_image_hover" class="block w-full text-xs text-zinc-400 file:mr-2 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-1.5 file:px-3 file:text-xs file:font-medium file:text-white hover:file:bg-zinc-700" />
+                                @error('profile_image_hover') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @if ($profile_image_hover)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ $profile_image_hover->temporaryUrl() }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="$set('profile_image_hover', null)" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @elseif($character->profile_image_hover_path)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ Storage::url($character->profile_image_hover_path) }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="removeImage('profile_image_hover_path')" wire:confirm="{{ __('Remove this image?') }}" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @endif
                             </div>
-                        @endif
+                        </div>
                     </div>
 
+                    {{-- Body Image --}}
                     <div>
-                        <label class="block text-sm font-medium text-zinc-400">{{ __('Body Image') }}</label>
-                        <input type="file" wire:model="full_body_image"
-                            class="mt-1 block w-full text-sm text-zinc-400 file:mr-4 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-zinc-700" />
-                        @error('full_body_image')
-                            <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
-                        @enderror
-
-                        @if ($full_body_image)
-                            <div class="mt-4 rounded-sm border border-zinc-700 p-2">
-                                <img src="{{ $full_body_image->temporaryUrl() }}" alt="{{ __('Body preview') }}"
-                                    class="h-40 w-full object-cover">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-accent mb-2">{{ __('Body Image') }}</p>
+                        <div class="h-px bg-accent/40 mb-3"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] uppercase tracking-wider text-zinc-500 mb-1">{{ __('Default') }}</label>
+                                <input type="file" wire:model="full_body_image" class="block w-full text-xs text-zinc-400 file:mr-2 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-1.5 file:px-3 file:text-xs file:font-medium file:text-white hover:file:bg-zinc-700" />
+                                @error('full_body_image') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @if ($full_body_image)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ $full_body_image->temporaryUrl() }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="$set('full_body_image', null)" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @elseif($character->full_body_image_path)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ Storage::url($character->full_body_image_path) }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="removeImage('full_body_image_path')" wire:confirm="{{ __('Remove this image?') }}" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @endif
                             </div>
-                        @elseif($character->full_body_image_path)
-                            <div class="mt-4 rounded-sm border border-zinc-700 p-2">
-                                <img src="{{ Storage::url($character->full_body_image_path) }}"
-                                    alt="{{ __('Current body image') }}" class="h-40 w-full object-cover">
+                            <div>
+                                <label class="block text-[11px] uppercase tracking-wider text-zinc-500 mb-1">{{ __('Hover') }}</label>
+                                <input type="file" wire:model="full_body_image_hover" class="block w-full text-xs text-zinc-400 file:mr-2 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-1.5 file:px-3 file:text-xs file:font-medium file:text-white hover:file:bg-zinc-700" />
+                                @error('full_body_image_hover') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @if ($full_body_image_hover)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ $full_body_image_hover->temporaryUrl() }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="$set('full_body_image_hover', null)" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @elseif($character->full_body_image_hover_path)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ Storage::url($character->full_body_image_hover_path) }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="removeImage('full_body_image_hover_path')" wire:confirm="{{ __('Remove this image?') }}" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @endif
                             </div>
-                        @endif
+                        </div>
                     </div>
 
+                    {{-- Profile Photo --}}
                     <div>
-                        <label class="block text-sm font-medium text-zinc-400">{{ __('Profile Photo') }}</label>
-                        <input type="file" wire:model="profile_photo"
-                            class="mt-1 block w-full text-sm text-zinc-400 file:mr-4 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-white hover:file:bg-zinc-700" />
-                        <p class="mt-1 text-xs text-zinc-600">{{ __('Used in chat & slider.') }}</p>
-                        @error('profile_photo')
-                            <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
-                        @enderror
-
-                        @if ($profile_photo)
-                            <div class="mt-4 rounded-sm border border-zinc-700 p-2">
-                                <img src="{{ $profile_photo->temporaryUrl() }}" alt="{{ __('Profile photo preview') }}"
-                                    class="h-40 w-full object-cover">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-accent mb-2">{{ __('Profile Photo') }}</p>
+                        <p class="text-[10px] text-zinc-600 -mt-1 mb-2">{{ __('Used in slider.') }}</p>
+                        <div class="h-px bg-accent/40 mb-3"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] uppercase tracking-wider text-zinc-500 mb-1">{{ __('Default') }}</label>
+                                <input type="file" wire:model="profile_photo" class="block w-full text-xs text-zinc-400 file:mr-2 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-1.5 file:px-3 file:text-xs file:font-medium file:text-white hover:file:bg-zinc-700" />
+                                @error('profile_photo') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @if ($profile_photo)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ $profile_photo->temporaryUrl() }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="$set('profile_photo', null)" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @elseif($character->profile_photo_path)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ Storage::url($character->profile_photo_path) }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="removeImage('profile_photo_path')" wire:confirm="{{ __('Remove this image?') }}" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @endif
                             </div>
-                        @elseif($character->profile_photo_path)
-                            <div class="mt-4 rounded-sm border border-zinc-700 p-2">
-                                <img src="{{ Storage::url($character->profile_photo_path) }}"
-                                    alt="{{ __('Current profile photo') }}" class="h-40 w-full object-cover">
+                            <div>
+                                <label class="block text-[11px] uppercase tracking-wider text-zinc-500 mb-1">{{ __('Hover') }}</label>
+                                <input type="file" wire:model="profile_photo_hover" class="block w-full text-xs text-zinc-400 file:mr-2 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-1.5 file:px-3 file:text-xs file:font-medium file:text-white hover:file:bg-zinc-700" />
+                                @error('profile_photo_hover') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @if ($profile_photo_hover)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ $profile_photo_hover->temporaryUrl() }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="$set('profile_photo_hover', null)" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @elseif($character->profile_photo_hover_path)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ Storage::url($character->profile_photo_hover_path) }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="removeImage('profile_photo_hover_path')" wire:confirm="{{ __('Remove this image?') }}" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @endif
                             </div>
-                        @endif
+                        </div>
                     </div>
+
+                    {{-- Chat Image & Background --}}
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-accent mb-2">{{ __('Other Images') }}</p>
+                        <div class="h-px bg-accent/40 mb-3"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] uppercase tracking-wider text-zinc-500 mb-1">{{ __('Chat Image') }}</label>
+                                <input type="file" wire:model="chat_image" class="block w-full text-xs text-zinc-400 file:mr-2 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-1.5 file:px-3 file:text-xs file:font-medium file:text-white hover:file:bg-zinc-700" />
+                                <p class="mt-1 text-[10px] text-zinc-600">{{ __('Falls back to profile/face.') }}</p>
+                                @error('chat_image') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @if ($chat_image)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ $chat_image->temporaryUrl() }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="$set('chat_image', null)" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @elseif($character->chat_image_path)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ Storage::url($character->chat_image_path) }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="removeImage('chat_image_path')" wire:confirm="{{ __('Remove this image?') }}" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @endif
+                            </div>
+                            <div>
+                                <label class="block text-[11px] uppercase tracking-wider text-zinc-500 mb-1">{{ __('Background') }}</label>
+                                <input type="file" wire:model="background_image" class="block w-full text-xs text-zinc-400 file:mr-2 file:rounded-sm file:border-0 file:bg-zinc-800 file:py-1.5 file:px-3 file:text-xs file:font-medium file:text-white hover:file:bg-zinc-700" />
+                                <p class="mt-1 text-[10px] text-zinc-600">{{ __('Behind all images. Max 4MB.') }}</p>
+                                @error('background_image') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                                @if ($background_image)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ $background_image->temporaryUrl() }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="$set('background_image', null)" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @elseif($character->background_image_path)
+                                    <div class="mt-2 relative rounded-sm border border-zinc-700 p-1">
+                                        <img src="{{ Storage::url($character->background_image_path) }}" class="h-28 w-full object-cover rounded-sm">
+                                        <button type="button" wire:click="removeImage('background_image_path')" wire:confirm="{{ __('Remove this image?') }}" class="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500">&times;</button>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            {{-- Chat Personality Section --}}
-            <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
-                <div class="bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between">
-                    <span>{{ __('Chat Personality (GPT)') }}</span>
-                    <div class="flex items-center gap-4">
-                        <label class="flex items-center gap-2 cursor-pointer">
+            {{-- Chat Personality Toggle --}}
+            <div x-data="{ open: false }" class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
+                <button @click="open = !open" type="button"
+                    class="w-full bg-zinc-800 px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between text-accent hover:bg-zinc-750 transition">
+                    <span>{{ __('Chat Personality') }}</span>
+                    <div class="flex items-center gap-3">
+                        <label class="flex items-center gap-2 cursor-pointer" @click.stop>
                             <input type="checkbox" wire:model.live="chat_online" class="rounded-sm border-zinc-600 bg-zinc-800 text-green-500 focus:ring-green-500">
                             <span class="text-xs normal-case tracking-normal {{ $chat_online ? 'text-green-400' : 'text-zinc-500' }}">{{ $chat_online ? __('Online') : __('Offline') }}</span>
                         </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
+                        <label class="flex items-center gap-2 cursor-pointer" @click.stop>
                             <input type="checkbox" wire:model.live="chat_enabled" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
-                            <span class="text-xs text-zinc-400 normal-case tracking-normal">{{ __('Enable in chat') }}</span>
+                            <span class="text-xs text-zinc-400 normal-case tracking-normal">{{ __('Enable') }}</span>
                         </label>
+                        <svg :class="open && 'rotate-180'" class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
                     </div>
-                </div>
-                <div class="p-4 space-y-4 {{ $chat_enabled ? '' : 'opacity-50 pointer-events-none' }}">
+                </button>
+                <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="p-4 space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-zinc-400">{{ __('Chat Mode') }}</label>
                         <select wire:model="chat_mode" class="mt-1 block w-full rounded-sm border-zinc-700 bg-zinc-800 text-white shadow-sm focus:border-accent focus:ring-accent">
@@ -207,13 +318,19 @@
                 </div>
             </div>
 
-            {{-- Character Social Links Section --}}
-            <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
-                <div class="bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between">
+            {{-- Social Media Links Toggle --}}
+            <div x-data="{ open: false }" class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
+                <div @click="open = !open"
+                    class="w-full bg-zinc-800 px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between text-accent hover:bg-zinc-750 transition cursor-pointer">
                     <span>{{ __('Social Media Links') }}</span>
-                    <button wire:click="addCharacterSocialLink" type="button" class="text-xs text-zinc-400 border border-zinc-700 px-2 py-1 hover:text-accent hover:border-accent transition">+ {{ __('Add') }}</button>
+                    <div class="flex items-center gap-3">
+                        <button wire:click="addCharacterSocialLink" type="button" @click.stop class="inline-flex items-center gap-1 text-xs text-zinc-400 border border-zinc-700 px-2 py-1 hover:text-accent hover:border-accent transition">
+                            + {{ __('Add') }}
+                        </button>
+                        <svg :class="open && 'rotate-180'" class="w-4 h-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+                    </div>
                 </div>
-                <div class="p-4 space-y-3">
+                <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="p-4 space-y-3">
                     @forelse($character_social_links as $index => $link)
                         <div class="flex items-center gap-3" wire:key="csocial-{{ $link['id'] }}">
                             <div class="w-40">

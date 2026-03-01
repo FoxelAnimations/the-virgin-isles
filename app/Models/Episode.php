@@ -19,7 +19,15 @@ class Episode extends Model
         'tiktok_url',
         'twitter_url',
         'sort_order',
+        'age_restricted',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'age_restricted' => 'boolean',
+        ];
+    }
 
     public function characters()
     {

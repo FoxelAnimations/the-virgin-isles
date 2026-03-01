@@ -27,8 +27,13 @@ class CreateCharacter extends Component
     public string $chat_mode = 'ai';
     public bool $chat_online = true;
     public $profile_image;
+    public $profile_image_hover;
     public $full_body_image;
+    public $full_body_image_hover;
     public $profile_photo;
+    public $profile_photo_hover;
+    public $chat_image;
+    public $background_image;
     public $images = [];
 
     protected function rules(): array
@@ -49,8 +54,13 @@ class CreateCharacter extends Component
             'chat_mode' => ['required', 'string', 'in:ai,manual'],
             'chat_online' => ['boolean'],
             'profile_image' => ['nullable', 'image', 'max:2048'],
+            'profile_image_hover' => ['nullable', 'image', 'max:2048'],
             'full_body_image' => ['nullable', 'image', 'max:2048'],
+            'full_body_image_hover' => ['nullable', 'image', 'max:2048'],
             'profile_photo' => ['nullable', 'image', 'max:2048'],
+            'profile_photo_hover' => ['nullable', 'image', 'max:2048'],
+            'chat_image' => ['nullable', 'image', 'max:2048'],
+            'background_image' => ['nullable', 'image', 'max:4096'],
             'images.*' => ['nullable', 'image', 'max:2048'],
         ];
     }
@@ -64,12 +74,32 @@ class CreateCharacter extends Component
                 ? $this->profile_image->store('characters/profile', 'public')
                 : null;
 
+            $profileImageHoverPath = $this->profile_image_hover
+                ? $this->profile_image_hover->store('characters/profile', 'public')
+                : null;
+
             $fullBodyImagePath = $this->full_body_image
                 ? $this->full_body_image->store('characters/full-body', 'public')
                 : null;
 
+            $fullBodyImageHoverPath = $this->full_body_image_hover
+                ? $this->full_body_image_hover->store('characters/full-body', 'public')
+                : null;
+
             $profilePhotoPath = $this->profile_photo
                 ? $this->profile_photo->store('characters/profile-photo', 'public')
+                : null;
+
+            $profilePhotoHoverPath = $this->profile_photo_hover
+                ? $this->profile_photo_hover->store('characters/profile-photo', 'public')
+                : null;
+
+            $chatImagePath = $this->chat_image
+                ? $this->chat_image->store('characters/chat', 'public')
+                : null;
+
+            $backgroundImagePath = $this->background_image
+                ? $this->background_image->store('characters/background', 'public')
                 : null;
 
             $character = Character::create([
@@ -88,8 +118,13 @@ class CreateCharacter extends Component
                 'chat_mode' => $validated['chat_mode'],
                 'chat_online' => $validated['chat_online'],
                 'profile_image_path' => $profileImagePath,
+                'profile_image_hover_path' => $profileImageHoverPath,
                 'full_body_image_path' => $fullBodyImagePath,
+                'full_body_image_hover_path' => $fullBodyImageHoverPath,
                 'profile_photo_path' => $profilePhotoPath,
+                'profile_photo_hover_path' => $profilePhotoHoverPath,
+                'chat_image_path' => $chatImagePath,
+                'background_image_path' => $backgroundImagePath,
             ]);
 
             foreach ($this->images as $index => $image) {
@@ -114,8 +149,13 @@ class CreateCharacter extends Component
             'job_id',
             'bio',
             'profile_image',
+            'profile_image_hover',
             'full_body_image',
+            'full_body_image_hover',
             'profile_photo',
+            'profile_photo_hover',
+            'chat_image',
+            'background_image',
             'images',
         ]);
 

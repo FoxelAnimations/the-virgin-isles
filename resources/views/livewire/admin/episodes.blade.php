@@ -64,7 +64,12 @@
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="font-semibold text-white">{{ $episode->title }}</div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-semibold text-white">{{ $episode->title }}</span>
+                                            @if ($episode->age_restricted)
+                                                <span class="inline-flex px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-red-900/30 text-red-400 rounded-sm">18+</span>
+                                            @endif
+                                        </div>
                                         @if ($episode->description)
                                             <div class="text-xs text-zinc-500 max-w-xs truncate">{{ \Illuminate\Support\Str::limit($episode->description, 60) }}</div>
                                         @endif
@@ -181,6 +186,15 @@
                             <input type="file" wire:model="thumbnail" accept="image/*"
                                 class="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:text-sm file:font-semibold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700">
                             @error('thumbnail') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- Age Restricted Toggle --}}
+                        <div class="mb-4">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" wire:model="age_restricted" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
+                                <span class="text-sm font-medium text-white">{{ __('18+ Age Gate') }}</span>
+                            </label>
+                            <p class="text-xs text-zinc-500 mt-1">{{ __('When enabled, viewers must confirm their age before watching this episode.') }}</p>
                         </div>
 
                         {{-- Characters Multi-Select --}}

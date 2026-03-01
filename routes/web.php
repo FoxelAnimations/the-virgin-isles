@@ -3,6 +3,7 @@
 use App\Livewire\Characters\Index as CharacterIndex;
 use App\Livewire\Episodes\Show as EpisodeShow;
 use App\Livewire\UserDashboard;
+use App\Livewire\Blog;
 use App\Livewire\Home;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\Characters as AdminCharacters;
@@ -15,11 +16,13 @@ use App\Livewire\Admin\Users as AdminUsers;
 use App\Livewire\Admin\BlockedVisitors;
 use App\Livewire\Admin\ChatList;
 use App\Livewire\Admin\ChatView;
+use App\Livewire\Admin\ContentBlocks;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
-Route::get('/characters', CharacterIndex::class)->name('characters.index');
+Route::get('/personages', CharacterIndex::class)->name('characters.index');
 Route::get('/episodes', EpisodeShow::class)->name('episodes.index');
+Route::get('/blog', Blog::class)->name('blog');
 
 Route::get('/admin/login', AdminLogin::class)->middleware('guest')->name('admin.login');
 
@@ -41,5 +44,6 @@ Route::middleware([
         Route::get('/admin/chats', ChatList::class)->name('admin.chats');
         Route::get('/admin/chats/blocked', BlockedVisitors::class)->name('admin.chats.blocked');
         Route::get('/admin/chats/{conversation}', ChatView::class)->name('admin.chats.view');
+        Route::get('/admin/content-blocks', ContentBlocks::class)->name('admin.content-blocks');
     });
 });

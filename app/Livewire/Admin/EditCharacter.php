@@ -6,6 +6,7 @@ use App\Models\Character;
 use App\Models\CharacterSocialLink;
 use App\Models\Job;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -31,8 +32,13 @@ class EditCharacter extends Component
     public bool $chat_online = true;
     public array $character_social_links = [];
     public $profile_image;
+    public $profile_image_hover;
     public $full_body_image;
+    public $full_body_image_hover;
     public $profile_photo;
+    public $profile_photo_hover;
+    public $chat_image;
+    public $background_image;
 
     protected function rules(): array
     {
@@ -54,8 +60,13 @@ class EditCharacter extends Component
             'character_social_links.*.title' => ['required', 'string', 'max:255'],
             'character_social_links.*.url' => ['required', 'url', 'max:255'],
             'profile_image' => ['nullable', 'image', 'max:2048'],
+            'profile_image_hover' => ['nullable', 'image', 'max:2048'],
             'full_body_image' => ['nullable', 'image', 'max:2048'],
+            'full_body_image_hover' => ['nullable', 'image', 'max:2048'],
             'profile_photo' => ['nullable', 'image', 'max:2048'],
+            'profile_photo_hover' => ['nullable', 'image', 'max:2048'],
+            'chat_image' => ['nullable', 'image', 'max:2048'],
+            'background_image' => ['nullable', 'image', 'max:4096'],
         ];
     }
 
@@ -83,12 +94,32 @@ class EditCharacter extends Component
                 $this->character->profile_image_path = $this->profile_image->store('characters/profile', 'public');
             }
 
+            if ($this->profile_image_hover) {
+                $this->character->profile_image_hover_path = $this->profile_image_hover->store('characters/profile', 'public');
+            }
+
             if ($this->full_body_image) {
                 $this->character->full_body_image_path = $this->full_body_image->store('characters/full-body', 'public');
             }
 
+            if ($this->full_body_image_hover) {
+                $this->character->full_body_image_hover_path = $this->full_body_image_hover->store('characters/full-body', 'public');
+            }
+
             if ($this->profile_photo) {
                 $this->character->profile_photo_path = $this->profile_photo->store('characters/profile-photo', 'public');
+            }
+
+            if ($this->profile_photo_hover) {
+                $this->character->profile_photo_hover_path = $this->profile_photo_hover->store('characters/profile-photo', 'public');
+            }
+
+            if ($this->chat_image) {
+                $this->character->chat_image_path = $this->chat_image->store('characters/chat', 'public');
+            }
+
+            if ($this->background_image) {
+                $this->character->background_image_path = $this->background_image->store('characters/background', 'public');
             }
 
             $this->character->save();
@@ -151,6 +182,31 @@ class EditCharacter extends Component
             ->where('character_id', $this->character->id)
             ->delete();
         $this->loadCharacterSocialLinks();
+    }
+
+    public function removeImage(string $field): void
+    {
+        $allowedFields = [
+            'profile_image_path',
+            'profile_image_hover_path',
+            'full_body_image_path',
+            'full_body_image_hover_path',
+            'profile_photo_path',
+            'profile_photo_hover_path',
+            'chat_image_path',
+            'background_image_path',
+        ];
+
+        if (!in_array($field, $allowedFields)) {
+            return;
+        }
+
+        $path = $this->character->{$field};
+
+        if ($path) {
+            Storage::disk('public')->delete($path);
+            $this->character->update([$field => null]);
+        }
     }
 
     public function render()

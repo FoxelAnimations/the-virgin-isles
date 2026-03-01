@@ -24,6 +24,7 @@ class Episodes extends Component
     public $tiktok_url = '';
     public $twitter_url = '';
     public $selectedCharacters = [];
+    public bool $age_restricted = false;
 
     public ?int $editingId = null;
     public bool $showModal = false;
@@ -39,6 +40,7 @@ class Episodes extends Component
             'youtube_link' => ['nullable', 'url', 'max:255'],
             'tiktok_url' => ['nullable', 'url', 'max:255'],
             'twitter_url' => ['nullable', 'url', 'max:255'],
+            'age_restricted' => ['boolean'],
             'selectedCharacters' => ['array'],
             'selectedCharacters.*' => ['exists:characters,id'],
         ];
@@ -100,6 +102,7 @@ class Episodes extends Component
                 'youtube_link' => $validated['youtube_link'] ?: null,
                 'tiktok_url' => $validated['tiktok_url'] ?: null,
                 'twitter_url' => $validated['twitter_url'] ?: null,
+                'age_restricted' => $validated['age_restricted'],
             ]);
 
             $episode->characters()->sync($this->selectedCharacters);
@@ -123,6 +126,7 @@ class Episodes extends Component
         $this->youtube_link = $episode->youtube_link ?? '';
         $this->tiktok_url = $episode->tiktok_url ?? '';
         $this->twitter_url = $episode->twitter_url ?? '';
+        $this->age_restricted = $episode->age_restricted ?? false;
         $this->selectedCharacters = $episode->characters->pluck('id')->toArray();
         $this->video = null;
         $this->thumbnail = null;
@@ -144,6 +148,7 @@ class Episodes extends Component
                 'youtube_link' => $validated['youtube_link'] ?: null,
                 'tiktok_url' => $validated['tiktok_url'] ?: null,
                 'twitter_url' => $validated['twitter_url'] ?: null,
+                'age_restricted' => $validated['age_restricted'],
             ];
 
             if ($this->source_type === 'youtube') {
@@ -204,7 +209,7 @@ class Episodes extends Component
         $this->reset([
             'title', 'description', 'source_type', 'video', 'youtube_url',
             'thumbnail', 'instagram_url', 'youtube_link', 'tiktok_url',
-            'twitter_url', 'selectedCharacters', 'editingId', 'showModal',
+            'twitter_url', 'selectedCharacters', 'age_restricted', 'editingId', 'showModal',
         ]);
         $this->source_type = 'upload';
     }

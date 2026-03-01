@@ -2,18 +2,22 @@
     x-data="{
         open: false,
         episode: null,
+        ageConfirmed: false,
         charOpen: false,
         char: null,
         openEpisode(ep) {
             this.episode = ep;
+            this.ageConfirmed = !ep.ageRestricted;
             this.open = true;
             document.body.classList.add('overflow-hidden');
         },
         close() {
             this.open = false;
             this.episode = null;
+            this.ageConfirmed = false;
             document.body.classList.remove('overflow-hidden');
         },
+        confirmAge() { this.ageConfirmed = true; },
         showChar(c) {
             this.char = c;
             this.charOpen = true;
@@ -56,6 +60,7 @@
                             youtube: {{ Js::from($episode->youtube_link) }},
                             tiktok: {{ Js::from($episode->tiktok_url) }},
                             twitter: {{ Js::from($episode->twitter_url) }},
+                            ageRestricted: {{ Js::from((bool) $episode->age_restricted) }},
                         })"
                     >
                         {{-- Thumbnail --}}
@@ -70,9 +75,14 @@
                             <div class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition">
                                 <svg class="w-14 h-14 text-accent" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             </div>
-                            <span class="absolute top-2 right-2 px-2 py-0.5 text-xs font-semibold uppercase tracking-wider {{ $episode->isYoutube() ? 'bg-red-600 text-white' : 'bg-accent text-black' }}">
-                                {{ $episode->source_type }}
-                            </span>
+                            <div class="absolute top-2 right-2 flex gap-1">
+                                @if ($episode->age_restricted)
+                                    <span class="px-2 py-0.5 text-xs font-bold uppercase tracking-wider bg-red-600 text-white">18+</span>
+                                @endif
+                                <span class="px-2 py-0.5 text-xs font-semibold uppercase tracking-wider {{ $episode->isYoutube() ? 'bg-red-600 text-white' : 'bg-accent text-black' }}">
+                                    {{ $episode->source_type }}
+                                </span>
+                            </div>
                         </div>
 
                         {{-- Info --}}
@@ -116,21 +126,39 @@
             </button>
 
             <div class="w-full max-w-5xl max-h-full overflow-y-auto" @click.stop>
-                {{-- Video Player --}}
-                <div class="aspect-video bg-black rounded-sm overflow-hidden mb-4">
-                    <template x-if="episode && episode.isYoutube && episode.embedUrl">
-                        <iframe
-                            :src="episode.embedUrl"
-                            class="w-full h-full"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen
-                        ></iframe>
-                    </template>
-                    <template x-if="episode && !episode.isYoutube && episode.videoUrl">
-                        <video controls autoplay class="w-full h-full" :src="episode.videoUrl"></video>
-                    </template>
-                </div>
+                {{-- Age Gate Overlay --}}
+                <template x-if="episode?.ageRestricted && !ageConfirmed">
+                    <div class="aspect-video bg-zinc-900 rounded-sm overflow-hidden mb-4 flex flex-col items-center justify-center text-center p-8">
+                        <div class="text-5xl font-bold text-red-500 mb-4">18+</div>
+                        <p class="text-white text-lg mb-6 max-w-md">{{ $ageGate?->message ?? 'Ben je 18 jaar of ouder?' }}</p>
+                        <div class="flex gap-4">
+                            <button @click="confirmAge()" class="bg-accent text-black px-6 py-3 text-sm font-bold uppercase tracking-wider hover:brightness-90 transition">
+                                {{ $ageGate?->confirm_text ?? 'Ja, ik ben 18+' }}
+                            </button>
+                            <button @click="close()" class="bg-zinc-800 text-white px-6 py-3 text-sm font-bold uppercase tracking-wider hover:bg-zinc-700 transition">
+                                {{ $ageGate?->deny_text ?? 'Nee' }}
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                {{-- Video Player (shown after age confirmation or if not restricted) --}}
+                <template x-if="!episode?.ageRestricted || ageConfirmed">
+                    <div class="aspect-video bg-black rounded-sm overflow-hidden mb-4">
+                        <template x-if="episode && episode.isYoutube && episode.embedUrl">
+                            <iframe
+                                :src="episode.embedUrl"
+                                class="w-full h-full"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen
+                            ></iframe>
+                        </template>
+                        <template x-if="episode && !episode.isYoutube && episode.videoUrl">
+                            <video controls autoplay class="w-full h-full" :src="episode.videoUrl"></video>
+                        </template>
+                    </div>
+                </template>
 
                 {{-- Episode Info --}}
                 <div class="text-white" x-show="episode">
