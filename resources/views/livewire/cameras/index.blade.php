@@ -124,9 +124,9 @@
                             </div>
 
                             {{-- Camera static effect --}}
-                            <div class="absolute inset-0 pointer-events-none z-[5]" x-show="staticEnabled" x-cloak>
-                                <div class="camera-scanlines absolute inset-0" :style="{ opacity: staticIntensity / 200 }"></div>
-                                <canvas class="camera-noise absolute inset-0 w-full h-full" :style="{ opacity: staticIntensity / 250 }"></canvas>
+                            <div class="absolute inset-0 pointer-events-none z-[5]" x-show="getCameraStaticEnabled({{ $camera->id }})" x-cloak>
+                                <div class="camera-scanlines absolute inset-0" :style="{ opacity: getCameraStaticIntensity({{ $camera->id }}) / 200 }"></div>
+                                <canvas class="camera-noise absolute inset-0 w-full h-full" data-camera-id="{{ $camera->id }}" :style="{ opacity: getCameraStaticIntensity({{ $camera->id }}) / 250 }"></canvas>
                             </div>
 
                             {{-- Timestamp overlay --}}
@@ -278,9 +278,9 @@
                                 </div>
 
                                 {{-- Camera static effect --}}
-                                <div class="absolute inset-0 pointer-events-none z-[5]" x-show="staticEnabled" x-cloak>
-                                    <div class="camera-scanlines absolute inset-0" :style="{ opacity: staticIntensity / 200 }"></div>
-                                    <canvas class="camera-noise absolute inset-0 w-full h-full" :style="{ opacity: staticIntensity / 250 }"></canvas>
+                                <div class="absolute inset-0 pointer-events-none z-[5]" x-show="popup.id && getCameraStaticEnabled(popup.id)" x-cloak>
+                                    <div class="camera-scanlines absolute inset-0" :style="{ opacity: popup.id ? getCameraStaticIntensity(popup.id) / 200 : 0 }"></div>
+                                    <canvas class="camera-noise absolute inset-0 w-full h-full" :data-camera-id="popup.id" :style="{ opacity: popup.id ? getCameraStaticIntensity(popup.id) / 250 : 0 }"></canvas>
                                 </div>
 
                                 {{-- Timestamp --}}
@@ -342,8 +342,6 @@ Alpine.data('cameraFeed', () => ({
     slotKeyframes: [],
 
     // Static/noise system
-    staticEnabled: false,
-    staticIntensity: 15,
     staticAnimFrame: null,
 
     // Weather system
@@ -530,10 +528,6 @@ Alpine.data('cameraFeed', () => ({
                 this.updateSkyColor();
             }
 
-            // Static effect settings
-            this.staticEnabled = data.static_enabled ?? false;
-            this.staticIntensity = data.static_intensity ?? 15;
-
             // Weather toggle from API
             const wasEnabled = this.weatherEnabled;
             this.weatherEnabled = data.weather_enabled ?? false;
@@ -593,24 +587,58 @@ Alpine.data('cameraFeed', () => ({
 
     buildKeyframes(slots) {
         const keyframes = [];
-        for (const [key, slot] of Object.entries(slots)) {
+        const slotArr = Object.values(slots);
+        const count = slotArr.length;
+
+        for (let i = 0; i < count; i++) {
+            const slot = slotArr[i];
             const startMin = this.timeToMin(slot.start);
             const endMin = slot.end === '24:00' ? 1440 : this.timeToMin(slot.end);
 
-            let midpoint;
-            if (endMin > startMin) {
-                midpoint = (startMin + endMin) / 2;
+            if (slot.is_transition) {
+                // Transition: prev color → own color (midpoint) → next color
+                const prev = slotArr[(i - 1 + count) % count];
+                const next = slotArr[(i + 1) % count];
+                let midpoint;
+                if (endMin > startMin) {
+                    midpoint = (startMin + endMin) / 2;
+                } else {
+                    const totalDuration = (1440 - startMin) + endMin;
+                    midpoint = (startMin + totalDuration / 2) % 1440;
+                }
+                // 0% = previous slot's color
+                keyframes.push({
+                    minutes: startMin,
+                    bgColor: prev.bg_color || '#000000',
+                    overlayColor: prev.overlay_color || '#00000000',
+                });
+                // 50% = this slot's own color
+                keyframes.push({
+                    minutes: midpoint,
+                    bgColor: slot.bg_color || '#000000',
+                    overlayColor: slot.overlay_color || '#00000000',
+                });
+                // 100% = next slot's color
+                keyframes.push({
+                    minutes: endMin >= 1440 ? 1439.99 : endMin,
+                    bgColor: next.bg_color || '#000000',
+                    overlayColor: next.overlay_color || '#00000000',
+                });
             } else {
-                const totalDuration = (1440 - startMin) + endMin;
-                midpoint = (startMin + totalDuration / 2) % 1440;
+                // Solid slot: holds color flat from start to end
+                keyframes.push({
+                    minutes: startMin,
+                    bgColor: slot.bg_color || '#000000',
+                    overlayColor: slot.overlay_color || '#00000000',
+                });
+                keyframes.push({
+                    minutes: endMin >= 1440 ? 1439.99 : endMin,
+                    bgColor: slot.bg_color || '#000000',
+                    overlayColor: slot.overlay_color || '#00000000',
+                });
             }
-
-            keyframes.push({
-                minutes: midpoint,
-                bgColor: slot.bg_color || '#000000',
-                overlayColor: slot.overlay_color || '#00000000',
-            });
         }
+
         keyframes.sort((a, b) => a.minutes - b.minutes);
         return keyframes;
     },
@@ -703,6 +731,14 @@ Alpine.data('cameraFeed', () => ({
 
     getCameraBackgroundIsVideo(id) {
         return this.cameras[id]?.background_is_video ?? false;
+    },
+
+    getCameraStaticEnabled(id) {
+        return this.cameras[id]?.static_enabled ?? false;
+    },
+
+    getCameraStaticIntensity(id) {
+        return this.cameras[id]?.static_intensity ?? 15;
     },
 
     getWeatherIcon() {
@@ -849,46 +885,57 @@ Alpine.data('cameraFeed', () => ({
         return this.timestampText;
     },
 
-    // Static noise canvas animation
+    // Static noise canvas animation — each camera gets independent timing
     startStaticNoise() {
-        let lastFrame = 0;
-        const fps = 8; // Low FPS for authentic static look
-        const interval = 1000 / fps;
+        const baseFps = 8;
+        const baseInterval = 1000 / baseFps;
+        const canvasTimers = new WeakMap();
 
         const renderNoise = (timestamp) => {
-            if (timestamp - lastFrame >= interval) {
-                lastFrame = timestamp;
-                if (this.staticEnabled && this.staticIntensity > 0) {
-                    document.querySelectorAll('.camera-noise').forEach(canvas => {
-                        const w = canvas.offsetWidth;
-                        const h = canvas.offsetHeight;
-                        if (w === 0 || h === 0) return;
+            document.querySelectorAll('.camera-noise').forEach(canvas => {
+                const cameraId = canvas.dataset.cameraId;
+                const camData = cameraId ? this.cameras[cameraId] : null;
+                if (!camData?.static_enabled || !camData.static_intensity) return;
 
-                        // Use small canvas and scale up for performance + chunky look
-                        const scale = 4;
-                        const sw = Math.ceil(w / scale);
-                        const sh = Math.ceil(h / scale);
-
-                        canvas.width = sw;
-                        canvas.height = sh;
-                        canvas.style.imageRendering = 'pixelated';
-
-                        const ctx = canvas.getContext('2d');
-                        const imageData = ctx.createImageData(sw, sh);
-                        const data = imageData.data;
-
-                        for (let i = 0; i < data.length; i += 4) {
-                            const v = Math.random() * 255;
-                            data[i] = v;
-                            data[i + 1] = v;
-                            data[i + 2] = v;
-                            data[i + 3] = Math.random() * 60;
-                        }
-
-                        ctx.putImageData(imageData, 0, 0);
+                // Give each canvas its own last-frame timer and fps variation
+                if (!canvasTimers.has(canvas)) {
+                    canvasTimers.set(canvas, {
+                        lastFrame: timestamp - Math.random() * baseInterval,
+                        interval: baseInterval + (Math.random() - 0.5) * 40,
                     });
                 }
-            }
+
+                const timer = canvasTimers.get(canvas);
+                if (timestamp - timer.lastFrame < timer.interval) return;
+                timer.lastFrame = timestamp;
+
+                const w = canvas.offsetWidth;
+                const h = canvas.offsetHeight;
+                if (w === 0 || h === 0) return;
+
+                // Use small canvas and scale up for performance + chunky look
+                const scale = 4;
+                const sw = Math.ceil(w / scale);
+                const sh = Math.ceil(h / scale);
+
+                canvas.width = sw;
+                canvas.height = sh;
+                canvas.style.imageRendering = 'pixelated';
+
+                const ctx = canvas.getContext('2d');
+                const imageData = ctx.createImageData(sw, sh);
+                const data = imageData.data;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const v = Math.random() * 255;
+                    data[i] = v;
+                    data[i + 1] = v;
+                    data[i + 2] = v;
+                    data[i + 3] = Math.random() * 60;
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+            });
             this.staticAnimFrame = requestAnimationFrame(renderNoise);
         };
         this.staticAnimFrame = requestAnimationFrame(renderNoise);

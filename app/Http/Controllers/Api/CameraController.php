@@ -31,6 +31,8 @@ class CameraController extends Controller
                     'audio_url' => null,
                     'background_url' => $camera->backgroundUrl(),
                     'background_is_video' => $camera->backgroundIsVideo(),
+                    'static_enabled' => $camera->static_enabled,
+                    'static_intensity' => $camera->static_intensity,
                     'next_check_seconds' => 300,
                 ];
             }
@@ -94,6 +96,8 @@ class CameraController extends Controller
                 'audio_url' => $audioUrl,
                 'background_url' => $camera->backgroundUrl(),
                 'background_is_video' => $camera->backgroundIsVideo(),
+                'static_enabled' => $camera->static_enabled,
+                'static_intensity' => $camera->static_intensity,
                 'next_check_seconds' => $secondsUntilEnd,
             ];
         });
@@ -105,8 +109,6 @@ class CameraController extends Controller
             'server_time' => $now->toIso8601String(),
             'slots' => CameraSlotSetting::getSlots(),
             'weather_enabled' => (bool) ($siteSettings?->weather_enabled ?? true),
-            'static_enabled' => (bool) ($siteSettings?->static_enabled ?? true),
-            'static_intensity' => (int) ($siteSettings?->static_intensity ?? 15),
         ]);
     }
 

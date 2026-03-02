@@ -14,7 +14,12 @@ class CameraSlotSetting extends Model
         'end_time',
         'bg_color',
         'overlay_color',
+        'is_transition',
         'sort_order',
+    ];
+
+    protected $casts = [
+        'is_transition' => 'boolean',
     ];
 
     /**
@@ -29,10 +34,10 @@ class CameraSlotSetting extends Model
             if ($settings->isEmpty()) {
                 // Fallback to defaults if table is empty
                 return [
-                    'nacht'   => ['start' => '00:00', 'end' => '06:00', 'label' => 'Nacht',   'bg_color' => '#0B1026', 'overlay_color' => '#0000001A'],
-                    'ochtend' => ['start' => '06:00', 'end' => '08:00', 'label' => 'Ochtend', 'bg_color' => '#F4845F', 'overlay_color' => '#FF8C0030'],
-                    'dag'     => ['start' => '08:00', 'end' => '18:00', 'label' => 'Dag',     'bg_color' => '#87CEEB', 'overlay_color' => '#FFFFFF10'],
-                    'avond'   => ['start' => '18:00', 'end' => '24:00', 'label' => 'Avond',   'bg_color' => '#D4621A', 'overlay_color' => '#FF450030'],
+                    'nacht'   => ['start' => '00:00', 'end' => '06:00', 'label' => 'Nacht',   'bg_color' => '#0B1026', 'overlay_color' => '#0000001A', 'is_transition' => false],
+                    'ochtend' => ['start' => '06:00', 'end' => '08:00', 'label' => 'Ochtend', 'bg_color' => '#F4845F', 'overlay_color' => '#FF8C0030', 'is_transition' => true],
+                    'dag'     => ['start' => '08:00', 'end' => '18:00', 'label' => 'Dag',     'bg_color' => '#87CEEB', 'overlay_color' => '#FFFFFF10', 'is_transition' => false],
+                    'avond'   => ['start' => '18:00', 'end' => '24:00', 'label' => 'Avond',   'bg_color' => '#D4621A', 'overlay_color' => '#FF450030', 'is_transition' => true],
                 ];
             }
 
@@ -43,6 +48,7 @@ class CameraSlotSetting extends Model
                     'label'         => $setting->label,
                     'bg_color'      => $setting->bg_color,
                     'overlay_color' => $setting->overlay_color,
+                    'is_transition' => (bool) $setting->is_transition,
                 ]];
             })->toArray();
         });

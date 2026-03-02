@@ -10,16 +10,12 @@ class CameraSettings extends Component
 {
     public array $slots = [];
     public bool $weatherEnabled = true;
-    public bool $staticEnabled = true;
-    public int $staticIntensity = 15;
 
     public function mount(): void
     {
         $this->loadSlots();
         $siteSettings = SiteSetting::first();
         $this->weatherEnabled = $siteSettings?->weather_enabled ?? true;
-        $this->staticEnabled = $siteSettings?->static_enabled ?? true;
-        $this->staticIntensity = $siteSettings?->static_intensity ?? 15;
     }
 
     protected function loadSlots(): void
@@ -35,6 +31,7 @@ class CameraSettings extends Component
                 'end_time'      => $setting->end_time === '24:00' ? '24:00' : $setting->end_time,
                 'bg_color'      => $setting->bg_color ?? '#000000',
                 'overlay_color' => $setting->overlay_color ?? '#00000000',
+                'is_transition' => (bool) $setting->is_transition,
             ];
         })->toArray();
     }
@@ -109,6 +106,7 @@ class CameraSettings extends Component
                 'end_time'      => $slot['end_time'],
                 'bg_color'      => $slot['bg_color'],
                 'overlay_color' => $slot['overlay_color'],
+                'is_transition' => $slot['is_transition'] ?? false,
             ]);
         }
 
@@ -118,9 +116,7 @@ class CameraSettings extends Component
         $siteSettings = SiteSetting::first();
         if ($siteSettings) {
             $siteSettings->update([
-                'weather_enabled'  => $this->weatherEnabled,
-                'static_enabled'   => $this->staticEnabled,
-                'static_intensity' => max(0, min(100, $this->staticIntensity)),
+                'weather_enabled' => $this->weatherEnabled,
             ]);
         }
 

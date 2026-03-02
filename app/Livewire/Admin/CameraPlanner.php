@@ -35,9 +35,15 @@ class CameraPlanner extends Component
     public string $scheduleStartTime = '08:00';
     public string $scheduleEndTime = '09:00';
 
+    // Static effect
+    public bool $staticEnabled = true;
+    public int $staticIntensity = 15;
+
     public function mount(Camera $camera): void
     {
         $this->camera = $camera;
+        $this->staticEnabled = $camera->static_enabled ?? true;
+        $this->staticIntensity = $camera->static_intensity ?? 15;
         $this->loadDefaultSelections();
     }
 
@@ -154,6 +160,19 @@ class CameraPlanner extends Component
         }
 
         session()->flash('status', 'Achtergrond verwijderd.');
+    }
+
+    // ─── Static Effect ────────────────────────────────────────
+
+    public function saveStaticSettings(): void
+    {
+        $this->camera->update([
+            'static_enabled' => $this->staticEnabled,
+            'static_intensity' => max(0, min(100, $this->staticIntensity)),
+        ]);
+
+        $this->camera->refresh();
+        session()->flash('status', 'Camera effect instellingen opgeslagen.');
     }
 
     public function deleteVideo(int $id): void

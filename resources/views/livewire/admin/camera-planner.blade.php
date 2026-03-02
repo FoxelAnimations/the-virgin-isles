@@ -166,6 +166,39 @@
                     </div>
                 </div>
 
+                {{-- Static Effect --}}
+                <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
+                    <div class="px-4 py-3 border-b border-zinc-800">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Camera effect</h3>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="text-xs text-zinc-500">Scanlijnen en ruis-effect</p>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" wire:model.live="staticEnabled" class="sr-only peer">
+                                <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                            </label>
+                        </div>
+                        @if ($staticEnabled)
+                            <div>
+                                <label class="block text-xs text-zinc-500 mb-2 uppercase tracking-wider">
+                                    Intensiteit: <span class="text-white font-mono">{{ $staticIntensity }}%</span>
+                                </label>
+                                <input type="range" wire:model.live="staticIntensity" min="0" max="100" step="5"
+                                    class="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer accent-accent">
+                                <div class="flex justify-between text-[10px] text-zinc-600 mt-1">
+                                    <span>Subtiel</span>
+                                    <span>Zwaar</span>
+                                </div>
+                            </div>
+                        @endif
+                        <button wire:click="saveStaticSettings"
+                            class="mt-3 w-full bg-accent text-black px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition hover:brightness-90">
+                            Opslaan
+                        </button>
+                    </div>
+                </div>
+
                 {{-- Video Library --}}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                     <div class="px-4 py-3 border-b border-zinc-800">

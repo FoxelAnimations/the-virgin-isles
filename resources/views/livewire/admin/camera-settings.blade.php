@@ -45,35 +45,6 @@
                 </div>
             </div>
 
-            {{-- Camera Static Effect --}}
-            <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
-                <div class="px-5 py-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Camera effect</h3>
-                            <p class="text-xs text-zinc-500 mt-1">Scanlijnen en ruis-effect over de camerafeed.</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" wire:model="staticEnabled" class="sr-only peer">
-                            <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
-                        </label>
-                    </div>
-                    @if ($staticEnabled)
-                        <div class="mt-4">
-                            <label class="block text-xs text-zinc-500 mb-2 uppercase tracking-wider">
-                                Intensiteit: <span class="text-white font-mono">{{ $staticIntensity }}%</span>
-                            </label>
-                            <input type="range" wire:model.live="staticIntensity" min="0" max="100" step="5"
-                                class="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer accent-accent">
-                            <div class="flex justify-between text-[10px] text-zinc-600 mt-1">
-                                <span>Subtiel</span>
-                                <span>Zwaar</span>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
             <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                 <div class="px-5 py-3 border-b border-zinc-800">
                     <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Dagdelen</h3>
@@ -117,7 +88,7 @@
                                 </div>
                             </div>
 
-                            {{-- Row 2: Colors --}}
+                            {{-- Row 2: Colors + Transition --}}
                             <div class="grid grid-cols-2 gap-4 mt-3">
                                 {{-- Background Color --}}
                                 <div>
@@ -153,6 +124,24 @@
                                     <p class="text-[10px] text-zinc-600 mt-1">Laatste 2 tekens = transparantie (00=onzichtbaar, FF=volledig)</p>
                                     @error("slots.{$index}.overlay_color") <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
                                 </div>
+                            </div>
+
+                            {{-- Row 3: Transition toggle --}}
+                            <div class="flex items-center justify-between mt-3 pt-3 border-t border-zinc-800/50">
+                                <div>
+                                    <span class="text-xs text-zinc-500 uppercase tracking-wider">Overgang</span>
+                                    <p class="text-[10px] text-zinc-600 mt-0.5">
+                                        @if ($slot['is_transition'] ?? false)
+                                            Kleur verloopt geleidelijk van vorig naar volgend dagdeel.
+                                        @else
+                                            Kleur blijft vast gedurende dit dagdeel.
+                                        @endif
+                                    </p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" wire:model.live="slots.{{ $index }}.is_transition" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                </label>
                             </div>
                         </div>
                     @endforeach
@@ -196,10 +185,13 @@
                             @php $widthPercent = (($ts['end'] - $ts['start']) / 1440) * 100; @endphp
                             <div class="flex items-center justify-center relative"
                                 style="width: {{ $widthPercent }}%; background-color: {{ $ts['slot']['bg_color'] ?? '#333' }};"
-                                title="{{ $ts['slot']['label'] }}: {{ $ts['slot']['start_time'] }} - {{ $ts['slot']['end_time'] }}">
+                                title="{{ $ts['slot']['label'] }}: {{ $ts['slot']['start_time'] }} - {{ $ts['slot']['end_time'] }}{{ ($ts['slot']['is_transition'] ?? false) ? ' (overgang)' : '' }}">
                                 @if ($widthPercent > 5)
                                     <span class="text-[10px] font-semibold text-white/80 uppercase tracking-wider truncate px-1 drop-shadow-sm">
                                         {{ $ts['slot']['label'] }}
+                                        @if ($ts['slot']['is_transition'] ?? false)
+                                            <span class="text-white/50 normal-case">~</span>
+                                        @endif
                                     </span>
                                 @endif
                             </div>

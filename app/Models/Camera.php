@@ -14,6 +14,8 @@ class Camera extends Model
         'is_hidden',
         'sort_order',
         'background_path',
+        'static_enabled',
+        'static_intensity',
     ];
 
     protected function casts(): array
@@ -22,6 +24,8 @@ class Camera extends Model
             'is_offline' => 'boolean',
             'is_hidden' => 'boolean',
             'sort_order' => 'integer',
+            'static_enabled' => 'boolean',
+            'static_intensity' => 'integer',
         ];
     }
 
