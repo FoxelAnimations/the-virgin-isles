@@ -30,6 +30,50 @@
 
         {{-- Settings Form --}}
         <form wire:submit="save" class="space-y-4">
+
+            {{-- Weather Toggle --}}
+            <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
+                <div class="px-5 py-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Weer effecten</h3>
+                        <p class="text-xs text-zinc-500 mt-1">Toon wolken en regen op basis van het actuele weer in Kortrijk.</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" wire:model="weatherEnabled" class="sr-only peer">
+                        <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                    </label>
+                </div>
+            </div>
+
+            {{-- Camera Static Effect --}}
+            <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
+                <div class="px-5 py-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Camera effect</h3>
+                            <p class="text-xs text-zinc-500 mt-1">Scanlijnen en ruis-effect over de camerafeed.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" wire:model="staticEnabled" class="sr-only peer">
+                            <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                        </label>
+                    </div>
+                    @if ($staticEnabled)
+                        <div class="mt-4">
+                            <label class="block text-xs text-zinc-500 mb-2 uppercase tracking-wider">
+                                Intensiteit: <span class="text-white font-mono">{{ $staticIntensity }}%</span>
+                            </label>
+                            <input type="range" wire:model.live="staticIntensity" min="0" max="100" step="5"
+                                class="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer accent-accent">
+                            <div class="flex justify-between text-[10px] text-zinc-600 mt-1">
+                                <span>Subtiel</span>
+                                <span>Zwaar</span>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                 <div class="px-5 py-3 border-b border-zinc-800">
                     <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Dagdelen</h3>
@@ -91,11 +135,16 @@
                                 {{-- Overlay Color --}}
                                 <div>
                                     <label class="block text-xs text-zinc-500 mb-1 uppercase tracking-wider">Overlay kleur</label>
-                                    <div class="flex items-center gap-2">
-                                        <input type="color" wire:model.live="slots.{{ $index }}.overlay_rgb"
-                                            value="{{ substr($slot['overlay_color'], 0, 7) }}"
-                                            x-data
-                                            x-on:input="$wire.set('slots.{{ $index }}.overlay_color', $event.target.value + ($wire.slots[{{ $index }}].overlay_color.length > 7 ? $wire.slots[{{ $index }}].overlay_color.slice(7) : 'FF'))"
+                                    <div class="flex items-center gap-2"
+                                        x-data="{ overlayRgb: '{{ substr($slot['overlay_color'], 0, 7) }}' }">
+                                        <input type="color"
+                                            x-model="overlayRgb"
+                                            x-on:input="
+                                                let alpha = $wire.slots[{{ $index }}].overlay_color.length > 7
+                                                    ? $wire.slots[{{ $index }}].overlay_color.slice(7)
+                                                    : 'FF';
+                                                $wire.set('slots.{{ $index }}.overlay_color', $event.target.value + alpha)
+                                            "
                                             class="h-9 w-12 bg-zinc-800 border border-zinc-700 rounded-sm cursor-pointer p-0.5">
                                         <input type="text" wire:model.live="slots.{{ $index }}.overlay_color"
                                             class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm rounded-sm focus:border-accent focus:ring-accent font-mono"

@@ -98,12 +98,8 @@
                                         <div class="flex items-center justify-end gap-2">
                                             <a href="{{ route('admin.camera-planner', $camera) }}"
                                                 class="inline-flex items-center px-2 py-1 text-xs font-semibold bg-accent text-black rounded-sm transition hover:brightness-90 uppercase tracking-wider">
-                                                {{ __('Planner') }}
-                                            </a>
-                                            <button wire:click="edit({{ $camera->id }})"
-                                                class="inline-flex items-center px-2 py-1 text-xs font-semibold bg-zinc-800 text-white rounded-sm transition hover:bg-zinc-700 uppercase tracking-wider">
                                                 {{ __('Bewerken') }}
-                                            </button>
+                                            </a>
                                             <button wire:click="delete({{ $camera->id }})"
                                                 wire:confirm="{{ __('Weet je zeker dat je deze camera wilt verwijderen?') }}"
                                                 class="inline-flex items-center px-2 py-1 text-xs font-semibold bg-red-900/30 text-red-400 border border-red-800 rounded-sm transition hover:bg-red-900/50 uppercase tracking-wider">
@@ -120,7 +116,7 @@
         </div>
     </div>
 
-    {{-- Create/Edit Modal --}}
+    {{-- Create Modal --}}
     @if ($showModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 md:p-8"
             x-data
@@ -131,7 +127,7 @@
             <div class="relative bg-zinc-900 border border-zinc-800 w-full max-w-md" @click.stop>
                 {{-- Header --}}
                 <div class="sticky top-0 z-10 bg-zinc-800 text-accent px-5 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between">
-                    <span>{{ $editingId ? __('Camera Bewerken') : __('Nieuwe Camera') }}</span>
+                    <span>{{ __('Nieuwe Camera') }}</span>
                     <button wire:click="closeModal" class="text-zinc-400 hover:text-white transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -141,7 +137,7 @@
 
                 {{-- Form --}}
                 <div class="p-5">
-                    <form wire:submit="{{ $editingId ? 'update' : 'save' }}">
+                    <form wire:submit="save">
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-zinc-400 mb-1">{{ __('Naam') }} *</label>
                             <input type="text" wire:model="name"
@@ -157,7 +153,7 @@
                             </button>
                             <button type="submit"
                                 class="px-4 py-2 text-sm font-semibold bg-accent text-black uppercase tracking-wider transition hover:brightness-90">
-                                {{ $editingId ? __('Opslaan') : __('Aanmaken') }}
+                                {{ __('Aanmaken') }}
                             </button>
                         </div>
                     </form>

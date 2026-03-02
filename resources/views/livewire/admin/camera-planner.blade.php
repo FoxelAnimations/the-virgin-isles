@@ -8,8 +8,20 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </a>
                 <div>
-                    <p class="text-sm uppercase tracking-[0.3em] text-zinc-500">Planner</p>
-                    <h1 class="text-3xl font-bold uppercase tracking-wider">{{ $camera->name }}</h1>
+                    <p class="text-sm uppercase tracking-[0.3em] text-zinc-500">Bewerken</p>
+                    <div class="flex items-center gap-2" x-data="{ editing: false, name: @js($camera->name) }">
+                        <h1 x-show="!editing" class="text-3xl font-bold uppercase tracking-wider" x-text="name" @click="editing = true; $nextTick(() => $refs.nameInput.focus())"></h1>
+                        <input x-show="editing" x-ref="nameInput" x-model="name" type="text"
+                            class="text-3xl font-bold uppercase tracking-wider bg-transparent border-b-2 border-accent text-white outline-none py-0 px-0"
+                            @keydown.enter="editing = false; $wire.updateName(name)"
+                            @keydown.escape="editing = false; name = @js($camera->name)"
+                            @click.away="editing = false; $wire.updateName(name)"
+                            style="display: none;"
+                        >
+                        <button x-show="!editing" @click="editing = true; $nextTick(() => $refs.nameInput.focus())" class="text-zinc-600 hover:text-zinc-400 transition" title="Naam bewerken">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -30,9 +42,129 @@
             </div>
         @endif
 
+        {{-- Time-of-Day Color Bar --}}
+        <div class="mb-4 bg-zinc-900 border border-zinc-800 rounded-sm"
+            x-data="{
+                nowPercent: 0,
+                nowLabel: '',
+                init() {
+                    this.tick();
+                    setInterval(() => this.tick(), 30000);
+                },
+                tick() {
+                    const now = new Date();
+                    const minutes = now.getHours() * 60 + now.getMinutes();
+                    this.nowPercent = (minutes / 1440) * 100;
+                    this.nowLabel = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                }
+            }"
+        >
+            <div class="px-4 py-2 border-b border-zinc-800 flex items-center justify-between">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-accent">Huidige tijd</h3>
+                <span class="text-xs font-mono text-white" x-text="nowLabel"></span>
+            </div>
+            <div class="p-4">
+                <div class="relative">
+                    {{-- Color bar --}}
+                    <div class="flex h-8 rounded-sm overflow-hidden">
+                        @php
+                            $slots = \App\Models\CameraSlotSetting::getSlots();
+                            $timelineSlots = [];
+                            foreach ($slots as $key => $slot) {
+                                $startParts = explode(':', $slot['start']);
+                                $endParts = explode(':', $slot['end']);
+                                $startMin = (int)$startParts[0] * 60 + (int)($startParts[1] ?? 0);
+                                $endMin = $slot['end'] === '24:00' ? 1440 : (int)$endParts[0] * 60 + (int)($endParts[1] ?? 0);
+
+                                if ($endMin > $startMin) {
+                                    $timelineSlots[] = ['start' => $startMin, 'end' => $endMin, 'slot' => $slot, 'key' => $key];
+                                } else {
+                                    if ($startMin < 1440) {
+                                        $timelineSlots[] = ['start' => $startMin, 'end' => 1440, 'slot' => $slot, 'key' => $key];
+                                    }
+                                    if ($endMin > 0) {
+                                        $timelineSlots[] = ['start' => 0, 'end' => $endMin, 'slot' => $slot, 'key' => $key];
+                                    }
+                                }
+                            }
+                            usort($timelineSlots, fn($a, $b) => $a['start'] <=> $b['start']);
+                        @endphp
+                        @foreach ($timelineSlots as $ts)
+                            @php $widthPercent = (($ts['end'] - $ts['start']) / 1440) * 100; @endphp
+                            <div class="flex items-center justify-center relative"
+                                style="width: {{ $widthPercent }}%; background-color: {{ $ts['slot']['bg_color'] ?? '#333' }};"
+                                title="{{ $ts['slot']['label'] }}: {{ $ts['slot']['start'] }} – {{ $ts['slot']['end'] }}">
+                                @if ($widthPercent > 8)
+                                    <span class="text-[10px] font-semibold text-white/80 uppercase tracking-wider truncate px-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                                        {{ $ts['slot']['label'] }}
+                                    </span>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Current time indicator --}}
+                    <div class="absolute top-0 bottom-0 pointer-events-none" :style="'left: ' + nowPercent + '%'">
+                        <div class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-r-[5px] border-t-[6px] border-l-transparent border-r-transparent" style="border-top-color: #E7FF57;"></div>
+                        <div class="absolute top-0 bottom-0 left-1/2 -translate-x-[0.5px] w-[1px]" style="background-color: #E7FF57;"></div>
+                        <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-r-[5px] border-b-[6px] border-l-transparent border-r-transparent" style="border-bottom-color: #E7FF57;"></div>
+                    </div>
+                </div>
+
+                {{-- Hour markers --}}
+                <div class="flex justify-between mt-1">
+                    @for ($h = 0; $h <= 24; $h += 3)
+                        <span class="text-[9px] text-zinc-600 font-mono">{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}</span>
+                    @endfor
+                </div>
+            </div>
+        </div>
+
         <div class="flex gap-6">
             {{-- LEFT SIDEBAR --}}
             <div class="w-64 shrink-0 space-y-4">
+
+                {{-- Background --}}
+                <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
+                    <div class="px-4 py-3 border-b border-zinc-800">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Achtergrond</h3>
+                    </div>
+                    <div class="p-3">
+                        @if ($camera->background_path)
+                            <div class="mb-3">
+                                @if ($camera->backgroundIsVideo())
+                                    <video src="{{ $camera->backgroundUrl() }}"
+                                           class="w-full aspect-video object-cover rounded-sm bg-black"
+                                           autoplay loop muted playsinline></video>
+                                @else
+                                    <img src="{{ $camera->backgroundUrl() }}"
+                                         class="w-full aspect-video object-cover rounded-sm bg-black"
+                                         alt="Achtergrond">
+                                @endif
+                                <button wire:click="removeBackground"
+                                        wire:confirm="Achtergrond verwijderen?"
+                                        class="mt-2 w-full bg-red-900/30 text-red-400 border border-red-800 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition hover:bg-red-900/50 rounded-sm">
+                                    Verwijderen
+                                </button>
+                            </div>
+                        @else
+                            <p class="text-xs text-zinc-600 mb-2">Geen achtergrond ingesteld.</p>
+                        @endif
+
+                        <input type="file" wire:model="backgroundUpload"
+                               accept="image/jpeg,image/png,image/gif,video/webm"
+                               class="block w-full text-xs text-zinc-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-sm file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700">
+                        <div wire:loading wire:target="backgroundUpload" class="text-xs text-zinc-500 mt-1">Uploaden...</div>
+                        @error('backgroundUpload') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
+                        @if ($backgroundUpload)
+                            <button wire:click="uploadBackground"
+                                    class="mt-2 w-full bg-accent text-black px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition hover:brightness-90">
+                                Upload
+                            </button>
+                        @endif
+                        <p class="text-[10px] text-zinc-600 mt-2">JPG, PNG, GIF of WebM. WebM met alpha-transparantie toont de luchtkleur erdoorheen.</p>
+                    </div>
+                </div>
 
                 {{-- Video Library --}}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
@@ -56,16 +188,43 @@
                     {{-- Video list --}}
                     <div class="p-2 space-y-1 max-h-[40vh] overflow-y-auto">
                         @forelse ($videos as $video)
-                            <div class="flex items-center justify-between bg-zinc-800 px-2 py-1.5 rounded-sm group"
+                            <div class="bg-zinc-800 rounded-sm group"
                                 draggable="true"
                                 ondragstart="event.dataTransfer.setData('video_id', '{{ $video->id }}'); event.dataTransfer.setData('video_name', '{{ $video->filename }}')"
                             >
-                                <span class="text-xs text-white truncate flex-1 cursor-grab" title="{{ $video->filename }}">{{ $video->filename }}</span>
-                                <button wire:click="deleteVideo({{ $video->id }})"
-                                    wire:confirm="Weet je zeker dat je deze video wilt verwijderen?"
-                                    class="ml-2 text-zinc-600 hover:text-red-400 transition opacity-0 group-hover:opacity-100 shrink-0">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>
+                                <div class="flex items-center justify-between px-2 py-1.5">
+                                    <span class="text-xs text-white truncate flex-1 cursor-grab" title="{{ $video->filename }}">{{ $video->filename }}</span>
+                                    <button wire:click="deleteVideo({{ $video->id }})"
+                                        wire:confirm="Weet je zeker dat je deze video wilt verwijderen?"
+                                        class="ml-2 text-zinc-600 hover:text-red-400 transition opacity-0 group-hover:opacity-100 shrink-0">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+                                {{-- Audio --}}
+                                <div class="px-2 pb-1.5">
+                                    @if ($video->audio_path)
+                                        <div class="flex items-center gap-1.5">
+                                            <svg class="w-3 h-3 text-accent shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M11 5L6 9H2v6h4l5 4V5z"/></svg>
+                                            <span class="text-[10px] text-zinc-400 truncate flex-1">Audio gekoppeld</span>
+                                            <button wire:click="removeAudio({{ $video->id }})" wire:confirm="Audio verwijderen?"
+                                                class="text-zinc-600 hover:text-red-400 transition shrink-0">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </button>
+                                        </div>
+                                    @else
+                                        <div>
+                                            <input type="file" wire:model="audioUploads.{{ $video->id }}" accept="audio/mpeg,audio/wav,audio/ogg,audio/aac,audio/mp4"
+                                                class="block w-full text-[10px] text-zinc-500 file:mr-1 file:py-0.5 file:px-2 file:rounded-sm file:border-0 file:text-[10px] file:font-semibold file:bg-zinc-700 file:text-zinc-300 hover:file:bg-zinc-600">
+                                            <div wire:loading wire:target="audioUploads.{{ $video->id }}" class="text-[10px] text-zinc-500 mt-0.5">Uploaden...</div>
+                                            @error("audioUploads.{$video->id}") <span class="text-red-400 text-[10px]">{{ $message }}</span> @enderror
+                                            @if (isset($audioUploads[$video->id]) && $audioUploads[$video->id])
+                                                <button wire:click="uploadAudio({{ $video->id }})" class="mt-1 w-full bg-zinc-700 text-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider transition hover:bg-zinc-600 rounded-sm">
+                                                    Audio koppelen
+                                                </button>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         @empty
                             <p class="text-xs text-zinc-600 text-center py-4">Nog geen video's</p>
@@ -116,6 +275,13 @@
 
                 {{-- Calendar Body --}}
                 <div class="flex relative" style="height: 1440px;">
+                    {{-- Current time line across all columns --}}
+                    <div class="absolute left-14 right-0 z-30 pointer-events-none flex items-center"
+                        :style="'top: ' + nowMinutes + 'px'">
+                        <div class="w-2 h-2 rounded-full -ml-1 shrink-0" style="background-color: #E7FF57;"></div>
+                        <div class="flex-1 h-[1px]" style="background-color: #E7FF57; opacity: 0.7;"></div>
+                    </div>
+
                     {{-- Time Labels --}}
                     <div class="w-14 shrink-0 relative">
                         @for ($h = 0; $h < 24; $h++)
@@ -289,8 +455,17 @@ Alpine.data('cameraPlanner', (initialData, initialSnap) => ({
     snap: initialSnap,
     dropPreview: null,
     _busy: false,
+    nowMinutes: 0,
 
     init() {
+        // Current time line
+        const updateNow = () => {
+            const d = new Date();
+            this.nowMinutes = d.getHours() * 60 + d.getMinutes();
+        };
+        updateNow();
+        setInterval(updateNow, 30000);
+
         // Sync data from Livewire (wire:ignore blocks DOM updates)
         Livewire.on('schedule-updated', (...args) => {
             const params = args[0];

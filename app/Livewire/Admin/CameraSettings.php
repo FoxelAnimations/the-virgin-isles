@@ -3,15 +3,23 @@
 namespace App\Livewire\Admin;
 
 use App\Models\CameraSlotSetting;
+use App\Models\SiteSetting;
 use Livewire\Component;
 
 class CameraSettings extends Component
 {
     public array $slots = [];
+    public bool $weatherEnabled = true;
+    public bool $staticEnabled = true;
+    public int $staticIntensity = 15;
 
     public function mount(): void
     {
         $this->loadSlots();
+        $siteSettings = SiteSetting::first();
+        $this->weatherEnabled = $siteSettings?->weather_enabled ?? true;
+        $this->staticEnabled = $siteSettings?->static_enabled ?? true;
+        $this->staticIntensity = $siteSettings?->static_intensity ?? 15;
     }
 
     protected function loadSlots(): void
@@ -105,6 +113,16 @@ class CameraSettings extends Component
         }
 
         CameraSlotSetting::clearCache();
+
+        // Save site settings
+        $siteSettings = SiteSetting::first();
+        if ($siteSettings) {
+            $siteSettings->update([
+                'weather_enabled'  => $this->weatherEnabled,
+                'static_enabled'   => $this->staticEnabled,
+                'static_intensity' => max(0, min(100, $this->staticIntensity)),
+            ]);
+        }
 
         session()->flash('status', 'Dagdeel-instellingen opgeslagen.');
     }

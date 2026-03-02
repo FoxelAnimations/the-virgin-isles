@@ -10,7 +10,6 @@ use Livewire\Component;
 class Cameras extends Component
 {
     public bool $showModal = false;
-    public ?int $editingId = null;
     public string $name = '';
 
     protected function rules(): array
@@ -53,36 +52,22 @@ class Cameras extends Component
         session()->flash('status', 'Camera aangemaakt.');
     }
 
-    public function edit(int $id): void
-    {
-        $camera = Camera::findOrFail($id);
-        $this->editingId = $camera->id;
-        $this->name = $camera->name;
-        $this->showModal = true;
-    }
-
-    public function update(): void
-    {
-        $this->validate();
-
-        $camera = Camera::findOrFail($this->editingId);
-        $camera->update([
-            'name' => $this->name,
-        ]);
-
-        $this->resetForm();
-        $this->showModal = false;
-        session()->flash('status', 'Camera bijgewerkt.');
-    }
-
     public function delete(int $id): void
     {
         $camera = Camera::findOrFail($id);
 
-        // Clean up video files from storage
+        // Clean up background file
+        if ($camera->background_path) {
+            Storage::disk('public')->delete($camera->background_path);
+        }
+
+        // Clean up video and audio files from storage
         foreach ($camera->videos as $video) {
             if ($video->video_path) {
                 Storage::disk('public')->delete($video->video_path);
+            }
+            if ($video->audio_path) {
+                Storage::disk('public')->delete($video->audio_path);
             }
         }
 
@@ -117,7 +102,7 @@ class Cameras extends Component
 
     protected function resetForm(): void
     {
-        $this->reset(['editingId', 'name']);
+        $this->reset(['name']);
     }
 
     public function render()

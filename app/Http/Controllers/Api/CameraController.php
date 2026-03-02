@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Camera;
 use App\Models\CameraDefaultBlock;
 use App\Models\CameraSlotSetting;
+use App\Models\SiteSetting;
 use Illuminate\Http\JsonResponse;
 
 class CameraController extends Controller
@@ -27,6 +28,9 @@ class CameraController extends Controller
                     'name' => $camera->name,
                     'status' => 'offline',
                     'video_url' => null,
+                    'audio_url' => null,
+                    'background_url' => $camera->backgroundUrl(),
+                    'background_is_video' => $camera->backgroundIsVideo(),
                     'next_check_seconds' => 300,
                 ];
             }
@@ -39,10 +43,12 @@ class CameraController extends Controller
                 ->first();
 
             $videoUrl = null;
+            $audioUrl = null;
             $blockEndTime = null;
 
             if ($activeScheduled) {
                 $videoUrl = $activeScheduled->video?->videoUrl();
+                $audioUrl = $activeScheduled->video?->audioUrl();
                 $blockEndTime = substr($activeScheduled->end_time, 0, 5);
             } else {
                 // Fall back to default block
@@ -53,17 +59,19 @@ class CameraController extends Controller
                     ->first();
 
                 $videoUrl = $defaultBlock?->video?->videoUrl();
+                $audioUrl = $defaultBlock?->video?->audioUrl();
                 $blockEndTime = CameraDefaultBlock::slots()[$slot]['end'];
             }
 
-            // Calculate seconds until current block ends (handles midnight wrap)
+            // Calculate seconds until current block ends (seconds-precise)
             $blockEndMinutes = $blockEndTime === '24:00' ? 1440 : $this->timeToMinutes($blockEndTime);
-            $currentMinutes = intval($now->format('H')) * 60 + intval($now->format('i'));
-            $diff = $blockEndMinutes - $currentMinutes;
+            $currentTotalSeconds = intval($now->format('H')) * 3600 + intval($now->format('i')) * 60 + intval($now->format('s'));
+            $blockEndSeconds = $blockEndMinutes * 60;
+            $diff = $blockEndSeconds - $currentTotalSeconds;
             if ($diff <= 0) {
-                $diff += 1440; // wrap around midnight
+                $diff += 86400; // wrap around midnight
             }
-            $secondsUntilEnd = max(60, $diff * 60);
+            $secondsUntilEnd = max(5, $diff);
 
             // Check if a scheduled video starts sooner
             $nextScheduled = $camera->scheduledVideos
@@ -73,8 +81,8 @@ class CameraController extends Controller
                 ->first();
 
             if ($nextScheduled) {
-                $nextStartMinutes = $this->timeToMinutes(substr($nextScheduled->start_time, 0, 5));
-                $secondsUntilNext = max(60, ($nextStartMinutes - $currentMinutes) * 60);
+                $nextStartSeconds = $this->timeToMinutes(substr($nextScheduled->start_time, 0, 5)) * 60;
+                $secondsUntilNext = max(5, $nextStartSeconds - $currentTotalSeconds);
                 $secondsUntilEnd = min($secondsUntilEnd, $secondsUntilNext);
             }
 
@@ -83,14 +91,22 @@ class CameraController extends Controller
                 'name' => $camera->name,
                 'status' => 'online',
                 'video_url' => $videoUrl,
+                'audio_url' => $audioUrl,
+                'background_url' => $camera->backgroundUrl(),
+                'background_is_video' => $camera->backgroundIsVideo(),
                 'next_check_seconds' => $secondsUntilEnd,
             ];
         });
+
+        $siteSettings = SiteSetting::first();
 
         return response()->json([
             'cameras' => $result->values(),
             'server_time' => $now->toIso8601String(),
             'slots' => CameraSlotSetting::getSlots(),
+            'weather_enabled' => (bool) ($siteSettings?->weather_enabled ?? true),
+            'static_enabled' => (bool) ($siteSettings?->static_enabled ?? true),
+            'static_intensity' => (int) ($siteSettings?->static_intensity ?? 15),
         ]);
     }
 

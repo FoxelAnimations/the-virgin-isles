@@ -18,6 +18,8 @@ class CameraPlanner extends Component
 
     // Video upload
     public $videoUpload = null;
+    public array $audioUploads = [];
+    public $backgroundUpload = null;
 
     // Default video selections (slot_key => video_id|null)
     public array $defaultSelections = [];
@@ -37,6 +39,17 @@ class CameraPlanner extends Component
     {
         $this->camera = $camera;
         $this->loadDefaultSelections();
+    }
+
+    public function updateName(string $name): void
+    {
+        $name = trim($name);
+        if ($name === '' || $name === $this->camera->name) {
+            return;
+        }
+
+        $this->camera->update(['name' => $name]);
+        $this->camera->refresh();
     }
 
     protected function loadDefaultSelections(): void
@@ -77,12 +90,81 @@ class CameraPlanner extends Component
         session()->flash('status', 'Video geüpload.');
     }
 
+    public function uploadAudio(int $videoId): void
+    {
+        $this->validate([
+            "audioUploads.{$videoId}" => ['required', 'mimes:mp3,wav,ogg,aac,m4a', 'max:51200'],
+        ]);
+
+        $video = CameraVideo::where('camera_id', $this->camera->id)->findOrFail($videoId);
+
+        // Delete old audio if exists
+        if ($video->audio_path) {
+            Storage::disk('public')->delete($video->audio_path);
+        }
+
+        $path = $this->audioUploads[$videoId]->store("cameras/{$this->camera->id}/audio", 'public');
+        $video->update(['audio_path' => $path]);
+
+        unset($this->audioUploads[$videoId]);
+        session()->flash('status', 'Audio geüpload.');
+    }
+
+    public function removeAudio(int $videoId): void
+    {
+        $video = CameraVideo::where('camera_id', $this->camera->id)->findOrFail($videoId);
+
+        if ($video->audio_path) {
+            Storage::disk('public')->delete($video->audio_path);
+            $video->update(['audio_path' => null]);
+        }
+
+        session()->flash('status', 'Audio verwijderd.');
+    }
+
+    // ─── Background ─────────────────────────────────────────
+
+    public function uploadBackground(): void
+    {
+        $this->validate([
+            'backgroundUpload' => ['required', 'mimes:jpg,jpeg,png,gif,webm', 'max:51200'],
+        ]);
+
+        // Delete old background if exists
+        if ($this->camera->background_path) {
+            Storage::disk('public')->delete($this->camera->background_path);
+        }
+
+        $path = $this->backgroundUpload->store(
+            "cameras/{$this->camera->id}/backgrounds",
+            'public'
+        );
+
+        $this->camera->update(['background_path' => $path]);
+
+        $this->reset('backgroundUpload');
+        session()->flash('status', 'Achtergrond geüpload.');
+    }
+
+    public function removeBackground(): void
+    {
+        if ($this->camera->background_path) {
+            Storage::disk('public')->delete($this->camera->background_path);
+            $this->camera->update(['background_path' => null]);
+        }
+
+        session()->flash('status', 'Achtergrond verwijderd.');
+    }
+
     public function deleteVideo(int $id): void
     {
         $video = CameraVideo::where('camera_id', $this->camera->id)->findOrFail($id);
 
         if ($video->video_path) {
             Storage::disk('public')->delete($video->video_path);
+        }
+        if ($video->audio_path) {
+            Storage::disk('public')->delete($video->audio_path);
         }
 
         $video->delete();

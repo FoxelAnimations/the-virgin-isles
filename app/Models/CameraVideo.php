@@ -12,6 +12,7 @@ class CameraVideo extends Model
         'camera_id',
         'filename',
         'video_path',
+        'audio_path',
         'sort_order',
     ];
 
@@ -23,5 +24,10 @@ class CameraVideo extends Model
     public function videoUrl(): ?string
     {
         return $this->video_path ? Storage::url($this->video_path) : null;
+    }
+
+    public function audioUrl(): ?string
+    {
+        return $this->audio_path ? Storage::url($this->audio_path) : null;
     }
 }
