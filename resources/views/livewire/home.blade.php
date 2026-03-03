@@ -19,7 +19,7 @@
                             <img
                                 src="{{ Storage::url($character->full_body_image_path) }}"
                                 alt="{{ $character->first_name }}"
-                                class="h-48 sm:h-56 md:h-64 lg:h-72 w-auto transition-opacity duration-300 {{ $character->full_body_image_hover_path ? 'group-hover:opacity-0' : '' }}"
+                                class="w-full max-h-56 sm:max-h-64 md:max-h-72 lg:max-h-80 transition-opacity duration-300 {{ $character->full_body_image_hover_path ? 'group-hover:opacity-0' : '' }}"
                                 loading="eager"
                                 draggable="false"
                             />
@@ -27,7 +27,7 @@
                                 <img
                                     src="{{ Storage::url($character->full_body_image_hover_path) }}"
                                     alt="{{ $character->first_name }}"
-                                    class="h-48 sm:h-56 md:h-64 lg:h-72 w-auto absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    class="w-full max-h-56 sm:max-h-64 md:max-h-72 lg:max-h-80 absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                     loading="eager"
                                     draggable="false"
                                 />

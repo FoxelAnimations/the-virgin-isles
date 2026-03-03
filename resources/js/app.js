@@ -13,24 +13,22 @@ function initCharacterCarousel() {
     if (!el || el.swiper) return;
 
     new Swiper(el, {
-        slidesPerView: 5,
+        slidesPerView: 3,
         slidesPerGroup: 1,
         centeredSlides: true,
         loop: true,
         grabCursor: true,
-        spaceBetween: 16,
+        spaceBetween: 12,
         speed: 750,
         watchSlidesProgress: true,
 
         breakpoints: {
             768: {
-                slidesPerView: 7,
-                slidesPerGroup: 1,
+                slidesPerView: 5,
                 spaceBetween: 16,
             },
             1024: {
-                slidesPerView: 9,
-                slidesPerGroup: 1,
+                slidesPerView: 7,
                 spaceBetween: 16,
             },
         },
