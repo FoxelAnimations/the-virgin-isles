@@ -1,6 +1,29 @@
 <div class="bg-black min-h-screen -mt-16 pt-16 text-white overflow-x-hidden">
 
     {{-- ============================================================
+         CHARACTER CAROUSEL
+         ============================================================ --}}
+    @if ($characters->count() >= 5)
+        <section class="w-full overflow-hidden bg-black" wire:ignore>
+            <div class="character-carousel swiper">
+                <div class="swiper-wrapper">
+                    @foreach ($characters as $character)
+                        <div class="swiper-slide">
+                            <img
+                                src="{{ Storage::url($character->full_body_image_path) }}"
+                                alt="{{ $character->first_name }}"
+                                class="h-48 sm:h-56 md:h-64 lg:h-72 w-auto"
+                                loading="eager"
+                                draggable="false"
+                            />
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    {{-- ============================================================
          HERO SECTION
          ============================================================ --}}
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
