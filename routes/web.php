@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BeaconController;
 use App\Livewire\Characters\Index as CharacterIndex;
 use App\Livewire\Episodes\Show as EpisodeShow;
 use App\Livewire\UserDashboard;
@@ -20,6 +21,11 @@ use App\Livewire\Admin\ContentBlocks;
 use App\Livewire\Admin\Cameras as AdminCameras;
 use App\Livewire\Admin\CameraPlanner;
 use App\Livewire\Admin\CameraSettings;
+use App\Livewire\Admin\Beacons as AdminBeacons;
+use App\Livewire\Admin\BeaconDetail;
+use App\Livewire\Admin\BeaconTypes;
+use App\Livewire\Admin\BeaconLogs;
+use App\Livewire\Admin\BeaconAnalytics;
 use App\Livewire\Cameras\Index as CameraIndex;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +34,10 @@ Route::get('/personages', CharacterIndex::class)->name('characters.index');
 Route::get('/episodes', EpisodeShow::class)->name('episodes.index');
 Route::get('/blog', Blog::class)->name('blog');
 Route::get('/cameras', CameraIndex::class)->name('cameras.index');
+
+// Public beacon scan endpoint (rate limiting handled inside controller to allow logging with flag)
+Route::get('/beacon/{guid}', [BeaconController::class, 'scan'])
+    ->name('beacon.scan');
 
 Route::get('/admin/login', AdminLogin::class)->middleware('guest')->name('admin.login');
 
@@ -53,5 +63,12 @@ Route::middleware([
         Route::get('/admin/cameras', AdminCameras::class)->name('admin.cameras');
         Route::get('/admin/cameras/settings', CameraSettings::class)->name('admin.camera-settings');
         Route::get('/admin/cameras/{camera}/planner', CameraPlanner::class)->name('admin.camera-planner');
+
+        // Beacons
+        Route::get('/admin/beacons', AdminBeacons::class)->name('admin.beacons');
+        Route::get('/admin/beacons/types', BeaconTypes::class)->name('admin.beacon-types');
+        Route::get('/admin/beacons/logs', BeaconLogs::class)->name('admin.beacon-logs');
+        Route::get('/admin/beacons/analytics', BeaconAnalytics::class)->name('admin.beacon-analytics');
+        Route::get('/admin/beacons/{beacon}', BeaconDetail::class)->name('admin.beacon-detail');
     });
 });

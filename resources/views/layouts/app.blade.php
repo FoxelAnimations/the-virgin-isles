@@ -17,7 +17,7 @@
         <!-- Styles -->
         @livewireStyles
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased overflow-x-hidden">
         <x-banner />
 
         <div class="min-h-screen {{ $bgClass ?? 'bg-gray-100' }}">

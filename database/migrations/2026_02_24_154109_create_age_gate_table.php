@@ -7,13 +7,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('age_gate', function (Blueprint $table) {
             $table->id();
+            $table->boolean('enabled')->default(true);
             $table->text('message');
             $table->string('confirm_text');
             $table->string('deny_text');
@@ -22,6 +20,7 @@ return new class extends Migration
         });
 
         DB::table('age_gate')->insert([
+            'enabled' => true,
             'message' => 'Deze website bevat content die alleen geschikt is voor bezoekers van 18 jaar en ouder. Ben je 18 of ouder?',
             'confirm_text' => 'Ja, ik ben 18+',
             'deny_text' => 'Nee',
@@ -31,9 +30,6 @@ return new class extends Migration
         ]);
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('age_gate');

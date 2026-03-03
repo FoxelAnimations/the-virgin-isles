@@ -13,6 +13,14 @@ return new class extends Migration
             $table->id();
             $table->boolean('login_enabled')->default(true);
             $table->boolean('register_enabled')->default(false);
+            $table->boolean('chat_enabled')->default(false);
+            $table->foreignId('default_chat_character_id')
+                ->nullable()
+                ->constrained('characters')
+                ->nullOnDelete();
+            $table->string('chat_blocked_sound')->nullable();
+            $table->string('chat_notification_sound')->nullable();
+            $table->boolean('weather_enabled')->default(true);
             $table->timestamps();
         });
 

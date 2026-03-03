@@ -11,14 +11,18 @@ return new class extends Migration
         Schema::create('chat_conversations', function (Blueprint $table) {
             $table->id();
             $table->uuid('visitor_uuid');
+            $table->string('visitor_name')->nullable();
+            $table->string('visitor_ip', 45)->nullable();
             $table->foreignId('character_id')->constrained('characters')->cascadeOnDelete();
             $table->enum('status', ['open', 'closed'])->default('open');
             $table->unsignedInteger('unread_count')->default(0);
             $table->timestamp('last_message_at')->nullable();
+            $table->timestamp('blocked_attempt_at')->nullable();
             $table->timestamps();
 
             $table->index(['status', 'last_message_at']);
             $table->index(['visitor_uuid', 'character_id']);
+            $table->index('visitor_ip');
         });
     }
 

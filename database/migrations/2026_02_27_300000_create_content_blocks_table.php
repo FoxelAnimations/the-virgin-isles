@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('separator_color')->nullable();
 
             $table->boolean('is_active')->default(true);
+            $table->enum('placement', ['home', 'blog', 'both'])->default('home');
             $table->unsignedInteger('sort_order')->default(0);
 
             $table->timestamps();

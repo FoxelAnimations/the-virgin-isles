@@ -14,6 +14,9 @@ return new class extends Migration
             $table->boolean('is_offline')->default(false);
             $table->boolean('is_hidden')->default(false);
             $table->unsignedInteger('sort_order')->default(0);
+            $table->string('background_path')->nullable();
+            $table->boolean('static_enabled')->default(true);
+            $table->unsignedTinyInteger('static_intensity')->default(15);
             $table->timestamps();
         });
     }

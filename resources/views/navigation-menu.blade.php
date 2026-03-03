@@ -52,26 +52,54 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-black">
-        <div class="pt-2 pb-3 space-y-1">
-            <a href="{{ route('home') }}" class="block px-4 py-2 {{ request()->routeIs('home') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest hover:text-[#E7FF57] transition">THUS</a>
-            <a href="{{ route('episodes.index') }}" class="block px-4 py-2 {{ request()->routeIs('episodes.index') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest hover:text-[#E7FF57] transition">AFLEVERINGEN</a>
-            <a href="{{ route('characters.index') }}" class="block px-4 py-2 {{ request()->routeIs('characters.index') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest hover:text-[#E7FF57] transition">PERSONAGES</a>
-            <a href="{{ route('blog') }}" class="block px-4 py-2 {{ request()->routeIs('blog') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest hover:text-[#E7FF57] transition">BLOG</a>
-            <a href="{{ route('cameras.index') }}" class="block px-4 py-2 {{ request()->routeIs('cameras.index') ? 'text-[#E7FF57]' : 'text-white' }} text-lg tracking-widest hover:text-[#E7FF57] transition">CAMERA'S</a>
+    <!-- Full-Screen Mobile Menu Overlay -->
+    <div x-show="open"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         x-cloak
+         class="fixed inset-0 z-50 bg-black flex flex-col sm:hidden"
+    >
+        <!-- Header: Logo + Close -->
+        <div class="flex items-center justify-between px-4 h-16">
+            <a href="{{ route('home') }}" class="block h-20 w-auto py-3">
+                <x-application-mark/>
+            </a>
+            <button @click="open = false" class="inline-flex items-center justify-center p-2 text-[#E7FF57] hover:text-white transition">
+                <svg class="size-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="flex-1 flex flex-col items-center justify-center space-y-6">
+            <a href="{{ route('home') }}" @click="open = false" class="{{ request()->routeIs('home') ? 'text-[#E7FF57]' : 'text-white' }} text-2xl tracking-widest hover:text-[#E7FF57] transition">THUS</a>
+            <a href="{{ route('episodes.index') }}" @click="open = false" class="{{ request()->routeIs('episodes.index') ? 'text-[#E7FF57]' : 'text-white' }} text-2xl tracking-widest hover:text-[#E7FF57] transition">AFLEVERINGEN</a>
+            <a href="{{ route('characters.index') }}" @click="open = false" class="{{ request()->routeIs('characters.index') ? 'text-[#E7FF57]' : 'text-white' }} text-2xl tracking-widest hover:text-[#E7FF57] transition">PERSONAGES</a>
+            <a href="{{ route('blog') }}" @click="open = false" class="{{ request()->routeIs('blog') ? 'text-[#E7FF57]' : 'text-white' }} text-2xl tracking-widest hover:text-[#E7FF57] transition">BLOG</a>
+            <a href="{{ route('cameras.index') }}" @click="open = false" class="{{ request()->routeIs('cameras.index') ? 'text-[#E7FF57]' : 'text-white' }} text-2xl tracking-widest hover:text-[#E7FF57] transition">CAMERA'S</a>
             @auth
                 @can('access-admin')
-                    <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-[#E7FF57] text-lg tracking-widest hover:brightness-90 transition">ADMIN</a>
+                    <a href="{{ route('admin.dashboard') }}" @click="open = false" class="text-[#E7FF57] text-2xl tracking-widest hover:brightness-90 transition">ADMIN</a>
                 @endcan
-                <a href="{{ route('dashboard') }}" class="block mx-4 mt-2 bg-[#E7FF57] text-black text-lg tracking-widest px-6 py-2 text-center transition hover:opacity-90">DASHBOARD</a>
-                <form method="POST" action="{{ route('logout') }}" class="px-4 mt-2">
+            @endauth
+        </div>
+
+        <!-- Bottom Actions -->
+        <div class="px-6 pb-10 space-y-3">
+            @auth
+                <a href="{{ route('dashboard') }}" class="block bg-[#E7FF57] text-black text-lg tracking-widest px-6 py-3 text-center transition hover:opacity-90">DASHBOARD</a>
+                <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full border border-white text-white text-lg tracking-widest px-6 py-2 text-center transition hover:bg-white hover:text-black">UITLOGGEN</button>
+                    <button type="submit" class="w-full border border-white text-white text-lg tracking-widest px-6 py-3 text-center transition hover:bg-white hover:text-black">UITLOGGEN</button>
                 </form>
             @else
                 @if(\App\Models\SiteSetting::first()?->login_enabled)
-                    <a href="{{ route('login') }}" class="block px-4 py-2 text-white text-lg tracking-widest hover:text-[#E7FF57] transition">INLOGGEN</a>
+                    <a href="{{ route('login') }}" class="block text-center text-white text-lg tracking-widest hover:text-[#E7FF57] transition py-3">INLOGGEN</a>
                 @endif
             @endauth
         </div>

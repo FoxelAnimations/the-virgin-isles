@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('youtube_link')->nullable();
             $table->string('tiktok_url')->nullable();
             $table->string('twitter_url')->nullable();
+            $table->unsignedInteger('sort_order')->default(0);
+            $table->boolean('age_restricted')->default(false);
             $table->timestamps();
         });
     }

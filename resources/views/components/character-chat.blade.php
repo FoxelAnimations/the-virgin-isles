@@ -408,7 +408,7 @@
         }
     }"
     x-cloak
-    class="fixed bottom-6 right-6 z-50"
+    class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50"
 >
     {{-- Chat Bubble --}}
     <template x-if="characters.length > 0">
@@ -422,7 +422,7 @@
                 x-transition:leave="transition ease-in duration-150"
                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-                class="absolute bottom-16 right-0 w-[360px] h-[500px] bg-zinc-900 border border-zinc-700 rounded-sm shadow-2xl flex flex-col overflow-hidden"
+                class="fixed bottom-20 right-4 left-4 sm:left-auto sm:absolute sm:bottom-16 sm:right-0 sm:w-[360px] h-[min(500px,70vh)] bg-zinc-900 border border-zinc-700 rounded-sm shadow-2xl flex flex-col overflow-hidden"
             >
                 {{-- Header --}}
                 <div class="bg-zinc-800 border-b border-zinc-700 px-4 py-3 flex items-center gap-3 shrink-0">

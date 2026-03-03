@@ -8,15 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('episodes', function (Blueprint $table) {
-            $table->boolean('age_restricted')->default(false)->after('sort_order');
+        Schema::create('beacon_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->string('slug')->unique();
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::table('episodes', function (Blueprint $table) {
-            $table->dropColumn('age_restricted');
-        });
+        Schema::dropIfExists('beacon_types');
     }
 };

@@ -1,4 +1,4 @@
-<div class="bg-black min-h-screen -mt-16 pt-16 text-white">
+<div class="bg-black min-h-screen -mt-16 pt-16 text-white overflow-x-hidden">
 
     {{-- ============================================================
          HERO SECTION
@@ -43,7 +43,7 @@
                         <p class="text-sm tracking-[0.3em] uppercase text-zinc-400 mb-4">{{ $heroContent->pre_title }}</p>
                     @endif
                     @if ($heroContent?->title)
-                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold uppercase leading-none mb-4">
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold uppercase leading-none mb-4 break-words">
                             {{ $heroContent->title }}
                         </h1>
                     @endif
@@ -256,15 +256,15 @@
                                 </div>
 
                                 {{-- Text Side --}}
-                                <div class="{{ $loop->index % 2 !== 0 ? 'md:order-1' : '' }} flex flex-col justify-center">
+                                <div class="{{ $loop->index % 2 !== 0 ? 'md:order-1' : '' }} flex flex-col justify-center min-w-0">
                                     @if ($block->pre_title)
                                         <p class="text-sm tracking-[0.3em] uppercase text-zinc-400 mb-4">{{ $block->pre_title }}</p>
                                     @endif
                                     @if ($block->title)
-                                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold uppercase leading-none mb-4">{{ $block->title }}</h2>
+                                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold uppercase leading-none mb-4 break-words">{{ $block->title }}</h2>
                                     @endif
                                     @if ($block->text)
-                                        <p class="text-zinc-400 text-lg leading-relaxed">{{ $block->text }}</p>
+                                        <p class="text-zinc-400 text-lg leading-relaxed break-words">{{ $block->text }}</p>
                                     @endif
                                     @if ($block->hasButton())
                                         <div class="mt-6">
@@ -285,10 +285,10 @@
                                     <p class="text-sm tracking-[0.3em] uppercase text-zinc-400 mb-4">{{ $block->pre_title }}</p>
                                 @endif
                                 @if ($block->title)
-                                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold uppercase leading-none mb-4">{{ $block->title }}</h2>
+                                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold uppercase leading-none mb-4 break-words">{{ $block->title }}</h2>
                                 @endif
                                 @if ($block->text)
-                                    <p class="text-zinc-400 text-lg leading-relaxed">{{ $block->text }}</p>
+                                    <p class="text-zinc-400 text-lg leading-relaxed break-words">{{ $block->text }}</p>
                                 @endif
                                 @if ($block->hasButton())
                                     <div class="mt-6">

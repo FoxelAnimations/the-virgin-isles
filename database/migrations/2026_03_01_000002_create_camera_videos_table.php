@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('camera_id')->constrained()->cascadeOnDelete();
             $table->string('filename');
             $table->string('video_path');
+            $table->string('audio_path')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
         });
