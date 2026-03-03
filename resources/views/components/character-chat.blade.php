@@ -19,6 +19,7 @@
         chatMode: 'ai',
         chatOnline: true,
         pollInterval: null,
+        statusInterval: null,
         blockedCheckInterval: null,
         waitingForReply: false,
         hasMore: false,
@@ -234,7 +235,9 @@
 
         startPolling() {
             this.stopPolling();
-            this.pollInterval = setInterval(() => this.pollForMessages(), 3000);
+            this.pollInterval = setInterval(() => this.pollForMessages(), 2000);
+            // Refresh character online status every 30s (separate from message polling)
+            this.statusInterval = setInterval(() => this.refreshCharacterStatus(), 30000);
         },
 
         stopPolling() {
@@ -242,6 +245,22 @@
                 clearInterval(this.pollInterval);
                 this.pollInterval = null;
             }
+            if (this.statusInterval) {
+                clearInterval(this.statusInterval);
+                this.statusInterval = null;
+            }
+        },
+
+        async refreshCharacterStatus() {
+            try {
+                const res = await fetch('/api/chat/characters');
+                if (!res.ok) return;
+                const data = await res.json();
+                this.characters = data.characters || [];
+                this.chatOnline = this.activeCharacter?.chat_online ?? true;
+                this.notificationSoundUrl = data.notification_sound_url || null;
+                this.blockedSoundUrl = data.blocked_sound_url || null;
+            } catch (e) {}
         },
 
         startBlockedCheck() {
@@ -278,16 +297,6 @@
 
         async pollForMessages() {
             if (!this.conversationId || !this.visitorUuid) return;
-
-            // Refresh online status
-            try {
-                const charRes = await fetch('/api/chat/characters');
-                const charData = await charRes.json();
-                this.characters = charData.characters || [];
-                this.chatOnline = this.activeCharacter?.chat_online ?? true;
-                this.notificationSoundUrl = charData.notification_sound_url || null;
-                this.blockedSoundUrl = charData.blocked_sound_url || null;
-            } catch (e) {}
 
             try {
                 const params = new URLSearchParams({
