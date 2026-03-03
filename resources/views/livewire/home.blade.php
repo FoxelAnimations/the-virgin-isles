@@ -3,19 +3,28 @@
     {{-- ============================================================
          CHARACTER CAROUSEL
          ============================================================ --}}
-    @if ($characters->count() >= 5)
+    @if ($characters->count() >= 1)
         <section class="w-full overflow-hidden bg-black" wire:ignore>
             <div class="character-carousel swiper">
                 <div class="swiper-wrapper">
                     @foreach ($characters as $character)
-                        <div class="swiper-slide">
+                        <div class="swiper-slide group">
                             <img
                                 src="{{ Storage::url($character->full_body_image_path) }}"
                                 alt="{{ $character->first_name }}"
-                                class="h-48 sm:h-56 md:h-64 lg:h-72 w-auto"
+                                class="h-48 sm:h-56 md:h-64 lg:h-72 w-auto transition-opacity duration-300 {{ $character->full_body_image_hover_path ? 'group-hover:opacity-0' : '' }}"
                                 loading="eager"
                                 draggable="false"
                             />
+                            @if ($character->full_body_image_hover_path)
+                                <img
+                                    src="{{ Storage::url($character->full_body_image_hover_path) }}"
+                                    alt="{{ $character->first_name }}"
+                                    class="h-48 sm:h-56 md:h-64 lg:h-72 w-auto absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    loading="eager"
+                                    draggable="false"
+                                />
+                            @endif
                         </div>
                     @endforeach
                 </div>

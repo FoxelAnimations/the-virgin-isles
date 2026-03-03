@@ -12,11 +12,14 @@ function initCharacterCarousel() {
     const el = document.querySelector('.character-carousel');
     if (!el || el.swiper) return;
 
+    const slideCount = el.querySelectorAll('.swiper-slide').length;
+    const canLoop = slideCount >= 5;
+
     new Swiper(el, {
-        slidesPerView: 5,
-        slidesPerGroup: 2,
+        slidesPerView: Math.min(slideCount, 5),
+        slidesPerGroup: canLoop ? 2 : 1,
         centeredSlides: true,
-        loop: true,
+        loop: canLoop,
         grabCursor: true,
         spaceBetween: 16,
         speed: 750,
@@ -24,13 +27,13 @@ function initCharacterCarousel() {
 
         breakpoints: {
             768: {
-                slidesPerView: 7,
-                slidesPerGroup: 2,
+                slidesPerView: Math.min(slideCount, 7),
+                slidesPerGroup: canLoop ? 2 : 1,
                 spaceBetween: 16,
             },
             1024: {
-                slidesPerView: 9,
-                slidesPerGroup: 3,
+                slidesPerView: Math.min(slideCount, 9),
+                slidesPerGroup: canLoop ? 3 : 1,
                 spaceBetween: 16,
             },
         },
@@ -40,8 +43,8 @@ function initCharacterCarousel() {
                 for (let i = 0; i < swiper.slides.length; i++) {
                     const slide = swiper.slides[i];
                     const absProgress = Math.min(Math.abs(slide.progress), 3);
-                    const scale = Math.max(1 - absProgress * 0.06, 0.82);
-                    const opacity = Math.max(1 - absProgress * 0.15, 0.5);
+                    const scale = Math.max(1 - absProgress * 0.25, 0.4);
+                    const opacity = Math.max(1 - absProgress * 0.5, 0.08);
                     slide.style.transform = `scale(${scale})`;
                     slide.style.opacity = opacity;
                 }

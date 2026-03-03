@@ -39,6 +39,7 @@
 }
 
 .character-carousel .swiper-slide {
+    position: relative;
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -47,7 +48,6 @@
 .character-carousel .swiper-slide img {
     object-fit: contain;
     object-position: bottom center;
-    pointer-events: none;
     user-select: none;
     -webkit-user-drag: none;
 }
