@@ -7,6 +7,7 @@ use App\Models\CharacterSocialLink;
 use App\Models\Job;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -58,7 +59,7 @@ class EditCharacter extends Component
             'chat_mode' => ['required', 'string', 'in:ai,manual'],
             'chat_online' => ['boolean'],
             'character_social_links.*.title' => ['required', 'string', 'max:255'],
-            'character_social_links.*.url' => ['required', 'url', 'max:255'],
+            'character_social_links.*.url' => ['required', 'string', 'starts_with:https://,http://', 'max:255'],
             'profile_image' => ['nullable', 'image', 'max:2048'],
             'profile_image_hover' => ['nullable', 'image', 'max:2048'],
             'full_body_image' => ['nullable', 'image', 'max:2048'],
@@ -72,58 +73,53 @@ class EditCharacter extends Component
 
     public function save(): void
     {
-        $validated = $this->validate();
-
         try {
+            $validated = $this->validate();
+
             DB::transaction(function () use ($validated) {
-                $this->character->first_name = $validated['first_name'];
-                $this->character->last_name = $validated['last_name'] ?? null;
-                $this->character->nick_name = $validated['nick_name'] ?? null;
-                $this->character->age = $validated['age'] ?? null;
-                $this->character->job_id = $validated['job_id'] ?? null;
-                $this->character->bio = $validated['bio'] ?? null;
-                $this->character->personality = $validated['personality'] ?? null;
-                $this->character->speaking_style = $validated['speaking_style'] ?? null;
-                $this->character->backstory = $validated['backstory'] ?? null;
-                $this->character->example_phrases = $validated['example_phrases'] ?? null;
-                $this->character->chat_instructions = $validated['chat_instructions'] ?? null;
-                $this->character->chat_enabled = $validated['chat_enabled'];
-                $this->character->chat_mode = $validated['chat_mode'];
-                $this->character->chat_online = $validated['chat_online'];
+                $imageData = [];
 
                 if ($this->profile_image) {
-                    $this->character->profile_image_path = $this->profile_image->store('characters/profile', 'public');
+                    $imageData['profile_image_path'] = $this->profile_image->store('characters/profile', 'public');
                 }
-
                 if ($this->profile_image_hover) {
-                    $this->character->profile_image_hover_path = $this->profile_image_hover->store('characters/profile', 'public');
+                    $imageData['profile_image_hover_path'] = $this->profile_image_hover->store('characters/profile', 'public');
                 }
-
                 if ($this->full_body_image) {
-                    $this->character->full_body_image_path = $this->full_body_image->store('characters/full-body', 'public');
+                    $imageData['full_body_image_path'] = $this->full_body_image->store('characters/full-body', 'public');
                 }
-
                 if ($this->full_body_image_hover) {
-                    $this->character->full_body_image_hover_path = $this->full_body_image_hover->store('characters/full-body', 'public');
+                    $imageData['full_body_image_hover_path'] = $this->full_body_image_hover->store('characters/full-body', 'public');
                 }
-
                 if ($this->profile_photo) {
-                    $this->character->profile_photo_path = $this->profile_photo->store('characters/profile-photo', 'public');
+                    $imageData['profile_photo_path'] = $this->profile_photo->store('characters/profile-photo', 'public');
                 }
-
                 if ($this->profile_photo_hover) {
-                    $this->character->profile_photo_hover_path = $this->profile_photo_hover->store('characters/profile-photo', 'public');
+                    $imageData['profile_photo_hover_path'] = $this->profile_photo_hover->store('characters/profile-photo', 'public');
                 }
-
                 if ($this->chat_image) {
-                    $this->character->chat_image_path = $this->chat_image->store('characters/chat', 'public');
+                    $imageData['chat_image_path'] = $this->chat_image->store('characters/chat', 'public');
                 }
-
                 if ($this->background_image) {
-                    $this->character->background_image_path = $this->background_image->store('characters/background', 'public');
+                    $imageData['background_image_path'] = $this->background_image->store('characters/background', 'public');
                 }
 
-                $this->character->save();
+                $this->character->update(array_merge([
+                    'first_name' => $validated['first_name'],
+                    'last_name' => $validated['last_name'] ?? null,
+                    'nick_name' => $validated['nick_name'] ?? null,
+                    'age' => $validated['age'] ?? null,
+                    'job_id' => $validated['job_id'] ?? null,
+                    'bio' => $validated['bio'] ?? null,
+                    'personality' => $validated['personality'] ?? null,
+                    'speaking_style' => $validated['speaking_style'] ?? null,
+                    'backstory' => $validated['backstory'] ?? null,
+                    'example_phrases' => $validated['example_phrases'] ?? null,
+                    'chat_instructions' => $validated['chat_instructions'] ?? null,
+                    'chat_enabled' => $validated['chat_enabled'],
+                    'chat_mode' => $validated['chat_mode'],
+                    'chat_online' => $validated['chat_online'],
+                ], $imageData));
 
                 foreach ($this->character_social_links as $linkData) {
                     CharacterSocialLink::where('id', $linkData['id'])->update([
@@ -133,7 +129,10 @@ class EditCharacter extends Component
                 }
             });
 
+            $this->character->refresh();
             session()->flash('status', 'Character updated successfully.');
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
             session()->flash('error', 'Save failed: ' . $e->getMessage());
         }
