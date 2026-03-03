@@ -14,7 +14,7 @@ function initCharacterCarousel() {
 
     new Swiper(el, {
         slidesPerView: 5,
-        slidesPerGroup: 2,
+        slidesPerGroup: 1,
         centeredSlides: true,
         loop: true,
         grabCursor: true,
@@ -25,12 +25,12 @@ function initCharacterCarousel() {
         breakpoints: {
             768: {
                 slidesPerView: 7,
-                slidesPerGroup: 2,
+                slidesPerGroup: 1,
                 spaceBetween: 16,
             },
             1024: {
                 slidesPerView: 9,
-                slidesPerGroup: 3,
+                slidesPerGroup: 1,
                 spaceBetween: 16,
             },
         },
