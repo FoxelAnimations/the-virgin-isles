@@ -42,7 +42,7 @@
     {{-- ============================================================
          HERO SECTION
          ============================================================ --}}
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:pb-20">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-stretch">
             {{-- Left: Video or Image (1/3) --}}
             <div class="bg-zinc-900 border border-zinc-800 rounded-sm overflow-hidden relative md:col-span-1">
