@@ -196,6 +196,38 @@
             </div>
         </div>
 
+        {{-- Homepage Content Settings --}}
+        <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden mt-6" x-data="{ open: false }">
+            <button type="button" @click="open = !open" class="w-full bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between hover:bg-zinc-700/50 transition">
+                <span>{{ __('Homepage Content') }}</span>
+                <svg class="w-4 h-4 text-zinc-400 transition-transform" :class="open && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="p-4" x-show="open" x-transition>
+                <form wire:submit="saveHomepageSettings" class="space-y-4">
+                    <p class="text-sm text-zinc-500">{{ __('Choose which content sections to display on the homepage. Each section shows the 5 most recent items.') }}</p>
+
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" wire:model.live="showEpisodes" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
+                        <span class="text-sm font-medium text-white">{{ __('Show Episodes') }}</span>
+                    </label>
+
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" wire:model.live="showShorts" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
+                        <span class="text-sm font-medium text-white">{{ __('Show Shorts') }}</span>
+                    </label>
+
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" wire:model.live="showMinis" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
+                        <span class="text-sm font-medium text-white">{{ __('Show Minis') }}</span>
+                    </label>
+
+                    <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
+                        {{ __('Save Homepage Settings') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+
         {{-- Chat Settings CMS --}}
         <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden mt-6" x-data="{ open: false }">
             <button type="button" @click="open = !open" class="w-full bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between hover:bg-zinc-700/50 transition">

@@ -30,6 +30,9 @@ class Dashboard extends Component
     public string $ageGateDenyUrl = '';
     public bool $chatEnabled = false;
     public $defaultChatCharacterId = null;
+    public bool $showEpisodes = true;
+    public bool $showShorts = true;
+    public bool $showMinis = true;
 
     public function mount(): void
     {
@@ -38,6 +41,7 @@ class Dashboard extends Component
         $this->loadAgeGate();
         $this->loadSiteSettings();
         $this->loadChatSettings();
+        $this->loadHomepageSettings();
     }
 
     protected function loadHeroContent(): void
@@ -230,6 +234,28 @@ class Dashboard extends Component
         ]);
 
         session()->flash('status', 'Chat settings updated successfully.');
+        $this->redirect(route('admin.dashboard'));
+    }
+
+    protected function loadHomepageSettings(): void
+    {
+        $settings = SiteSetting::first();
+        if ($settings) {
+            $this->showEpisodes = $settings->show_episodes ?? true;
+            $this->showShorts = $settings->show_shorts ?? true;
+            $this->showMinis = $settings->show_minis ?? true;
+        }
+    }
+
+    public function saveHomepageSettings(): void
+    {
+        SiteSetting::first()?->update([
+            'show_episodes' => $this->showEpisodes,
+            'show_shorts' => $this->showShorts,
+            'show_minis' => $this->showMinis,
+        ]);
+
+        session()->flash('status', 'Homepage settings updated successfully.');
         $this->redirect(route('admin.dashboard'));
     }
 

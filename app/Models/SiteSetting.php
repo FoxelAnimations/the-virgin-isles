@@ -16,6 +16,9 @@ class SiteSetting extends Model
         'chat_blocked_sound',
         'chat_notification_sound',
         'weather_enabled',
+        'show_episodes',
+        'show_shorts',
+        'show_minis',
     ];
 
     protected function casts(): array
@@ -25,6 +28,9 @@ class SiteSetting extends Model
             'register_enabled' => 'boolean',
             'chat_enabled' => 'boolean',
             'weather_enabled' => 'boolean',
+            'show_episodes' => 'boolean',
+            'show_shorts' => 'boolean',
+            'show_minis' => 'boolean',
         ];
     }
 
