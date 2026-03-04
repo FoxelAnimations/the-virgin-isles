@@ -54,15 +54,15 @@
                                         'links' => $character->socialLinks->map(fn($l) => ['title' => $l->title, 'url' => $l->url]),
                                     ]) }}"
                                 >
-                                    <img src="{{ Storage::url($character->full_body_image_path) }}" alt="{{ $character->first_name }}" class="w-full h-full character-static-img" loading="eager" draggable="false" />
+                                    <img src="{{ Storage::url($character->full_body_image_path) }}" alt="{{ $character->first_name }}" class="character-static-img" loading="eager" draggable="false" />
                                     @if ($character->full_body_image_hover_path)
-                                        <img src="{{ Storage::url($character->full_body_image_hover_path) }}" alt="{{ $character->first_name }}" class="w-full h-full absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 character-hover-img" loading="eager" draggable="false" />
+                                        <img src="{{ Storage::url($character->full_body_image_hover_path) }}" alt="{{ $character->first_name }}" class="absolute bottom-0 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 character-hover-img" loading="eager" draggable="false" />
                                     @endif
                                     @if ($character->full_body_image_animated_path)
                                         @if (str_ends_with($character->full_body_image_animated_path, '.webm'))
-                                            <video src="{{ Storage::url($character->full_body_image_animated_path) }}" class="w-full h-full absolute inset-0 character-animated-layer" style="opacity: 0.01;" muted playsinline preload="auto" draggable="false"></video>
+                                            <video src="{{ Storage::url($character->full_body_image_animated_path) }}" class="absolute bottom-0 left-1/2 -translate-x-1/2 character-animated-layer" style="opacity: 0.01;" muted playsinline preload="auto" draggable="false"></video>
                                         @else
-                                            <img src="{{ Storage::url($character->full_body_image_animated_path) }}" alt="{{ $character->first_name }} animated" class="w-full h-full absolute inset-0 character-animated-layer" style="opacity: 0.01;" loading="eager" draggable="false" />
+                                            <img src="{{ Storage::url($character->full_body_image_animated_path) }}" alt="{{ $character->first_name }} animated" class="absolute bottom-0 left-1/2 -translate-x-1/2 character-animated-layer" style="opacity: 0.01;" loading="eager" draggable="false" />
                                         @endif
                                     @endif
                                 </div>
@@ -103,15 +103,15 @@
                                         'links' => $character->socialLinks->map(fn($l) => ['title' => $l->title, 'url' => $l->url]),
                                     ]) }}"
                                 >
-                                    <img src="{{ Storage::url($character->full_body_image_path) }}" alt="{{ $character->first_name }}" class="w-full h-full character-static-img" loading="eager" draggable="false" />
+                                    <img src="{{ Storage::url($character->full_body_image_path) }}" alt="{{ $character->first_name }}" class="character-static-img" loading="eager" draggable="false" />
                                     @if ($character->full_body_image_hover_path)
-                                        <img src="{{ Storage::url($character->full_body_image_hover_path) }}" alt="{{ $character->first_name }}" class="w-full h-full absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 character-hover-img" loading="eager" draggable="false" />
+                                        <img src="{{ Storage::url($character->full_body_image_hover_path) }}" alt="{{ $character->first_name }}" class="absolute bottom-0 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 character-hover-img" loading="eager" draggable="false" />
                                     @endif
                                     @if ($character->full_body_image_animated_path)
                                         @if (str_ends_with($character->full_body_image_animated_path, '.webm'))
-                                            <video src="{{ Storage::url($character->full_body_image_animated_path) }}" class="w-full h-full absolute inset-0 character-animated-layer" style="opacity: 0.01;" muted playsinline preload="auto" draggable="false"></video>
+                                            <video src="{{ Storage::url($character->full_body_image_animated_path) }}" class="absolute bottom-0 left-1/2 -translate-x-1/2 character-animated-layer" style="opacity: 0.01;" muted playsinline preload="auto" draggable="false"></video>
                                         @else
-                                            <img src="{{ Storage::url($character->full_body_image_animated_path) }}" alt="{{ $character->first_name }} animated" class="w-full h-full absolute inset-0 character-animated-layer" style="opacity: 0.01;" loading="eager" draggable="false" />
+                                            <img src="{{ Storage::url($character->full_body_image_animated_path) }}" alt="{{ $character->first_name }} animated" class="absolute bottom-0 left-1/2 -translate-x-1/2 character-animated-layer" style="opacity: 0.01;" loading="eager" draggable="false" />
                                         @endif
                                     @endif
                                 </div>
