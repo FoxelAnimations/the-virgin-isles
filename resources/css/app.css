@@ -45,6 +45,7 @@
     align-items: flex-end;
     justify-content: center;
     cursor: pointer;
+    overflow: hidden;
     height: 14rem;       /* 224px — mobile */
 }
 

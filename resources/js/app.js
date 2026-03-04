@@ -16,9 +16,10 @@ function initCharacterCarousel() {
     let entranceTriggered = false;
     let isDragging = false;
 
-    // Name/job label elements
-    const nameEl = el.parentElement.querySelector('.carousel-center-name');
-    const jobEl = el.parentElement.querySelector('.carousel-center-job');
+    // Name/job label elements (labels are in the wire:ignore wrapper, two levels up)
+    const wrapper = el.parentElement.parentElement;
+    const nameEl = wrapper.querySelector('.carousel-center-name');
+    const jobEl = wrapper.querySelector('.carousel-center-job');
 
     function updateCenterLabel(slides) {
         let closest = null;

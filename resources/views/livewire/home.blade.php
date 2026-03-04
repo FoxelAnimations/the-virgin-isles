@@ -57,7 +57,7 @@
                                 <img
                                     src="{{ Storage::url($character->full_body_image_path) }}"
                                     alt="{{ $character->first_name }}"
-                                    class="w-full h-full character-static-img"
+                                    class="h-full w-auto character-static-img"
                                     loading="eager"
                                     draggable="false"
                                 />
@@ -66,7 +66,7 @@
                                     <img
                                         src="{{ Storage::url($character->full_body_image_hover_path) }}"
                                         alt="{{ $character->first_name }}"
-                                        class="w-full h-full absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 character-hover-img"
+                                        class="h-full w-auto absolute bottom-0 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 character-hover-img"
                                         loading="eager"
                                         draggable="false"
                                     />
@@ -76,7 +76,7 @@
                                     @if (str_ends_with($character->full_body_image_animated_path, '.webm'))
                                         <video
                                             src="{{ Storage::url($character->full_body_image_animated_path) }}"
-                                            class="w-full h-full absolute inset-0 character-animated-layer"
+                                            class="h-full w-auto absolute bottom-0 left-1/2 -translate-x-1/2 character-animated-layer"
                                             style="opacity: 0.01;"
                                             muted
                                             playsinline
@@ -87,7 +87,7 @@
                                         <img
                                             src="{{ Storage::url($character->full_body_image_animated_path) }}"
                                             alt="{{ $character->first_name }} animated"
-                                            class="w-full h-full absolute inset-0 character-animated-layer"
+                                            class="h-full w-auto absolute bottom-0 left-1/2 -translate-x-1/2 character-animated-layer"
                                             style="opacity: 0.01;"
                                             loading="eager"
                                             draggable="false"
