@@ -188,7 +188,7 @@
                                         <span class="text-white text-lg uppercase tracking-wider" x-text="char?.job"></span>
                                     </template>
                                     <template x-if="char?.age">
-                                        <span class="text-zinc-500 text-lg uppercase tracking-wider">Leeftijd<span class="text-accent" x-text="char?.age"></span></span>
+                                        <span class="text-zinc-500 text-lg uppercase tracking-wider">Leeftijd : <span class="text-accent" x-text="char?.age"></span></span>
                                     </template>
                                 </div>
                                 <template x-if="char?.bio">
