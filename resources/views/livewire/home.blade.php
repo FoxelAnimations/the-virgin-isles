@@ -159,18 +159,18 @@
                             <div class="aspect-square bg-zinc-800 overflow-hidden relative group/modal"
                                 :style="char?.background ? 'background-image: url(\'' + char.background + '\'); background-size: cover; background-position: center;' : ''"
                             >
-                                <template x-if="char?.fullBody || char?.image">
+                                <template x-if="char?.image || char?.fullBody">
                                     <div class="w-full h-full relative">
-                                        <img :src="char?.fullBody || char?.image" :alt="char?.name"
+                                        <img :src="char?.image || char?.fullBody" :alt="char?.name"
                                             class="w-full h-full object-cover object-top relative z-[1] transition duration-300"
-                                            :class="(char?.fullBody ? char?.fullBodyHover : char?.imageHover) ? 'group-hover/modal:opacity-0' : ''">
-                                        <template x-if="char?.fullBody ? char?.fullBodyHover : char?.imageHover">
-                                            <img :src="char?.fullBody ? char?.fullBodyHover : char?.imageHover" :alt="char?.name"
+                                            :class="(char?.image ? char?.imageHover : char?.fullBodyHover) ? 'group-hover/modal:opacity-0' : ''">
+                                        <template x-if="char?.image ? char?.imageHover : char?.fullBodyHover">
+                                            <img :src="char?.image ? char?.imageHover : char?.fullBodyHover" :alt="char?.name"
                                                 class="absolute inset-0 w-full h-full object-cover object-top z-[2] opacity-0 transition duration-300 group-hover/modal:opacity-100">
                                         </template>
                                     </div>
                                 </template>
-                                <template x-if="!char?.fullBody && !char?.image && !char?.background">
+                                <template x-if="!char?.image && !char?.fullBody && !char?.background">
                                     <div class="w-full h-full flex items-center justify-center text-zinc-700">
                                         <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     </div>
