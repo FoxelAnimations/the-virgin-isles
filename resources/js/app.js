@@ -40,7 +40,7 @@ function initCharacterCarousel() {
     }
 
     const swiper = new Swiper(el, {
-        slidesPerView: 7,
+        slidesPerView: 3,
         slidesPerGroup: 1,
         centeredSlides: true,
         loop: true,
@@ -53,6 +53,7 @@ function initCharacterCarousel() {
         passiveListeners: true,
 
         breakpoints: {
+            640: { slidesPerView: 5, spaceBetween: 4 },
             768: { slidesPerView: 9, spaceBetween: 6 },
             1024: { slidesPerView: 11, spaceBetween: 6 },
         },
@@ -70,13 +71,18 @@ function initCharacterCarousel() {
                 } catch (e) {}
             },
             setTranslate(swiper) {
+                // Adapt curve based on current slidesPerView so center is always prominent
+                const spv = swiper.params.slidesPerView || 3;
+                const halfView = Math.max(Math.floor(spv / 2), 1);
+
                 for (let i = 0; i < swiper.slides.length; i++) {
                     const slide = swiper.slides[i];
-                    const absProgress = Math.min(Math.abs(slide.progress), 6);
+                    const absProgress = Math.abs(slide.progress);
 
-                    // Gentle hill curve: gradual slope, higher minimum
-                    const scale = Math.max(1 - Math.pow(absProgress / 5, 1.8) * 0.35, 0.65);
-                    const opacity = Math.max(1 - Math.pow(absProgress / 5, 1.5) * 0.75, 0.25);
+                    // Normalize: 0 at center, ~1 at visible edge
+                    const norm = Math.min(absProgress / halfView, 1.2);
+                    const scale = Math.max(1 - Math.pow(norm, 1.5) * 0.4, 0.55);
+                    const opacity = Math.max(1 - Math.pow(norm, 1.3) * 0.85, 0.1);
 
                     if (entranceComplete) {
                         slide.style.transform = `scale(${scale})`;

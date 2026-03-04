@@ -23,9 +23,9 @@
 
             <div wire:ignore>
                 <div class="relative">
-                    {{-- Gradient edges: wide black fade --}}
-                    <div class="absolute inset-y-0 left-0 w-1/3 z-10 pointer-events-none bg-gradient-to-r from-black via-black/60 to-transparent"></div>
-                    <div class="absolute inset-y-0 right-0 w-1/3 z-10 pointer-events-none bg-gradient-to-l from-black via-black/60 to-transparent"></div>
+                    {{-- Gradient edges --}}
+                    <div class="absolute inset-y-0 left-0 w-1/3 z-10 pointer-events-none bg-gradient-to-r from-black/40 via-black/20 to-transparent"></div>
+                    <div class="absolute inset-y-0 right-0 w-1/3 z-10 pointer-events-none bg-gradient-to-l from-black/40 via-black/20 to-transparent"></div>
 
                 <div class="character-carousel carousel-entering swiper">
                     @php
