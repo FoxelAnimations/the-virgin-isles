@@ -23,9 +23,9 @@
 
             <div wire:ignore>
                 <div class="relative">
-                    {{-- Gradient edges: black → zinc-900 → transparent --}}
-                    <div class="absolute inset-y-0 left-0 w-24 sm:w-32 lg:w-48 z-10 pointer-events-none bg-gradient-to-r from-black to-transparent"></div>
-                    <div class="absolute inset-y-0 right-0 w-24 sm:w-32 lg:w-48 z-10 pointer-events-none bg-gradient-to-l from-black to-transparent"></div>
+                    {{-- Gradient edges: wide black fade --}}
+                    <div class="absolute inset-y-0 left-0 w-1/3 z-10 pointer-events-none bg-gradient-to-r from-black via-black/60 to-transparent"></div>
+                    <div class="absolute inset-y-0 right-0 w-1/3 z-10 pointer-events-none bg-gradient-to-l from-black via-black/60 to-transparent"></div>
 
                 <div class="character-carousel carousel-entering swiper">
                     @php
@@ -57,7 +57,7 @@
                                 <img
                                     src="{{ Storage::url($character->full_body_image_path) }}"
                                     alt="{{ $character->first_name }}"
-                                    class="h-full w-auto max-w-full character-static-img"
+                                    class="w-full h-full character-static-img"
                                     loading="eager"
                                     draggable="false"
                                 />
@@ -66,7 +66,7 @@
                                     <img
                                         src="{{ Storage::url($character->full_body_image_hover_path) }}"
                                         alt="{{ $character->first_name }}"
-                                        class="h-full w-auto max-w-full absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 character-hover-img"
+                                        class="w-full h-full absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 character-hover-img"
                                         loading="eager"
                                         draggable="false"
                                     />
@@ -76,7 +76,7 @@
                                     @if (str_ends_with($character->full_body_image_animated_path, '.webm'))
                                         <video
                                             src="{{ Storage::url($character->full_body_image_animated_path) }}"
-                                            class="h-full w-auto max-w-full absolute inset-0 m-auto character-animated-layer"
+                                            class="w-full h-full absolute inset-0 character-animated-layer"
                                             style="opacity: 0.01;"
                                             muted
                                             playsinline
@@ -87,7 +87,7 @@
                                         <img
                                             src="{{ Storage::url($character->full_body_image_animated_path) }}"
                                             alt="{{ $character->first_name }} animated"
-                                            class="h-full w-auto max-w-full absolute inset-0 m-auto character-animated-layer"
+                                            class="w-full h-full absolute inset-0 character-animated-layer"
                                             style="opacity: 0.01;"
                                             loading="eager"
                                             draggable="false"

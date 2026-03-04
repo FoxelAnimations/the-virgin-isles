@@ -36,7 +36,7 @@
 .character-carousel {
     overflow: hidden;
     padding: 2rem 0 1.5rem;
-    background: #18181b; /* zinc-900 */
+    background: radial-gradient(ellipse 40% 100% at center, #18181b 0%, #000 100%);
 }
 
 .character-carousel .swiper-slide {
