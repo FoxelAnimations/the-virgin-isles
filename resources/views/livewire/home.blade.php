@@ -41,7 +41,7 @@
                                     class="swiper-slide group"
                                     data-name="{{ $character->first_name }}"
                                     data-job="{{ $character->job?->title }}"
-                                    data-character-json="{{ Js::from([
+                                    data-character-json="{{ json_encode([
                                         'name' => $character->full_name,
                                         'nickname' => $character->nick_name,
                                         'job' => $character->job?->title,
@@ -90,7 +90,7 @@
                                     class="swiper-slide group"
                                     data-name="{{ $character->first_name }}"
                                     data-job="{{ $character->job?->title }}"
-                                    data-character-json="{{ Js::from([
+                                    data-character-json="{{ json_encode([
                                         'name' => $character->full_name,
                                         'nickname' => $character->nick_name,
                                         'job' => $character->job?->title,
