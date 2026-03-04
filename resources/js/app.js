@@ -16,9 +16,9 @@ function initCharacterCarousel() {
     let entranceTriggered = false;
     let isDragging = false;
 
-    // Name/age label elements
+    // Name/job label elements
     const nameEl = el.parentElement.querySelector('.carousel-center-name');
-    const ageEl = el.parentElement.querySelector('.carousel-center-age');
+    const jobEl = el.parentElement.querySelector('.carousel-center-job');
 
     function updateCenterLabel(slides) {
         let closest = null;
@@ -33,9 +33,8 @@ function initCharacterCarousel() {
         if (closest && nameEl) {
             nameEl.textContent = closest.dataset.name || '';
         }
-        if (closest && ageEl) {
-            const age = closest.dataset.age;
-            ageEl.textContent = age ? age : '';
+        if (closest && jobEl) {
+            jobEl.textContent = closest.dataset.job || '';
         }
     }
 
@@ -76,7 +75,7 @@ function initCharacterCarousel() {
 
                     // Gentle hill curve: gradual slope, higher minimum
                     const scale = Math.max(1 - Math.pow(absProgress / 5, 1.8) * 0.35, 0.65);
-                    const opacity = Math.max(1 - Math.pow(absProgress / 5, 1.8) * 0.45, 0.55);
+                    const opacity = Math.max(1 - Math.pow(absProgress / 5, 1.5) * 0.75, 0.25);
 
                     if (entranceComplete) {
                         slide.style.transform = `scale(${scale})`;

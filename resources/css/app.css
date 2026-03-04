@@ -36,6 +36,7 @@
 .character-carousel {
     overflow: hidden;
     padding: 2rem 0 1.5rem;
+    background: #18181b; /* zinc-900 */
 }
 
 .character-carousel .swiper-slide {
@@ -44,6 +45,17 @@
     align-items: flex-end;
     justify-content: center;
     cursor: pointer;
+    height: 14rem;       /* 224px — mobile */
+}
+
+@media (min-width: 640px) {
+    .character-carousel .swiper-slide { height: 16rem; }   /* 256px */
+}
+@media (min-width: 768px) {
+    .character-carousel .swiper-slide { height: 20rem; }   /* 320px */
+}
+@media (min-width: 1024px) {
+    .character-carousel .swiper-slide { height: 23rem; }   /* 368px */
 }
 
 .character-carousel .swiper-slide img,
