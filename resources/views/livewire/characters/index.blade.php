@@ -28,6 +28,7 @@
                         @click="show({
                             name: {{ Js::from($character->full_name) }},
                             nickname: {{ Js::from($character->nick_name) }},
+                            age: {{ Js::from($character->age) }},
                             job: {{ Js::from($character->job?->title) }},
                             bio: {{ Js::from($character->bio) }},
                             image: {{ Js::from($character->profile_image_path ? Storage::url($character->profile_image_path) : null) }},
@@ -117,13 +118,13 @@
                     <div class="aspect-square bg-zinc-800 overflow-hidden relative group/modal"
                         :style="char?.background ? 'background-image: url(\'' + char.background + '\'); background-size: cover; background-position: center;' : ''"
                     >
-                        <template x-if="char?.fullBody || char?.image">
+                        <template x-if="char?.image || char?.fullBody">
                             <div class="w-full h-full relative">
-                                <img :src="char?.fullBody || char?.image" :alt="char?.name"
+                                <img :src="char?.image || char?.fullBody" :alt="char?.name"
                                     class="w-full h-full object-cover object-top relative z-[1] transition duration-300"
-                                    :class="(char?.fullBody ? char?.fullBodyHover : char?.imageHover) ? 'group-hover/modal:opacity-0' : ''">
-                                <template x-if="char?.fullBody ? char?.fullBodyHover : char?.imageHover">
-                                    <img :src="char?.fullBody ? char?.fullBodyHover : char?.imageHover" :alt="char?.name"
+                                    :class="(char?.image ? char?.imageHover : char?.fullBodyHover) ? 'group-hover/modal:opacity-0' : ''">
+                                <template x-if="char?.image ? char?.imageHover : char?.fullBodyHover">
+                                    <img :src="char?.image ? char?.imageHover : char?.fullBodyHover" :alt="char?.name"
                                         class="absolute inset-0 w-full h-full object-cover object-top z-[2] opacity-0 transition duration-300 group-hover/modal:opacity-100">
                                 </template>
                             </div>
@@ -141,9 +142,14 @@
                         <template x-if="char?.nickname">
                             <p class="text-accent text-sm uppercase tracking-wider mb-2">"<span x-text="char?.nickname"></span>"</p>
                         </template>
-                        <template x-if="char?.job">
-                            <p class="text-zinc-500 text-lg uppercase tracking-wider mb-6" x-text="char?.job"></p>
-                        </template>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mb-6">
+                            <template x-if="char?.job">
+                                <span class="text-white text-lg uppercase tracking-wider" x-text="char?.job"></span>
+                            </template>
+                            <template x-if="char?.age">
+                                <span class="text-zinc-500 text-lg uppercase tracking-wider">Leeftijd : <span class="text-accent" x-text="char?.age"></span></span>
+                            </template>
+                        </div>
                         <template x-if="char?.bio">
                             <p class="text-zinc-400 text-sm leading-relaxed" x-text="char?.bio"></p>
                         </template>
