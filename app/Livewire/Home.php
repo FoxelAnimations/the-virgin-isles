@@ -19,9 +19,11 @@ class Home extends Component
         $settings = SiteSetting::first();
 
         return view('livewire.home', [
-            'characters' => Character::whereNotNull('full_body_image_path')
+            'characters' => Character::with(['job', 'socialLinks'])
+                ->whereNotNull('full_body_image_path')
                 ->orderBy('sort_order')
-                ->get(['id', 'first_name', 'last_name', 'full_body_image_path', 'full_body_image_hover_path', 'full_body_image_animated_path']),
+                ->get(),
+            'carouselTitle' => $settings?->carousel_title,
             'heroVideo' => HeroVideo::latest()->first(),
             'heroContent' => HeroContent::first(),
             'latestEpisodes' => ($settings?->show_episodes ?? true) ? Episode::with('characters')->where('category', 'episode')->where('visible', true)->latest()->take(5)->get() : collect(),

@@ -408,11 +408,14 @@
         toggle() {
             this.open = !this.open;
             if (this.open) {
+                document.body.style.overflow = window.innerWidth < 640 ? 'hidden' : '';
                 this.$nextTick(() => {
                     this.scrollToBottom();
                     this.$refs.chatInput?.focus();
                 });
                 this.startPollingIfNeeded();
+            } else {
+                document.body.style.overflow = '';
             }
         }
     }"
@@ -431,7 +434,7 @@
                 x-transition:leave="transition ease-in duration-150"
                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-                class="fixed bottom-20 right-4 left-4 sm:left-auto sm:absolute sm:bottom-16 sm:right-0 sm:w-[360px] h-[min(500px,70vh)] bg-zinc-900 border border-zinc-700 rounded-sm shadow-2xl flex flex-col overflow-hidden"
+                class="fixed inset-0 sm:inset-auto sm:absolute sm:bottom-16 sm:right-0 sm:w-[360px] sm:h-[min(500px,70vh)] bg-zinc-900 sm:border sm:border-zinc-700 sm:rounded-sm shadow-2xl flex flex-col overflow-hidden"
             >
                 {{-- Header --}}
                 <div class="bg-zinc-800 border-b border-zinc-700 px-4 py-3 flex items-center gap-3 shrink-0">

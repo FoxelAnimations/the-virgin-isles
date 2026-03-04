@@ -19,6 +19,7 @@ class SiteSetting extends Model
         'show_episodes',
         'show_shorts',
         'show_minis',
+        'carousel_title',
     ];
 
     protected function casts(): array

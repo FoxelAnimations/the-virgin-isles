@@ -204,6 +204,12 @@
             </button>
             <div class="p-4" x-show="open" x-transition>
                 <form wire:submit="saveHomepageSettings" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-zinc-500 mb-1">{{ __('Carousel Title (H1)') }}</label>
+                        <input type="text" wire:model="carouselTitle" class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm" placeholder="e.g. Characters">
+                        <p class="text-xs text-zinc-600 mt-1">{{ __('Displayed above the character carousel. Leave empty to hide.') }}</p>
+                    </div>
+
                     <p class="text-sm text-zinc-500">{{ __('Choose which content sections to display on the homepage. Each section shows the 5 most recent items.') }}</p>
 
                     <label class="flex items-center gap-3 cursor-pointer">

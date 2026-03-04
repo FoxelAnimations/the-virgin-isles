@@ -33,6 +33,7 @@ class Dashboard extends Component
     public bool $showEpisodes = true;
     public bool $showShorts = true;
     public bool $showMinis = true;
+    public string $carouselTitle = '';
 
     public function mount(): void
     {
@@ -244,6 +245,7 @@ class Dashboard extends Component
             $this->showEpisodes = $settings->show_episodes ?? true;
             $this->showShorts = $settings->show_shorts ?? true;
             $this->showMinis = $settings->show_minis ?? true;
+            $this->carouselTitle = $settings->carousel_title ?? '';
         }
     }
 
@@ -253,6 +255,7 @@ class Dashboard extends Component
             'show_episodes' => $this->showEpisodes,
             'show_shorts' => $this->showShorts,
             'show_minis' => $this->showMinis,
+            'carousel_title' => $this->carouselTitle ?: null,
         ]);
 
         session()->flash('status', 'Homepage settings updated successfully.');

@@ -14,14 +14,38 @@ function initCharacterCarousel() {
 
     let entranceComplete = false;
     let entranceTriggered = false;
+    let isDragging = false;
+
+    // Name/age label elements
+    const nameEl = el.parentElement.querySelector('.carousel-center-name');
+    const ageEl = el.parentElement.querySelector('.carousel-center-age');
+
+    function updateCenterLabel(slides) {
+        let closest = null;
+        let minProgress = Infinity;
+        for (let i = 0; i < slides.length; i++) {
+            const ap = Math.abs(slides[i].progress);
+            if (ap < minProgress) {
+                minProgress = ap;
+                closest = slides[i];
+            }
+        }
+        if (closest && nameEl) {
+            nameEl.textContent = closest.dataset.name || '';
+        }
+        if (closest && ageEl) {
+            const age = closest.dataset.age;
+            ageEl.textContent = age ? age : '';
+        }
+    }
 
     const swiper = new Swiper(el, {
-        slidesPerView: 3,
+        slidesPerView: 7,
         slidesPerGroup: 1,
         centeredSlides: true,
         loop: true,
         grabCursor: true,
-        spaceBetween: 12,
+        spaceBetween: 4,
         speed: 750,
         watchSlidesProgress: true,
         simulateTouch: true,
@@ -29,19 +53,30 @@ function initCharacterCarousel() {
         passiveListeners: true,
 
         breakpoints: {
-            768: { slidesPerView: 5, spaceBetween: 16 },
-            1024: { slidesPerView: 7, spaceBetween: 16 },
+            768: { slidesPerView: 9, spaceBetween: 6 },
+            1024: { slidesPerView: 11, spaceBetween: 6 },
         },
 
         on: {
+            touchStart() { isDragging = false; },
+            touchMove() { isDragging = true; },
+            click(swiper, event) {
+                if (isDragging) return;
+                const slide = event.target.closest('.swiper-slide');
+                if (!slide || !slide.dataset.characterJson) return;
+                try {
+                    const data = JSON.parse(slide.dataset.characterJson);
+                    el.dispatchEvent(new CustomEvent('character-popup', { bubbles: true, detail: data }));
+                } catch (e) {}
+            },
             setTranslate(swiper) {
                 for (let i = 0; i < swiper.slides.length; i++) {
                     const slide = swiper.slides[i];
-                    const absProgress = Math.min(Math.abs(slide.progress), 3);
+                    const absProgress = Math.min(Math.abs(slide.progress), 6);
 
-                    // Hill-shaped curve: flat plateau near center, steepens outward
-                    const scale = Math.max(1 - Math.pow(absProgress, 1.5) * 0.22, 0.4);
-                    const opacity = Math.max(1 - Math.pow(absProgress, 1.5) * 0.45, 0.08);
+                    // Gentle hill curve: gradual slope, higher minimum
+                    const scale = Math.max(1 - Math.pow(absProgress / 5, 1.8) * 0.35, 0.65);
+                    const opacity = Math.max(1 - Math.pow(absProgress / 5, 1.8) * 0.45, 0.55);
 
                     if (entranceComplete) {
                         slide.style.transform = `scale(${scale})`;
@@ -54,26 +89,22 @@ function initCharacterCarousel() {
                             const wasSelected = slide.dataset.wasSelected === 'true';
 
                             if (isSelected && !wasSelected) {
-                                // Became selected: show animated, hide static
                                 animatedEl.style.opacity = '1';
                                 const staticImg = slide.querySelector('.character-static-img');
                                 if (staticImg) staticImg.style.opacity = '0';
                                 const hoverImg = slide.querySelector('.character-hover-img');
                                 if (hoverImg) hoverImg.style.opacity = '0';
 
-                                // Play animation
                                 if (animatedEl.tagName === 'VIDEO') {
                                     animatedEl.currentTime = 0;
                                     animatedEl.play().catch(() => {});
                                 } else {
-                                    // GIF: reset src to replay
                                     const src = animatedEl.src;
                                     animatedEl.src = '';
                                     animatedEl.offsetHeight;
                                     animatedEl.src = src;
                                 }
                             } else if (!isSelected && wasSelected) {
-                                // Left center: hide animated, restore static
                                 animatedEl.style.opacity = '0.01';
                                 const staticImg = slide.querySelector('.character-static-img');
                                 if (staticImg) staticImg.style.opacity = '';
@@ -83,8 +114,10 @@ function initCharacterCarousel() {
 
                             slide.dataset.wasSelected = isSelected ? 'true' : 'false';
                         }
+
+                        // Update name/age label continuously during swipe
+                        updateCenterLabel(swiper.slides);
                     } else {
-                        // Store targets for entrance animation
                         slide.dataset.targetScale = scale;
                         slide.dataset.targetOpacity = opacity;
                     }
@@ -140,6 +173,9 @@ function initCharacterCarousel() {
                 delete slides[i].dataset.targetOpacity;
             }
             swiper.update();
+
+            // Show initial center label
+            updateCenterLabel(swiper.slides);
         }, maxDelay + 700);
     }
 

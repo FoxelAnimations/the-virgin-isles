@@ -4,63 +4,176 @@
          CHARACTER CAROUSEL
          ============================================================ --}}
     @if ($characters->count() >= 1)
-        <section class="w-full overflow-hidden bg-black" wire:ignore>
-            <div class="character-carousel carousel-entering swiper">
-                @php
-                    // Repeat characters for looping + overscroll (5 extra per side)
-                    $slides = $characters;
-                    while ($slides->count() < 20) {
-                        $slides = $slides->concat($characters);
-                    }
-                @endphp
-                <div class="swiper-wrapper">
-                    @foreach ($slides as $character)
-                        <div class="swiper-slide group">
-                            {{-- Static image --}}
-                            <img
-                                src="{{ Storage::url($character->full_body_image_path) }}"
-                                alt="{{ $character->first_name }}"
-                                class="w-full max-h-56 sm:max-h-64 md:max-h-80 lg:max-h-[370px] character-static-img"
-                                loading="eager"
-                                draggable="false"
-                            />
-                            {{-- Hover image --}}
-                            @if ($character->full_body_image_hover_path)
+        <section
+            class="w-full overflow-hidden bg-black"
+            x-data="{
+                charOpen: false,
+                char: null,
+                showChar(c) { this.char = c; this.charOpen = true; document.body.classList.add('overflow-hidden'); },
+                closeChar() { this.charOpen = false; this.char = null; document.body.classList.remove('overflow-hidden'); },
+            }"
+            @keydown.escape.window="closeChar()"
+            @character-popup.window="showChar($event.detail)"
+        >
+            @if ($carouselTitle)
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold uppercase text-center tracking-wider pt-10 pb-2">
+                    {{ $carouselTitle }}
+                </h1>
+            @endif
+
+            <div wire:ignore>
+                <div class="character-carousel carousel-entering swiper">
+                    @php
+                        $slides = $characters;
+                        while ($slides->count() < 20) {
+                            $slides = $slides->concat($characters);
+                        }
+                    @endphp
+                    <div class="swiper-wrapper">
+                        @foreach ($slides as $character)
+                            <div
+                                class="swiper-slide group"
+                                data-name="{{ $character->first_name }}"
+                                data-age="{{ $character->age }}"
+                                data-character-json="{{ Js::from([
+                                    'name' => $character->full_name,
+                                    'nickname' => $character->nick_name,
+                                    'job' => $character->job?->title,
+                                    'bio' => $character->bio,
+                                    'image' => $character->profile_image_path ? Storage::url($character->profile_image_path) : null,
+                                    'imageHover' => $character->profile_image_hover_path ? Storage::url($character->profile_image_hover_path) : null,
+                                    'fullBody' => Storage::url($character->full_body_image_path),
+                                    'fullBodyHover' => $character->full_body_image_hover_path ? Storage::url($character->full_body_image_hover_path) : null,
+                                    'background' => $character->background_image_path ? Storage::url($character->background_image_path) : null,
+                                    'links' => $character->socialLinks->map(fn($l) => ['title' => $l->title, 'url' => $l->url]),
+                                ]) }}"
+                            >
+                                {{-- Static image --}}
                                 <img
-                                    src="{{ Storage::url($character->full_body_image_hover_path) }}"
+                                    src="{{ Storage::url($character->full_body_image_path) }}"
                                     alt="{{ $character->first_name }}"
-                                    class="w-full max-h-56 sm:max-h-64 md:max-h-80 lg:max-h-[370px] absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 character-hover-img"
+                                    class="w-full max-h-56 sm:max-h-64 md:max-h-80 lg:max-h-[370px] character-static-img"
                                     loading="eager"
                                     draggable="false"
                                 />
-                            @endif
-                            {{-- Animated layer (gif/webm) --}}
-                            @if ($character->full_body_image_animated_path)
-                                @if (str_ends_with($character->full_body_image_animated_path, '.webm'))
-                                    <video
-                                        src="{{ Storage::url($character->full_body_image_animated_path) }}"
-                                        class="w-full max-h-56 sm:max-h-64 md:max-h-80 lg:max-h-[370px] absolute inset-0 m-auto character-animated-layer"
-                                        style="opacity: 0.01;"
-                                        muted
-                                        playsinline
-                                        preload="auto"
-                                        draggable="false"
-                                    ></video>
-                                @else
+                                {{-- Hover image --}}
+                                @if ($character->full_body_image_hover_path)
                                     <img
-                                        src="{{ Storage::url($character->full_body_image_animated_path) }}"
-                                        alt="{{ $character->first_name }} animated"
-                                        class="w-full max-h-56 sm:max-h-64 md:max-h-80 lg:max-h-[370px] absolute inset-0 m-auto character-animated-layer"
-                                        style="opacity: 0.01;"
+                                        src="{{ Storage::url($character->full_body_image_hover_path) }}"
+                                        alt="{{ $character->first_name }}"
+                                        class="w-full max-h-56 sm:max-h-64 md:max-h-80 lg:max-h-[370px] absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 character-hover-img"
                                         loading="eager"
                                         draggable="false"
                                     />
                                 @endif
-                            @endif
-                        </div>
-                    @endforeach
+                                {{-- Animated layer (gif/webm) --}}
+                                @if ($character->full_body_image_animated_path)
+                                    @if (str_ends_with($character->full_body_image_animated_path, '.webm'))
+                                        <video
+                                            src="{{ Storage::url($character->full_body_image_animated_path) }}"
+                                            class="w-full max-h-56 sm:max-h-64 md:max-h-80 lg:max-h-[370px] absolute inset-0 m-auto character-animated-layer"
+                                            style="opacity: 0.01;"
+                                            muted
+                                            playsinline
+                                            preload="auto"
+                                            draggable="false"
+                                        ></video>
+                                    @else
+                                        <img
+                                            src="{{ Storage::url($character->full_body_image_animated_path) }}"
+                                            alt="{{ $character->first_name }} animated"
+                                            class="w-full max-h-56 sm:max-h-64 md:max-h-80 lg:max-h-[370px] absolute inset-0 m-auto character-animated-layer"
+                                            style="opacity: 0.01;"
+                                            loading="eager"
+                                            draggable="false"
+                                        />
+                                    @endif
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Center character name + age --}}
+                <div class="text-center py-3">
+                    <span class="carousel-center-name text-lg md:text-xl font-bold uppercase tracking-wider text-white"></span>
+                    <span class="carousel-center-age text-lg md:text-xl font-bold uppercase tracking-wider text-accent ml-2"></span>
                 </div>
             </div>
+
+            {{-- Character Popup Modal --}}
+            <template x-teleport="body">
+                <div
+                    x-show="charOpen"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 md:p-8"
+                    @click.self="closeChar()"
+                    style="display: none;"
+                >
+                    <button @click="closeChar()" class="absolute top-4 right-4 z-10 text-white hover:text-accent transition">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+
+                    <div
+                        x-show="charOpen"
+                        x-transition:enter="transition ease-out duration-200 delay-75"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        class="bg-zinc-900 border border-zinc-800 w-full max-w-4xl max-h-[85vh] overflow-y-auto"
+                        @click.stop
+                    >
+                        <div class="grid grid-cols-1 md:grid-cols-2">
+                            {{-- Left: Image --}}
+                            <div class="aspect-square bg-zinc-800 overflow-hidden relative group/modal"
+                                :style="char?.background ? 'background-image: url(\'' + char.background + '\'); background-size: cover; background-position: center;' : ''"
+                            >
+                                <template x-if="char?.fullBody || char?.image">
+                                    <div class="w-full h-full relative">
+                                        <img :src="char?.fullBody || char?.image" :alt="char?.name"
+                                            class="w-full h-full object-cover object-top relative z-[1] transition duration-300"
+                                            :class="(char?.fullBody ? char?.fullBodyHover : char?.imageHover) ? 'group-hover/modal:opacity-0' : ''">
+                                        <template x-if="char?.fullBody ? char?.fullBodyHover : char?.imageHover">
+                                            <img :src="char?.fullBody ? char?.fullBodyHover : char?.imageHover" :alt="char?.name"
+                                                class="absolute inset-0 w-full h-full object-cover object-top z-[2] opacity-0 transition duration-300 group-hover/modal:opacity-100">
+                                        </template>
+                                    </div>
+                                </template>
+                                <template x-if="!char?.fullBody && !char?.image && !char?.background">
+                                    <div class="w-full h-full flex items-center justify-center text-zinc-700">
+                                        <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    </div>
+                                </template>
+                            </div>
+
+                            {{-- Right: Info --}}
+                            <div class="p-6 md:p-8 flex flex-col justify-center">
+                                <h2 class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-white mb-1" x-text="char?.name"></h2>
+                                <template x-if="char?.nickname">
+                                    <p class="text-accent text-sm uppercase tracking-wider mb-2">"<span x-text="char?.nickname"></span>"</p>
+                                </template>
+                                <template x-if="char?.job">
+                                    <p class="text-zinc-500 text-lg uppercase tracking-wider mb-6" x-text="char?.job"></p>
+                                </template>
+                                <template x-if="char?.bio">
+                                    <p class="text-zinc-400 text-sm leading-relaxed" x-text="char?.bio"></p>
+                                </template>
+                                <template x-if="char?.links?.length > 0">
+                                    <div class="flex flex-wrap gap-2 mt-6">
+                                        <template x-for="(link, i) in char.links" :key="i">
+                                            <a :href="link.url" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 bg-accent text-black px-3 py-1.5 text-xs font-semibold uppercase tracking-wider hover:brightness-90 transition" x-text="link.title"></a>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </section>
     @endif
 
@@ -107,9 +220,9 @@
                         <p class="text-sm tracking-[0.3em] uppercase text-zinc-400 mb-4">{{ $heroContent->pre_title }}</p>
                     @endif
                     @if ($heroContent?->title)
-                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold uppercase leading-none mb-4 break-words">
+                        <h2 class="text-5xl md:text-6xl lg:text-7xl font-bold uppercase leading-none mb-4 break-words">
                             {{ $heroContent->title }}
-                        </h1>
+                        </h2>
                     @endif
                     @if ($heroContent?->description)
                         <p class="text-zinc-400 text-lg leading-relaxed max-w-md">
