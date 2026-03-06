@@ -292,7 +292,7 @@
                 x-data="cameraPlanner({{ Js::from($scheduleData) }}, {{ $snapMinutes }}, {{ Js::from($videosMeta) }})"
             >
                 {{-- Day Headers (sticky) --}}
-                <div class="flex border-b border-zinc-800 sticky top-0 z-30 bg-zinc-950/95 backdrop-blur">
+                <div class="flex border-b border-zinc-800 sticky top-16 z-30 bg-zinc-950/95 backdrop-blur">
                     <div class="w-14 shrink-0"></div>
                     @foreach (\App\Models\CameraDefaultBlock::DAY_LABELS as $i => $label)
                         <div class="flex-1 text-center py-2 text-xs font-semibold uppercase tracking-wider {{ $i < 6 ? 'border-r border-zinc-800' : '' }} text-zinc-400">
