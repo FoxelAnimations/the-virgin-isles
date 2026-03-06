@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Beacon;
+use App\Models\BeaconImage;
 use App\Models\BeaconScan;
 use App\Models\BeaconType;
 use Illuminate\Support\Facades\Storage;
@@ -33,6 +34,7 @@ class BeaconDetail extends Component
     public string $outOfActionRedirectUrl = '';
     public string $outOfActionMessage = '';
     public $image = null;
+    public $newImages = [];
 
     public function mount(Beacon $beacon): void
     {
@@ -72,6 +74,8 @@ class BeaconDetail extends Component
             'outOfActionRedirectUrl' => ['nullable', 'string', 'max:2048'],
             'outOfActionMessage' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'max:4096'],
+            'newImages' => ['nullable', 'array', 'max:10'],
+            'newImages.*' => ['image', 'max:4096'],
         ]);
 
         if ($this->image) {
@@ -97,8 +101,20 @@ class BeaconDetail extends Component
             'image_path' => $this->beacon->image_path,
         ]);
 
+        if (!empty($this->newImages)) {
+            $maxSort = $this->beacon->images()->max('sort_order') ?? -1;
+            foreach ($this->newImages as $newImage) {
+                $path = $newImage->store('beacons', 'public');
+                $this->beacon->images()->create([
+                    'image_path' => $path,
+                    'sort_order' => ++$maxSort,
+                ]);
+            }
+        }
+
         $this->beacon->refresh();
         $this->image = null;
+        $this->newImages = [];
         session()->flash('status', 'Beacon updated.');
     }
 
@@ -107,6 +123,16 @@ class BeaconDetail extends Component
         if ($this->beacon->image_path) {
             Storage::disk('public')->delete($this->beacon->image_path);
             $this->beacon->update(['image_path' => null]);
+            $this->beacon->refresh();
+        }
+    }
+
+    public function removeBeaconImage(int $imageId): void
+    {
+        $image = BeaconImage::where('id', $imageId)->where('beacon_id', $this->beacon->id)->first();
+        if ($image) {
+            Storage::disk('public')->delete($image->image_path);
+            $image->delete();
             $this->beacon->refresh();
         }
     }

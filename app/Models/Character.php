@@ -36,6 +36,7 @@ class Character extends Model
         'chat_image_path',
         'background_image_path',
         'sort_order',
+        'show_in_slider',
     ];
 
     protected function casts(): array
@@ -43,6 +44,7 @@ class Character extends Model
         return [
             'chat_enabled' => 'boolean',
             'chat_online' => 'boolean',
+            'show_in_slider' => 'boolean',
         ];
     }
 

@@ -62,6 +62,11 @@ class Beacon extends Model
         return $this->belongsTo(BeaconType::class, 'type_id');
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(BeaconImage::class)->orderBy('sort_order');
+    }
+
     public function scans(): HasMany
     {
         return $this->hasMany(BeaconScan::class, 'beacon_id')->orderByDesc('scanned_at');

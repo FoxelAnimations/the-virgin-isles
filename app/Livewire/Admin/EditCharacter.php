@@ -31,6 +31,7 @@ class EditCharacter extends Component
     public bool $chat_enabled = false;
     public string $chat_mode = 'ai';
     public bool $chat_online = true;
+    public bool $show_in_slider = true;
     public array $character_social_links = [];
     public $profile_image;
     public $profile_image_hover;
@@ -59,6 +60,7 @@ class EditCharacter extends Component
             'chat_enabled' => ['boolean'],
             'chat_mode' => ['required', 'string', 'in:ai,manual'],
             'chat_online' => ['boolean'],
+            'show_in_slider' => ['boolean'],
             'character_social_links.*.title' => ['required', 'string', 'max:255'],
             'character_social_links.*.url' => ['required', 'string', 'starts_with:https://,http://', 'max:255'],
             'profile_image' => ['nullable', 'image', 'max:2048'],
@@ -124,6 +126,7 @@ class EditCharacter extends Component
                     'chat_enabled' => $validated['chat_enabled'],
                     'chat_mode' => $validated['chat_mode'],
                     'chat_online' => $validated['chat_online'],
+                    'show_in_slider' => $validated['show_in_slider'],
                 ], $imageData));
 
                 foreach ($this->character_social_links as $linkData) {
@@ -160,6 +163,7 @@ class EditCharacter extends Component
         $this->chat_enabled = $character->chat_enabled ?? false;
         $this->chat_mode = $character->chat_mode ?? 'ai';
         $this->chat_online = $character->chat_online ?? true;
+        $this->show_in_slider = $character->show_in_slider ?? true;
         $this->loadCharacterSocialLinks();
     }
 

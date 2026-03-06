@@ -84,9 +84,9 @@
                     </div>
                 </div>
 
-                {{-- Image --}}
+                {{-- Main Image --}}
                 <div id="image-section" class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Image</h3>
+                    <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Main Image</h3>
 
                     @if ($beacon->image_path)
                         <div class="flex items-start gap-4">
@@ -102,6 +102,85 @@
                         <input type="file" wire:model="image" accept="image/*" class="w-full text-sm text-zinc-400 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-sm file:font-semibold file:bg-zinc-800 file:text-zinc-300 file:cursor-pointer hover:file:bg-zinc-700">
                         @error('image') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                     </div>
+                </div>
+
+                {{-- Additional Images --}}
+                <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4"
+                    x-data="{ editing: false, lightbox: { open: false, src: '', index: 0 }, images: {{ Js::from($beacon->images->map(fn($img) => ['id' => $img->id, 'url' => Storage::url($img->image_path)])) }} }">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400">Additional Images</h3>
+                        <button type="button" @click="editing = !editing"
+                            class="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-semibold rounded-sm transition uppercase tracking-wider"
+                            :class="editing ? 'bg-accent text-black' : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:text-white hover:border-zinc-500'">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            <span x-text="editing ? 'Done' : 'Edit'"></span>
+                        </button>
+                    </div>
+
+                    @if ($beacon->images->isNotEmpty())
+                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-3">
+                            @foreach ($beacon->images as $img)
+                                <div class="relative group">
+                                    <img src="{{ Storage::url($img->image_path) }}" alt=""
+                                        class="w-full aspect-square object-cover rounded-sm border border-zinc-700 cursor-pointer hover:border-zinc-500 transition"
+                                        @click="if (!editing) { lightbox.src = '{{ Storage::url($img->image_path) }}'; lightbox.index = {{ $loop->index }}; lightbox.open = true; }">
+
+                                    {{-- Remove button (visible in edit mode) --}}
+                                    <button type="button" x-show="editing" x-cloak
+                                        wire:click="removeBeaconImage({{ $img->id }})"
+                                        wire:confirm="Remove this image?"
+                                        class="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] hover:bg-red-500 z-10">
+                                        &times;
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-zinc-600 text-sm">No additional images yet.</p>
+                    @endif
+
+                    {{-- Upload new images (visible in edit mode) --}}
+                    <div x-show="editing" x-cloak>
+                        <input type="file" wire:model="newImages" accept="image/*" multiple
+                            class="w-full text-sm text-zinc-400 file:mr-3 file:py-2 file:px-3 file:border-0 file:text-sm file:font-semibold file:bg-zinc-800 file:text-zinc-300 file:cursor-pointer hover:file:bg-zinc-700">
+                        <p class="mt-1 text-[10px] text-zinc-600">Select multiple images. Max 4MB each.</p>
+                        @error('newImages.*') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Lightbox --}}
+                    <template x-teleport="body">
+                        <div x-show="lightbox.open" x-transition.opacity
+                            class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+                            @click.self="lightbox.open = false"
+                            @keydown.escape.window="lightbox.open = false"
+                            style="display: none;">
+
+                            {{-- Close --}}
+                            <button @click="lightbox.open = false" class="absolute top-4 right-4 text-white hover:text-accent transition z-10">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+
+                            {{-- Prev --}}
+                            <button @click="lightbox.index = (lightbox.index - 1 + images.length) % images.length; lightbox.src = images[lightbox.index].url"
+                                x-show="images.length > 1"
+                                class="absolute left-4 text-white hover:text-accent transition z-10">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+
+                            {{-- Image --}}
+                            <img :src="lightbox.src" class="max-w-full max-h-[85vh] object-contain rounded-sm" @click.stop>
+
+                            {{-- Next --}}
+                            <button @click="lightbox.index = (lightbox.index + 1) % images.length; lightbox.src = images[lightbox.index].url"
+                                x-show="images.length > 1"
+                                class="absolute right-4 text-white hover:text-accent transition z-10">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+
+                            {{-- Counter --}}
+                            <div class="absolute bottom-4 text-zinc-400 text-sm font-mono" x-text="(lightbox.index + 1) + ' / ' + images.length"></div>
+                        </div>
+                    </template>
                 </div>
 
                 {{-- Coordinates --}}

@@ -91,6 +91,13 @@
                     </div>
                 </div>
 
+                <div class="flex items-center gap-3 pt-2">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" wire:model="show_in_slider" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
+                        <span class="text-sm text-zinc-400">{{ __('Show in home slider') }}</span>
+                    </label>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-zinc-400">{{ __('Biography') }}</label>
                     <textarea wire:model="bio" rows="5"

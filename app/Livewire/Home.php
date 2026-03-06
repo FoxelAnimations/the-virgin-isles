@@ -21,6 +21,7 @@ class Home extends Component
         return view('livewire.home', [
             'characters' => Character::with(['job', 'socialLinks'])
                 ->whereNotNull('full_body_image_path')
+                ->where('show_in_slider', true)
                 ->orderBy('sort_order')
                 ->get(),
             'carouselTitle' => $settings?->carousel_title,
