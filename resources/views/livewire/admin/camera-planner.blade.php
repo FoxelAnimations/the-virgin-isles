@@ -2,7 +2,7 @@
     <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Header --}}
-        <div class="flex items-center justify-between mb-6">
+        <div class="sticky top-0 z-30 flex items-center justify-between mb-6 bg-zinc-950/95 backdrop-blur border-b border-zinc-800 px-4 sm:px-6 lg:px-8 -mx-4 sm:-mx-6 lg:-mx-8 py-4">
             <div class="flex items-center gap-4">
                 <a href="{{ route('admin.cameras') }}" class="text-zinc-400 hover:text-white transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
