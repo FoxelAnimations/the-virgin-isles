@@ -106,11 +106,6 @@ class CameraPlanner extends Component
 
     public function uploadVideo(): void
     {
-        $this->validate([
-            'videoUpload' => ['required', 'mimes:mp4,webm,mov'],
-            'newAudioUpload' => ['nullable', 'mimes:mp3,wav,ogg,aac,m4a'],
-        ]);
-
         $filename = $this->videoUpload->getClientOriginalName();
         $videoPath = $this->videoUpload->store("cameras/{$this->camera->id}/videos", 'public');
 
@@ -146,11 +141,6 @@ class CameraPlanner extends Component
 
     public function saveEditVideo(): void
     {
-        $this->validate([
-            'editVideoName' => ['required', 'string', 'max:255'],
-            'editVideoType' => ['required', 'in:loop,realtime'],
-        ]);
-
         $video = CameraVideo::where('camera_id', $this->camera->id)->findOrFail($this->editingVideoId);
         $video->update([
             'filename' => trim($this->editVideoName),
@@ -176,10 +166,6 @@ class CameraPlanner extends Component
 
     public function uploadAudio(int $videoId): void
     {
-        $this->validate([
-            "audioUploads.{$videoId}" => ['required', 'mimes:mp3,wav,ogg,aac,m4a'],
-        ]);
-
         $video = CameraVideo::where('camera_id', $this->camera->id)->findOrFail($videoId);
 
         if ($video->audio_path) {
@@ -209,10 +195,6 @@ class CameraPlanner extends Component
 
     public function uploadBackground(): void
     {
-        $this->validate([
-            'backgroundUpload' => ['required', 'mimes:jpg,jpeg,png,gif,webm'],
-        ]);
-
         if ($this->camera->background_path) {
             Storage::disk('public')->delete($this->camera->background_path);
         }
