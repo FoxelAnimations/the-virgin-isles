@@ -63,50 +63,17 @@
                                 </template>
                             </div>
 
-                            {{-- Weather effects --}}
-                            <div class="absolute inset-0 overflow-hidden pointer-events-none z-[1]" x-show="weatherEnabled" x-cloak>
-                                {{-- Clouds --}}
-                                <div class="absolute inset-0" :style="{ opacity: cloudOpacity, transition: 'opacity 5s ease' }">
-                                    <template x-for="cloud in cardClouds" :key="cloud.id">
-                                        <div class="cloud-shape absolute" :style="{
-                                            top: cloud.top + '%',
-                                            width: cloud.width + 'px',
-                                            height: cloud.height + 'px',
-                                            filter: 'blur(' + cloud.blur + 'px)',
-                                            animation: 'cloud-drift-card ' + cloud.speed + 's linear infinite',
-                                            animationDelay: cloud.delay + 's',
-                                            opacity: cloud.opacity,
-                                        }">
-                                            <div class="absolute rounded-full bg-white/40" :style="{
-                                                width: '60%', height: '70%', bottom: '0', left: '10%',
-                                            }"></div>
-                                            <div class="absolute rounded-full bg-white/50" :style="{
-                                                width: '50%', height: '85%', bottom: '5%', left: '25%',
-                                            }"></div>
-                                            <div class="absolute rounded-full bg-white/35" :style="{
-                                                width: '45%', height: '65%', bottom: '0', left: '50%',
-                                            }"></div>
-                                            <div class="absolute rounded-full bg-white/30" :style="{
-                                                width: '35%', height: '50%', bottom: '10%', left: '5%',
-                                            }"></div>
-                                            <div class="absolute rounded-full bg-white/25" :style="{
-                                                width: '30%', height: '45%', bottom: '5%', left: '60%',
-                                            }"></div>
-                                        </div>
-                                    </template>
-                                </div>
-                                {{-- Rain canvas --}}
-                                <canvas class="absolute inset-0 w-full h-full rain-canvas" data-type="card"></canvas>
-                            </div>
-
                             {{-- Video --}}
                             <video
                                 x-ref="cam{{ $camera->id }}"
                                 muted playsinline preload="metadata"
-                                class="absolute inset-0 w-full h-full object-cover z-[2]"
+                                class="absolute inset-0 w-full h-full object-cover z-[1]"
                                 x-show="getCameraStatus({{ $camera->id }}) === 'online' && getCameraVideoUrl({{ $camera->id }})"
                                 style="display: none;"
                             ></video>
+
+                            {{-- Subtle dark overlay for cards --}}
+                            <div class="absolute inset-0 z-[2] pointer-events-none bg-black/30"></div>
 
                             {{-- Color overlay --}}
                             <div class="absolute inset-0 z-[3] pointer-events-none"
@@ -126,7 +93,7 @@
                             {{-- Camera static effect --}}
                             <div class="absolute inset-0 pointer-events-none z-[5]" x-show="getCameraStaticEnabled({{ $camera->id }})" x-cloak>
                                 <div class="camera-scanlines absolute inset-0" :style="{ opacity: getCameraStaticIntensity({{ $camera->id }}) / 200 }"></div>
-                                <canvas class="camera-noise absolute inset-0 w-full h-full" data-camera-id="{{ $camera->id }}" :style="{ opacity: getCameraStaticIntensity({{ $camera->id }}) / 250 }"></canvas>
+                                <canvas class="camera-noise absolute inset-0 w-full h-full" data-camera-id="{{ $camera->id }}" data-static-scope="card" :style="{ opacity: getCameraStaticIntensity({{ $camera->id }}) / 250 }"></canvas>
                             </div>
 
                             {{-- Timestamp overlay --}}
@@ -280,7 +247,7 @@
                                 {{-- Camera static effect --}}
                                 <div class="absolute inset-0 pointer-events-none z-[5]" x-show="popup.id && getCameraStaticEnabled(popup.id)" x-cloak>
                                     <div class="camera-scanlines absolute inset-0" :style="{ opacity: popup.id ? getCameraStaticIntensity(popup.id) / 200 : 0 }"></div>
-                                    <canvas class="camera-noise absolute inset-0 w-full h-full" :data-camera-id="popup.id" :style="{ opacity: popup.id ? getCameraStaticIntensity(popup.id) / 250 : 0 }"></canvas>
+                                    <canvas class="camera-noise absolute inset-0 w-full h-full" :data-camera-id="popup.id" data-static-scope="popup" :style="{ opacity: popup.id ? getCameraStaticIntensity(popup.id) / 250 : 0 }"></canvas>
                                 </div>
 
                                 {{-- Timestamp --}}
@@ -925,11 +892,50 @@ Alpine.data('cameraFeed', () => ({
         const baseInterval = 1000 / baseFps;
         const canvasTimers = new WeakMap();
 
+        const drawNoiseFrame = (canvas) => {
+            const w = canvas.offsetWidth;
+            const h = canvas.offsetHeight;
+            if (w === 0 || h === 0) return;
+
+            // Use small canvas and scale up for performance + chunky look
+            const scale = 4;
+            const sw = Math.ceil(w / scale);
+            const sh = Math.ceil(h / scale);
+
+            canvas.width = sw;
+            canvas.height = sh;
+            canvas.style.imageRendering = 'pixelated';
+
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.createImageData(sw, sh);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const v = Math.random() * 255;
+                data[i] = v;
+                data[i + 1] = v;
+                data[i + 2] = v;
+                data[i + 3] = Math.random() * 60;
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        };
+
         const renderNoise = (timestamp) => {
             document.querySelectorAll('.camera-noise').forEach(canvas => {
                 const cameraId = canvas.dataset.cameraId;
                 const camData = cameraId ? this.cameras[cameraId] : null;
                 if (!camData?.static_enabled || !camData.static_intensity) return;
+
+                const scope = canvas.dataset.staticScope || 'card';
+
+                // For list cards: draw once (frozen) and skip animation
+                if (scope === 'card') {
+                    if (canvas.dataset.rendered === '1') return;
+                    drawNoiseFrame(canvas);
+                    canvas.dataset.rendered = '1';
+                    return;
+                }
 
                 // Give each canvas its own last-frame timer and fps variation
                 if (!canvasTimers.has(canvas)) {
@@ -943,32 +949,7 @@ Alpine.data('cameraFeed', () => ({
                 if (timestamp - timer.lastFrame < timer.interval) return;
                 timer.lastFrame = timestamp;
 
-                const w = canvas.offsetWidth;
-                const h = canvas.offsetHeight;
-                if (w === 0 || h === 0) return;
-
-                // Use small canvas and scale up for performance + chunky look
-                const scale = 4;
-                const sw = Math.ceil(w / scale);
-                const sh = Math.ceil(h / scale);
-
-                canvas.width = sw;
-                canvas.height = sh;
-                canvas.style.imageRendering = 'pixelated';
-
-                const ctx = canvas.getContext('2d');
-                const imageData = ctx.createImageData(sw, sh);
-                const data = imageData.data;
-
-                for (let i = 0; i < data.length; i += 4) {
-                    const v = Math.random() * 255;
-                    data[i] = v;
-                    data[i + 1] = v;
-                    data[i + 2] = v;
-                    data[i + 3] = Math.random() * 60;
-                }
-
-                ctx.putImageData(imageData, 0, 0);
+                drawNoiseFrame(canvas);
             });
             this.staticAnimFrame = requestAnimationFrame(renderNoise);
         };
