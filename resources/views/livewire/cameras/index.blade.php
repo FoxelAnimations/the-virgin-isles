@@ -313,7 +313,7 @@ Alpine.data('cameraFeed', () => ({
 
     // Weather system
     weatherEnabled: false,
-    weatherData: { cloud_cover: 0, rain: 0, temperature: null, weather_code: undefined },
+    weatherData: { cloud_cover: 0, rain: 0, wind_speed: 0, temperature: null, weather_code: undefined },
     cloudOpacity: 0,
     cardClouds: [],
     popupClouds: [],
@@ -321,6 +321,14 @@ Alpine.data('cameraFeed', () => ({
     rainAnimFrame: null,
     rainDrops: [],
     popupPollTimer: null,
+
+    // Weather audio system (Web Audio API)
+    slotsData: {},
+    weatherAudioCtx: null,
+    rainGainNode: null,
+    windGainNode: null,
+    rainSourceNode: null,
+    windSourceNode: null,
 
     async init() {
         this.updateTimestamp();
@@ -468,12 +476,13 @@ Alpine.data('cameraFeed', () => ({
             return;
         }
         try {
-            const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=50.8278&longitude=3.2644&current=cloud_cover,rain,temperature_2m,weather_code');
+            const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=50.8278&longitude=3.2644&current=cloud_cover,rain,temperature_2m,weather_code,wind_speed_10m');
             if (!res.ok) return;
             const data = await res.json();
             this.weatherData = {
                 cloud_cover: data.current?.cloud_cover ?? 0,
                 rain: data.current?.rain ?? 0,
+                wind_speed: data.current?.wind_speed_10m ?? 0,
                 temperature: data.current?.temperature_2m ?? null,
                 weather_code: data.current?.weather_code ?? 0,
             };
@@ -489,8 +498,9 @@ Alpine.data('cameraFeed', () => ({
             if (!res.ok) throw new Error('API returned ' + res.status);
             const data = await res.json();
 
-            // Process slot data for sky colors
+            // Process slot data for sky colors and weather audio
             if (data.slots) {
+                this.slotsData = data.slots;
                 this.slotKeyframes = this.buildKeyframes(data.slots);
                 this.updateSkyColor();
             }
@@ -718,6 +728,134 @@ Alpine.data('cameraFeed', () => ({
         return this.cameras[id]?.static_intensity ?? 15;
     },
 
+    // Weather audio helpers
+    getCurrentSlot() {
+        const now = new Date();
+        const parts = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Europe/Brussels', hour: 'numeric', minute: 'numeric', hour12: false,
+        }).formatToParts(now);
+        const h = parseInt(parts.find(p => p.type === 'hour').value) || 0;
+        const m = parseInt(parts.find(p => p.type === 'minute').value) || 0;
+        const currentMin = h * 60 + m;
+
+        for (const [key, slot] of Object.entries(this.slotsData)) {
+            const startMin = this.timeToMin(slot.start);
+            const endMin = slot.end === '24:00' ? 1440 : this.timeToMin(slot.end);
+            if (endMin > startMin) {
+                if (currentMin >= startMin && currentMin < endMin) return slot;
+            } else {
+                if (currentMin >= startMin || currentMin < endMin) return slot;
+            }
+        }
+        return null;
+    },
+
+    initWeatherAudio() {
+        if (this.weatherAudioCtx) return;
+        this.weatherAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Rain: brown noise (low-pass filtered white noise)
+        const rainBufferSize = this.weatherAudioCtx.sampleRate * 2;
+        const rainBuffer = this.weatherAudioCtx.createBuffer(1, rainBufferSize, this.weatherAudioCtx.sampleRate);
+        const rainData = rainBuffer.getChannelData(0);
+        let lastOut = 0;
+        for (let i = 0; i < rainBufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            rainData[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = rainData[i];
+            rainData[i] *= 3.5;
+        }
+        this.rainSourceNode = this.weatherAudioCtx.createBufferSource();
+        this.rainSourceNode.buffer = rainBuffer;
+        this.rainSourceNode.loop = true;
+        const rainFilter = this.weatherAudioCtx.createBiquadFilter();
+        rainFilter.type = 'lowpass';
+        rainFilter.frequency.value = 800;
+        this.rainGainNode = this.weatherAudioCtx.createGain();
+        this.rainGainNode.gain.value = 0;
+        this.rainSourceNode.connect(rainFilter);
+        rainFilter.connect(this.rainGainNode);
+        this.rainGainNode.connect(this.weatherAudioCtx.destination);
+        this.rainSourceNode.start();
+
+        // Wind: bandpass-filtered noise with slow modulation
+        const windBufferSize = this.weatherAudioCtx.sampleRate * 3;
+        const windBuffer = this.weatherAudioCtx.createBuffer(1, windBufferSize, this.weatherAudioCtx.sampleRate);
+        const windData = windBuffer.getChannelData(0);
+        let b0 = 0, b1 = 0, b2 = 0;
+        for (let i = 0; i < windBufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99765 * b0 + white * 0.0990460;
+            b1 = 0.96300 * b1 + white * 0.2965164;
+            b2 = 0.57000 * b2 + white * 1.0526913;
+            windData[i] = (b0 + b1 + b2 + white * 0.1848) * 0.25;
+        }
+        this.windSourceNode = this.weatherAudioCtx.createBufferSource();
+        this.windSourceNode.buffer = windBuffer;
+        this.windSourceNode.loop = true;
+        const windFilter = this.weatherAudioCtx.createBiquadFilter();
+        windFilter.type = 'bandpass';
+        windFilter.frequency.value = 400;
+        windFilter.Q.value = 0.5;
+        this.windGainNode = this.weatherAudioCtx.createGain();
+        this.windGainNode.gain.value = 0;
+        this.windSourceNode.connect(windFilter);
+        windFilter.connect(this.windGainNode);
+        this.windGainNode.connect(this.weatherAudioCtx.destination);
+        this.windSourceNode.start();
+    },
+
+    updateWeatherAudioVolumes() {
+        if (!this.weatherAudioCtx || this.popup.muted) return;
+
+        const cam = this.cameras[this.popup.id];
+        if (!cam) return;
+
+        const slot = this.getCurrentSlot();
+        const rainEnabled = slot?.rain_enabled ?? false;
+        const windEnabled = slot?.wind_enabled ?? false;
+
+        // Camera volume (0-100) as base, weather intensity as multiplier
+        const cameraRainVol = (cam.rain_volume ?? 50) / 100;
+        const cameraWindVol = (cam.wind_volume ?? 50) / 100;
+
+        // Weather intensity: rain mm/h (0-10 mapped to 0-1), wind speed km/h (0-50 mapped to 0-1)
+        const rainIntensity = this.weatherEnabled ? Math.min((this.weatherData.rain || 0) / 5, 1) : 0;
+        const windIntensity = this.weatherEnabled ? Math.min((this.weatherData.wind_speed || 0) / 40, 1) : 0;
+
+        // Effective volume = camera setting * weather intensity (with minimum floor when weather is active)
+        const rainVol = rainEnabled ? cameraRainVol * Math.max(rainIntensity, 0.05) : 0;
+        const windVol = windEnabled ? cameraWindVol * Math.max(windIntensity, 0.1) : 0;
+
+        const t = this.weatherAudioCtx.currentTime;
+        this.rainGainNode.gain.linearRampToValueAtTime(rainVol * 0.6, t + 1);
+        this.windGainNode.gain.linearRampToValueAtTime(windVol * 0.5, t + 1);
+    },
+
+    startWeatherAudio() {
+        this.initWeatherAudio();
+        if (this.weatherAudioCtx.state === 'suspended') {
+            this.weatherAudioCtx.resume();
+        }
+        this.updateWeatherAudioVolumes();
+        // Update volumes periodically (weather changes, slot changes)
+        if (!this._weatherAudioInterval) {
+            this._weatherAudioInterval = setInterval(() => this.updateWeatherAudioVolumes(), 5000);
+        }
+    },
+
+    stopWeatherAudio() {
+        if (this._weatherAudioInterval) {
+            clearInterval(this._weatherAudioInterval);
+            this._weatherAudioInterval = null;
+        }
+        if (this.weatherAudioCtx && this.rainGainNode && this.windGainNode) {
+            const t = this.weatherAudioCtx.currentTime;
+            this.rainGainNode.gain.linearRampToValueAtTime(0, t + 0.3);
+            this.windGainNode.gain.linearRampToValueAtTime(0, t + 0.3);
+        }
+    },
+
     getWeatherIcon() {
         const code = this.weatherData.weather_code;
         if (code === undefined || code === null) return '';
@@ -783,6 +921,7 @@ Alpine.data('cameraFeed', () => ({
             bgVideoEl.removeAttribute('src');
             bgVideoEl.load();
         }
+        this.stopWeatherAudio();
         this.popup.open = false;
         this.popup.id = null;
     },
@@ -870,6 +1009,12 @@ Alpine.data('cameraFeed', () => ({
             } else {
                 audioEl.play().catch(() => {});
             }
+        }
+        // Weather audio
+        if (this.popup.muted) {
+            this.stopWeatherAudio();
+        } else {
+            this.startWeatherAudio();
         }
     },
 
@@ -964,6 +1109,11 @@ Alpine.data('cameraFeed', () => ({
         if (this.staticAnimFrame) cancelAnimationFrame(this.staticAnimFrame);
         this.stopPopupPolling();
         this.stopRain();
+        this.stopWeatherAudio();
+        if (this.weatherAudioCtx) {
+            this.weatherAudioCtx.close().catch(() => {});
+            this.weatherAudioCtx = null;
+        }
     },
 }));
 </script>

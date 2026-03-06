@@ -33,6 +33,8 @@ class CameraController extends Controller
                     'background_is_video' => $camera->backgroundIsVideo(),
                     'static_enabled' => $camera->static_enabled,
                     'static_intensity' => $camera->static_intensity,
+                    'rain_volume' => $camera->rain_volume,
+                    'wind_volume' => $camera->wind_volume,
                     'next_check_seconds' => 300,
                 ];
             }
@@ -116,6 +118,8 @@ class CameraController extends Controller
                 'background_is_video' => $camera->backgroundIsVideo(),
                 'static_enabled' => $camera->static_enabled,
                 'static_intensity' => $camera->static_intensity,
+                'rain_volume' => $camera->rain_volume,
+                'wind_volume' => $camera->wind_volume,
                 'next_check_seconds' => $secondsUntilEnd,
             ];
         });

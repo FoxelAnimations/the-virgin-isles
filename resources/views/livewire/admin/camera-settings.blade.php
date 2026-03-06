@@ -149,6 +149,30 @@
                                     <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
                                 </label>
                             </div>
+
+                            {{-- Row 4: Weather audio toggles --}}
+                            <div class="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-zinc-800/50">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <span class="text-xs text-zinc-500 uppercase tracking-wider">Regen geluid</span>
+                                        <p class="text-[10px] text-zinc-600 mt-0.5">Regengeluid afspelen tijdens dit dagdeel.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer ml-3">
+                                        <input type="checkbox" wire:model.live="slots.{{ $index }}.rain_enabled" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <span class="text-xs text-zinc-500 uppercase tracking-wider">Wind geluid</span>
+                                        <p class="text-[10px] text-zinc-600 mt-0.5">Windgeluid afspelen tijdens dit dagdeel.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer ml-3">
+                                        <input type="checkbox" wire:model.live="slots.{{ $index }}.wind_enabled" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     @endforeach
                 </div>

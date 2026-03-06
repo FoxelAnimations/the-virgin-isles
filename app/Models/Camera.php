@@ -16,6 +16,8 @@ class Camera extends Model
         'background_path',
         'static_enabled',
         'static_intensity',
+        'rain_volume',
+        'wind_volume',
     ];
 
     protected function casts(): array
@@ -26,6 +28,8 @@ class Camera extends Model
             'sort_order' => 'integer',
             'static_enabled' => 'boolean',
             'static_intensity' => 'integer',
+            'rain_volume' => 'integer',
+            'wind_volume' => 'integer',
         ];
     }
 

@@ -53,11 +53,17 @@ class CameraPlanner extends Component
     public bool $staticEnabled = true;
     public int $staticIntensity = 15;
 
+    // Weather audio volumes
+    public int $rainVolume = 50;
+    public int $windVolume = 50;
+
     public function mount(Camera $camera): void
     {
         $this->camera = $camera;
         $this->staticEnabled = $camera->static_enabled ?? true;
         $this->staticIntensity = $camera->static_intensity ?? 15;
+        $this->rainVolume = $camera->rain_volume ?? 50;
+        $this->windVolume = $camera->wind_volume ?? 50;
         $this->loadDefaultSelections();
     }
 
@@ -239,6 +245,8 @@ class CameraPlanner extends Component
         $this->camera->update([
             'static_enabled' => $this->staticEnabled,
             'static_intensity' => max(0, min(100, $this->staticIntensity)),
+            'rain_volume' => max(0, min(100, $this->rainVolume)),
+            'wind_volume' => max(0, min(100, $this->windVolume)),
         ]);
 
         foreach ($this->defaultSelections as $slot => $videoId) {

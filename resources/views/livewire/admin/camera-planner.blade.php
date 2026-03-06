@@ -198,6 +198,39 @@
                                 </div>
                             </div>
                         @endif
+
+                        {{-- Weather Audio Volumes --}}
+                        <div class="mt-4 pt-3 border-t border-zinc-800">
+                            <p class="text-xs text-zinc-500 mb-3">Weer geluidsvolume (binnen/buiten)</p>
+
+                            {{-- Rain Volume --}}
+                            <div class="mb-3">
+                                <label class="block text-xs text-zinc-500 mb-1 uppercase tracking-wider">
+                                    <svg class="w-3.5 h-3.5 inline-block mr-1 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m-7.071-2.929l.707-.707M5.636 5.636l-.707-.707m12.728 0l-.707.707M18.364 18.364l.707.707M3 12h1m16 0h1"/></svg>
+                                    Regen: <span class="text-white font-mono">{{ $rainVolume }}%</span>
+                                </label>
+                                <input type="range" wire:model.live="rainVolume" min="0" max="100" step="5"
+                                    class="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer accent-blue-400">
+                                <div class="flex justify-between text-[10px] text-zinc-600 mt-1">
+                                    <span>Binnen</span>
+                                    <span>Buiten</span>
+                                </div>
+                            </div>
+
+                            {{-- Wind Volume --}}
+                            <div>
+                                <label class="block text-xs text-zinc-500 mb-1 uppercase tracking-wider">
+                                    <svg class="w-3.5 h-3.5 inline-block mr-1 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5a2 2 0 100 4H3m15 4a2 2 0 110 4H3m12-12a2 2 0 100 4H3"/></svg>
+                                    Wind: <span class="text-white font-mono">{{ $windVolume }}%</span>
+                                </label>
+                                <input type="range" wire:model.live="windVolume" min="0" max="100" step="5"
+                                    class="w-full h-1.5 bg-zinc-700 rounded-full appearance-none cursor-pointer accent-teal-400">
+                                <div class="flex justify-between text-[10px] text-zinc-600 mt-1">
+                                    <span>Binnen</span>
+                                    <span>Buiten</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

@@ -32,6 +32,8 @@ class CameraSettings extends Component
                 'bg_color'      => $setting->bg_color ?? '#000000',
                 'overlay_color' => $setting->overlay_color ?? '#00000000',
                 'is_transition' => (bool) $setting->is_transition,
+                'rain_enabled'  => (bool) $setting->rain_enabled,
+                'wind_enabled'  => (bool) $setting->wind_enabled,
             ];
         })->toArray();
     }
@@ -107,6 +109,8 @@ class CameraSettings extends Component
                 'bg_color'      => $slot['bg_color'],
                 'overlay_color' => $slot['overlay_color'],
                 'is_transition' => $slot['is_transition'] ?? false,
+                'rain_enabled'  => $slot['rain_enabled'] ?? false,
+                'wind_enabled'  => $slot['wind_enabled'] ?? false,
             ]);
         }
 
