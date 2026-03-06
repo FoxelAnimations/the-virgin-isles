@@ -106,6 +106,10 @@ class CameraPlanner extends Component
 
     public function uploadVideo(): void
     {
+        if (!$this->videoUpload) {
+            return;
+        }
+
         $filename = $this->videoUpload->getClientOriginalName();
         $videoPath = $this->videoUpload->store("cameras/{$this->camera->id}/videos", 'public');
 
@@ -166,6 +170,10 @@ class CameraPlanner extends Component
 
     public function uploadAudio(int $videoId): void
     {
+        if (empty($this->audioUploads[$videoId])) {
+            return;
+        }
+
         $video = CameraVideo::where('camera_id', $this->camera->id)->findOrFail($videoId);
 
         if ($video->audio_path) {
@@ -195,6 +203,10 @@ class CameraPlanner extends Component
 
     public function uploadBackground(): void
     {
+        if (!$this->backgroundUpload) {
+            return;
+        }
+
         if ($this->camera->background_path) {
             Storage::disk('public')->delete($this->camera->background_path);
         }
