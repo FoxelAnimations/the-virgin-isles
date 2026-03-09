@@ -300,7 +300,6 @@
 <script>
 Alpine.data('cameraFeed', () => ({
     cameras: {},
-    timers: {},
     clockTimer: null,
     skyTimer: null,
     timestampText: '',
@@ -325,6 +324,8 @@ Alpine.data('cameraFeed', () => ({
     rainDrops: [],
     popupPollTimer: null,
     currentSlotSoundUrl: null,
+    _scheduleLoading: false,
+    _scheduleTimer: null,
 
     // Weather audio system (Web Audio API)
     slotsData: {},
@@ -496,21 +497,26 @@ Alpine.data('cameraFeed', () => ({
         }
     },
 
+    scheduleNextCheck(seconds) {
+        if (this._scheduleTimer) clearTimeout(this._scheduleTimer);
+        this._scheduleTimer = setTimeout(() => this.loadSchedule(), Math.max(5, seconds) * 1000);
+    },
+
     async loadSchedule() {
+        // Prevent concurrent loads
+        if (this._scheduleLoading) return;
+        this._scheduleLoading = true;
+
         try {
             const res = await fetch('/api/cameras/schedule');
             if (!res.ok) throw new Error('API returned ' + res.status);
             const data = await res.json();
 
-            // Process slot data for sky colors, weather audio, and slot sounds
+            // Process slot data for sky colors and weather audio
             if (data.slots) {
                 this.slotsData = data.slots;
                 this.slotKeyframes = this.buildKeyframes(data.slots);
                 this.updateSkyColor();
-                // Update slot sound if popup is open
-                if (this.popup.open) {
-                    this.updateSlotSound();
-                }
             }
 
             // Weather toggle from API
@@ -529,10 +535,14 @@ Alpine.data('cameraFeed', () => ({
                 await this.fetchWeather();
             }
 
+            // Find the soonest next_check across all cameras
+            let minCheckSeconds = 300;
+
             data.cameras.forEach(cam => {
                 const prev = this.cameras[cam.id];
                 const videoChanged = !prev || prev.video_url !== cam.video_url;
                 const audioChanged = !prev || prev.audio_url !== cam.audio_url;
+                const soundChanged = !prev || prev.default_sound_url !== cam.default_sound_url;
 
                 this.cameras[cam.id] = { ...cam };
 
@@ -550,7 +560,6 @@ Alpine.data('cameraFeed', () => ({
                                     if (offset > 0) {
                                         videoEl.currentTime = Math.min(offset, Math.max(0, videoEl.duration - 0.1));
                                     } else if (isRealtime) {
-                                        // show current frame for realtime even if offset is 0
                                         videoEl.currentTime = 0;
                                     }
                                     videoEl.pause();
@@ -563,20 +572,28 @@ Alpine.data('cameraFeed', () => ({
                             }
                         }
 
-                        // Update popup if it's showing this camera
+                        // Update popup only if video/audio actually changed
                         if (this.popup.open && this.popup.id === cam.id) {
                             this.loadPopupVideo();
                         }
                     });
                 }
 
-                // Schedule next check based on when the current block ends
-                if (this.timers[cam.id]) clearTimeout(this.timers[cam.id]);
-                const checkIn = Math.max(5, cam.next_check_seconds) * 1000;
-                this.timers[cam.id] = setTimeout(() => this.loadSchedule(), checkIn);
+                // Update slot sound if it changed (without reloading video)
+                if (soundChanged && this.popup.open && this.popup.id === cam.id) {
+                    this.updateSlotSound();
+                }
+
+                // Track the soonest check time
+                minCheckSeconds = Math.min(minCheckSeconds, cam.next_check_seconds ?? 300);
             });
+
+            // Single timer for the next schedule refresh
+            this.scheduleNextCheck(minCheckSeconds);
         } catch (e) {
-            setTimeout(() => this.loadSchedule(), 30000);
+            this.scheduleNextCheck(30);
+        } finally {
+            this._scheduleLoading = false;
         }
     },
 
@@ -1167,7 +1184,7 @@ Alpine.data('cameraFeed', () => ({
     },
 
     destroy() {
-        Object.values(this.timers).forEach(t => clearTimeout(t));
+        if (this._scheduleTimer) clearTimeout(this._scheduleTimer);
         if (this.clockTimer) clearInterval(this.clockTimer);
         if (this.skyTimer) clearInterval(this.skyTimer);
         if (this.weatherTimer) clearInterval(this.weatherTimer);
