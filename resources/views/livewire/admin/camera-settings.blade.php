@@ -95,7 +95,7 @@
                             </div>
 
                             {{-- Row 2: Colors + Transition --}}
-                            <div class="grid grid-cols-2 gap-4 mt-3">
+                            <div class="grid grid-cols-3 gap-4 mt-3">
                                 {{-- Background Color --}}
                                 <div>
                                     <label class="block text-xs text-zinc-500 mb-1 uppercase tracking-wider">Achtergrondkleur</label>
@@ -129,6 +129,28 @@
                                     </div>
                                     <p class="text-[10px] text-zinc-600 mt-1">Laatste 2 tekens = transparantie (00=onzichtbaar, FF=volledig)</p>
                                     @error("slots.{$index}.overlay_color") <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
+                                </div>
+
+                                {{-- Cloud Color --}}
+                                <div>
+                                    <label class="block text-xs text-zinc-500 mb-1 uppercase tracking-wider">Wolkenkleur</label>
+                                    <div class="flex items-center gap-2"
+                                        x-data="{ cloudRgb: '{{ substr($slot['cloud_color'], 0, 7) }}' }">
+                                        <input type="color"
+                                            x-model="cloudRgb"
+                                            x-on:input="
+                                                let alpha = $wire.slots[{{ $index }}].cloud_color.length > 7
+                                                    ? $wire.slots[{{ $index }}].cloud_color.slice(7)
+                                                    : 'FF';
+                                                $wire.set('slots.{{ $index }}.cloud_color', $event.target.value + alpha)
+                                            "
+                                            class="h-9 w-12 bg-zinc-800 border border-zinc-700 rounded-sm cursor-pointer p-0.5">
+                                        <input type="text" wire:model.live="slots.{{ $index }}.cloud_color"
+                                            class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm rounded-sm focus:border-accent focus:ring-accent font-mono"
+                                            placeholder="#RRGGBBAA" maxlength="9">
+                                    </div>
+                                    <p class="text-[10px] text-zinc-600 mt-1">Kleur van de wolken in dit dagdeel.</p>
+                                    @error("slots.{$index}.cloud_color") <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
@@ -245,6 +267,31 @@
                             <div class="flex items-center justify-center relative"
                                 style="width: {{ $widthPercent }}%; background-color: rgba({{ $r }}, {{ $g }}, {{ $b }}, {{ round($ocAlpha, 3) }});"
                                 title="{{ $ts['slot']['label'] }} overlay: {{ $oc }}">
+                                @if ($widthPercent > 5)
+                                    <span class="text-[10px] font-semibold text-white/60 uppercase tracking-wider truncate px-1 drop-shadow-sm">
+                                        {{ $ts['slot']['label'] }}
+                                    </span>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Cloud color bar --}}
+                    <p class="text-[10px] text-zinc-500 uppercase tracking-wider mt-3">Wolken</p>
+                    <div class="flex h-10 rounded-sm overflow-hidden bg-zinc-700">
+                        @foreach ($timelineSlots as $ts)
+                            @php
+                                $widthPercent = (($ts['end'] - $ts['start']) / 1440) * 100;
+                                $cc = $ts['slot']['cloud_color'] ?? '#FFFFFF66';
+                                $ccRgb = substr($cc, 0, 7);
+                                $ccAlpha = strlen($cc) > 7 ? hexdec(substr($cc, 7, 2)) / 255 : 1;
+                                $cr = hexdec(substr($ccRgb, 1, 2));
+                                $cg = hexdec(substr($ccRgb, 3, 2));
+                                $cb = hexdec(substr($ccRgb, 5, 2));
+                            @endphp
+                            <div class="flex items-center justify-center relative"
+                                style="width: {{ $widthPercent }}%; background-color: rgba({{ $cr }}, {{ $cg }}, {{ $cb }}, {{ round($ccAlpha, 3) }});"
+                                title="{{ $ts['slot']['label'] }} wolken: {{ $cc }}">
                                 @if ($widthPercent > 5)
                                     <span class="text-[10px] font-semibold text-white/60 uppercase tracking-wider truncate px-1 drop-shadow-sm">
                                         {{ $ts['slot']['label'] }}

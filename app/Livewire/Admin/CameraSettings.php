@@ -31,6 +31,7 @@ class CameraSettings extends Component
                 'end_time'      => $setting->end_time === '24:00' ? '24:00' : $setting->end_time,
                 'bg_color'      => $setting->bg_color ?? '#000000',
                 'overlay_color' => $setting->overlay_color ?? '#00000000',
+                'cloud_color'   => $setting->cloud_color ?? '#FFFFFF66',
                 'is_transition' => (bool) $setting->is_transition,
                 'rain_enabled'  => (bool) $setting->rain_enabled,
                 'wind_enabled'  => (bool) $setting->wind_enabled,
@@ -65,6 +66,7 @@ class CameraSettings extends Component
             'slots.*.end_time'      => ['required', 'regex:/^\d{2}:\d{2}$/'],
             'slots.*.bg_color'      => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'slots.*.overlay_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6,8}$/'],
+            'slots.*.cloud_color'   => ['required', 'regex:/^#[0-9A-Fa-f]{6,8}$/'],
         ], [
             'slots.*.label.required'         => 'Label is verplicht.',
             'slots.*.end_time.required'      => 'Eindtijd is verplicht.',
@@ -73,6 +75,8 @@ class CameraSettings extends Component
             'slots.*.bg_color.regex'         => 'Ongeldig kleurformaat (#RRGGBB).',
             'slots.*.overlay_color.required' => 'Overlay kleur is verplicht.',
             'slots.*.overlay_color.regex'    => 'Ongeldig kleurformaat (#RRGGBB of #RRGGBBAA).',
+            'slots.*.cloud_color.required'   => 'Wolkenkleur is verplicht.',
+            'slots.*.cloud_color.regex'      => 'Ongeldig kleurformaat (#RRGGBB of #RRGGBBAA).',
         ]);
 
         $count = count($this->slots);
@@ -108,6 +112,7 @@ class CameraSettings extends Component
                 'end_time'      => $slot['end_time'],
                 'bg_color'      => $slot['bg_color'],
                 'overlay_color' => $slot['overlay_color'],
+                'cloud_color'   => $slot['cloud_color'],
                 'is_transition' => $slot['is_transition'] ?? false,
                 'rain_enabled'  => $slot['rain_enabled'] ?? false,
                 'wind_enabled'  => $slot['wind_enabled'] ?? false,

@@ -191,20 +191,25 @@
                                                 animationDelay: cloud.delay + 's',
                                                 opacity: cloud.opacity,
                                             }">
-                                                <div class="absolute rounded-full bg-white/40" :style="{
+                                                <div class="absolute rounded-full" :style="{
                                                     width: '60%', height: '70%', bottom: '0', left: '10%',
+                                                    backgroundColor: scaleCloudAlpha(cloudColor, 0.4),
                                                 }"></div>
-                                                <div class="absolute rounded-full bg-white/50" :style="{
+                                                <div class="absolute rounded-full" :style="{
                                                     width: '50%', height: '85%', bottom: '5%', left: '25%',
+                                                    backgroundColor: scaleCloudAlpha(cloudColor, 0.5),
                                                 }"></div>
-                                                <div class="absolute rounded-full bg-white/35" :style="{
+                                                <div class="absolute rounded-full" :style="{
                                                     width: '45%', height: '65%', bottom: '0', left: '50%',
+                                                    backgroundColor: scaleCloudAlpha(cloudColor, 0.35),
                                                 }"></div>
-                                                <div class="absolute rounded-full bg-white/30" :style="{
+                                                <div class="absolute rounded-full" :style="{
                                                     width: '35%', height: '50%', bottom: '10%', left: '5%',
+                                                    backgroundColor: scaleCloudAlpha(cloudColor, 0.3),
                                                 }"></div>
-                                                <div class="absolute rounded-full bg-white/25" :style="{
+                                                <div class="absolute rounded-full" :style="{
                                                     width: '30%', height: '45%', bottom: '5%', left: '60%',
+                                                    backgroundColor: scaleCloudAlpha(cloudColor, 0.25),
                                                 }"></div>
                                             </div>
                                         </template>
@@ -308,6 +313,7 @@ Alpine.data('cameraFeed', () => ({
     // Sky color system
     skyColor: '#0B1026',
     overlayColor: 'rgba(0,0,0,0)',
+    cloudColor: 'rgba(255, 255, 255, 0.4)',
     slotKeyframes: [],
 
     // Static/noise system
@@ -623,18 +629,21 @@ Alpine.data('cameraFeed', () => ({
                     minutes: startMin,
                     bgColor: prev.bg_color || '#000000',
                     overlayColor: prev.overlay_color || '#00000000',
+                    cloudColor: prev.cloud_color || '#FFFFFF66',
                 });
                 // 50% = this slot's own color
                 keyframes.push({
                     minutes: midpoint,
                     bgColor: slot.bg_color || '#000000',
                     overlayColor: slot.overlay_color || '#00000000',
+                    cloudColor: slot.cloud_color || '#FFFFFF66',
                 });
                 // 100% = next slot's color
                 keyframes.push({
                     minutes: endMin >= 1440 ? 1439.99 : endMin,
                     bgColor: next.bg_color || '#000000',
                     overlayColor: next.overlay_color || '#00000000',
+                    cloudColor: next.cloud_color || '#FFFFFF66',
                 });
             } else {
                 // Solid slot: holds color flat from start to end
@@ -642,11 +651,13 @@ Alpine.data('cameraFeed', () => ({
                     minutes: startMin,
                     bgColor: slot.bg_color || '#000000',
                     overlayColor: slot.overlay_color || '#00000000',
+                    cloudColor: slot.cloud_color || '#FFFFFF66',
                 });
                 keyframes.push({
                     minutes: endMin >= 1440 ? 1439.99 : endMin,
                     bgColor: slot.bg_color || '#000000',
                     overlayColor: slot.overlay_color || '#00000000',
+                    cloudColor: slot.cloud_color || '#FFFFFF66',
                 });
             }
         }
@@ -702,6 +713,7 @@ Alpine.data('cameraFeed', () => ({
 
         this.skyColor = this.lerpHex(prevKf.bgColor, nextKf.bgColor, t);
         this.overlayColor = this.lerpHexAlpha(prevKf.overlayColor, nextKf.overlayColor, t);
+        this.cloudColor = this.lerpHexAlpha(prevKf.cloudColor, nextKf.cloudColor, t);
     },
 
     lerpHex(c1, c2, t) {
@@ -723,6 +735,13 @@ Alpine.data('cameraFeed', () => ({
         const b = Math.round(b1 + (b2 - b1) * t);
         const a = (a1 + (a2 - a1) * t).toFixed(3);
         return `rgba(${r}, ${g}, ${b}, ${a})`;
+    },
+
+    scaleCloudAlpha(rgbaStr, scale) {
+        const m = rgbaStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+),?\s*([\d.]+)?\)/);
+        if (!m) return rgbaStr;
+        const a = parseFloat(m[4] ?? 1) * scale;
+        return `rgba(${m[1]}, ${m[2]}, ${m[3]}, ${a.toFixed(3)})`;
     },
 
     getCameraStatus(id) {

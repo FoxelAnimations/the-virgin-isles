@@ -14,6 +14,7 @@ class CameraSlotSetting extends Model
         'end_time',
         'bg_color',
         'overlay_color',
+        'cloud_color',
         'is_transition',
         'rain_enabled',
         'wind_enabled',
@@ -38,10 +39,10 @@ class CameraSlotSetting extends Model
             if ($settings->isEmpty()) {
                 // Fallback to defaults if table is empty
                 return [
-                    'nacht'   => ['start' => '00:00', 'end' => '06:00', 'label' => 'Nacht',   'bg_color' => '#0B1026', 'overlay_color' => '#0000001A', 'is_transition' => false, 'rain_enabled' => false, 'wind_enabled' => false],
-                    'ochtend' => ['start' => '06:00', 'end' => '08:00', 'label' => 'Ochtend', 'bg_color' => '#F4845F', 'overlay_color' => '#FF8C0030', 'is_transition' => true,  'rain_enabled' => false, 'wind_enabled' => false],
-                    'dag'     => ['start' => '08:00', 'end' => '18:00', 'label' => 'Dag',     'bg_color' => '#87CEEB', 'overlay_color' => '#FFFFFF10', 'is_transition' => false, 'rain_enabled' => false, 'wind_enabled' => false],
-                    'avond'   => ['start' => '18:00', 'end' => '24:00', 'label' => 'Avond',   'bg_color' => '#D4621A', 'overlay_color' => '#FF450030', 'is_transition' => true,  'rain_enabled' => false, 'wind_enabled' => false],
+                    'nacht'   => ['start' => '00:00', 'end' => '06:00', 'label' => 'Nacht',   'bg_color' => '#0B1026', 'overlay_color' => '#0000001A', 'cloud_color' => '#FFFFFF66', 'is_transition' => false, 'rain_enabled' => false, 'wind_enabled' => false],
+                    'ochtend' => ['start' => '06:00', 'end' => '08:00', 'label' => 'Ochtend', 'bg_color' => '#F4845F', 'overlay_color' => '#FF8C0030', 'cloud_color' => '#FFFFFF66', 'is_transition' => true,  'rain_enabled' => false, 'wind_enabled' => false],
+                    'dag'     => ['start' => '08:00', 'end' => '18:00', 'label' => 'Dag',     'bg_color' => '#87CEEB', 'overlay_color' => '#FFFFFF10', 'cloud_color' => '#FFFFFF66', 'is_transition' => false, 'rain_enabled' => false, 'wind_enabled' => false],
+                    'avond'   => ['start' => '18:00', 'end' => '24:00', 'label' => 'Avond',   'bg_color' => '#D4621A', 'overlay_color' => '#FF450030', 'cloud_color' => '#FFFFFF66', 'is_transition' => true,  'rain_enabled' => false, 'wind_enabled' => false],
                 ];
             }
 
@@ -52,6 +53,7 @@ class CameraSlotSetting extends Model
                     'label'         => $setting->label,
                     'bg_color'      => $setting->bg_color,
                     'overlay_color' => $setting->overlay_color,
+                    'cloud_color'   => $setting->cloud_color ?? '#FFFFFF66',
                     'is_transition' => (bool) $setting->is_transition,
                     'rain_enabled'  => (bool) $setting->rain_enabled,
                     'wind_enabled'  => (bool) $setting->wind_enabled,
