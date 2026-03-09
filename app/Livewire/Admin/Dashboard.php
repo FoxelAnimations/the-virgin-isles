@@ -17,6 +17,7 @@ class Dashboard extends Component
     use WithFileUploads;
 
     public $video;
+    public $heroImage;
     public array $socialLinks = [];
     public string $heroPreTitle = '';
     public string $heroTitle = '';
@@ -67,27 +68,23 @@ class Dashboard extends Component
             ->toArray();
     }
 
-    protected function rules(): array
-    {
-        return [
-            'video' => ['required', 'mimes:mp4,webm,mov'],
-        ];
-    }
-
     public function uploadVideo(): void
     {
-        $this->validate();
+        $this->validate(['video' => ['required', 'mimes:mp4,webm,mov']]);
 
-        $existing = HeroVideo::latest()->first();
+        $hero = HeroVideo::latest()->first();
 
-        if ($existing) {
-            Storage::disk('public')->delete($existing->video_path);
-            $existing->delete();
+        if ($hero && $hero->video_path) {
+            Storage::disk('public')->delete($hero->video_path);
         }
 
         $path = $this->video->store('videos/hero', 'public');
 
-        HeroVideo::create(['video_path' => $path]);
+        if ($hero) {
+            $hero->update(['video_path' => $path]);
+        } else {
+            HeroVideo::create(['video_path' => $path]);
+        }
 
         $this->reset('video');
         session()->flash('status', 'Hero video uploaded successfully.');
@@ -96,14 +93,60 @@ class Dashboard extends Component
 
     public function removeVideo(): void
     {
-        $heroVideo = HeroVideo::latest()->first();
+        $hero = HeroVideo::latest()->first();
 
-        if ($heroVideo) {
-            Storage::disk('public')->delete($heroVideo->video_path);
-            $heroVideo->delete();
+        if ($hero && $hero->video_path) {
+            Storage::disk('public')->delete($hero->video_path);
+            $hero->update(['video_path' => null]);
+
+            // Delete the record entirely if both are empty
+            if (! $hero->image_path) {
+                $hero->delete();
+            }
         }
 
         session()->flash('status', 'Hero video removed.');
+        $this->redirect(route('admin.dashboard'));
+    }
+
+    public function uploadImage(): void
+    {
+        $this->validate(['heroImage' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,gif']]);
+
+        $hero = HeroVideo::latest()->first();
+
+        if ($hero && $hero->image_path) {
+            Storage::disk('public')->delete($hero->image_path);
+        }
+
+        $path = $this->heroImage->store('images/hero', 'public');
+
+        if ($hero) {
+            $hero->update(['image_path' => $path]);
+        } else {
+            HeroVideo::create(['image_path' => $path]);
+        }
+
+        $this->reset('heroImage');
+        session()->flash('status', 'Hero image uploaded successfully.');
+        $this->redirect(route('admin.dashboard'));
+    }
+
+    public function removeImage(): void
+    {
+        $hero = HeroVideo::latest()->first();
+
+        if ($hero && $hero->image_path) {
+            Storage::disk('public')->delete($hero->image_path);
+            $hero->update(['image_path' => null]);
+
+            // Delete the record entirely if both are empty
+            if (! $hero->video_path) {
+                $hero->delete();
+            }
+        }
+
+        session()->flash('status', 'Hero image removed.');
         $this->redirect(route('admin.dashboard'));
     }
 

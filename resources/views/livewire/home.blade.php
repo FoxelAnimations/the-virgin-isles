@@ -216,7 +216,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
             {{-- Left: Video or Image (1:1) --}}
             <div class="bg-zinc-900 border border-zinc-800 rounded-sm overflow-hidden relative aspect-square">
-                @if ($heroVideo)
+                @if ($heroVideo?->video_path)
                     <div x-data="{ muted: true }" class="absolute inset-0 cursor-pointer" @click="muted = !muted; $refs.heroVid.muted = muted">
                         <video
                             x-ref="heroVid"
@@ -237,6 +237,10 @@
                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
                             </template>
                         </div>
+                    </div>
+                @elseif ($heroVideo?->image_path)
+                    <div class="absolute inset-0">
+                        <img src="{{ Storage::url($heroVideo->image_path) }}" alt="Hero" class="w-full h-full object-cover">
                     </div>
                 @else
                     <div class="absolute inset-0 flex items-center justify-center">
@@ -492,7 +496,7 @@
                                         <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold uppercase leading-none mb-4 break-words">{{ $block->title }}</h2>
                                     @endif
                                     @if ($block->text)
-                                        <p class="text-zinc-400 text-lg leading-relaxed break-words">{{ $block->text }}</p>
+                                        <div class="content-block-text font-description text-zinc-400 text-lg leading-relaxed break-words">{!! $block->text !!}</div>
                                     @endif
                                     @if ($block->hasButton())
                                         <div class="mt-6">

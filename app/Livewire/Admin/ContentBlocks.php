@@ -35,7 +35,7 @@ class ContentBlocks extends Component
         return [
             'pre_title' => ['nullable', 'string', 'max:255'],
             'title' => ['nullable', 'string', 'max:255'],
-            'text' => ['nullable', 'string', 'max:5000'],
+            'text' => ['nullable', 'string', 'max:15000'],
             'media_type' => ['nullable', 'string', 'in:image,video,youtube'],
             'image_upload' => ['nullable', 'image', 'max:4096'],
             'video_upload' => ['nullable', 'mimes:mp4,webm,mov', 'max:51200'],
@@ -77,10 +77,17 @@ class ContentBlocks extends Component
     {
         $this->validate();
 
+        // Sanitize HTML: only allow safe tags
+        $cleanText = $this->text ? strip_tags($this->text, '<p><br><strong><em><u><h2><h3><ul><ol><li>') : null;
+        // Remove empty editor content
+        if ($cleanText && trim(strip_tags($cleanText)) === '') {
+            $cleanText = null;
+        }
+
         $data = [
             'pre_title' => $this->pre_title ?: null,
             'title' => $this->title ?: null,
-            'text' => $this->text ?: null,
+            'text' => $cleanText,
             'media_type' => $this->media_type ?: null,
             'youtube_url' => $this->media_type === 'youtube' ? ($this->youtube_url ?: null) : null,
             'button_label' => $this->button_label ?: null,

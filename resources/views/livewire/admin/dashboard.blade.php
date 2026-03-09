@@ -18,44 +18,87 @@
             <div class="bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider">{{ __('Hero Section') }}</div>
             <div class="p-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {{-- Left: Video --}}
-                    <div>
-                        <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Video') }}</h3>
-                        @if ($heroVideo)
-                            <div class="mb-3">
-                                <video class="w-full max-h-48 rounded-sm bg-black" controls>
-                                    <source src="{{ Storage::url($heroVideo->video_path) }}" type="video/mp4">
-                                </video>
-                            </div>
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="text-xs text-zinc-500">{{ __('Current hero video') }}</span>
-                                <button
-                                    wire:click="removeVideo"
-                                    wire:confirm="Are you sure you want to remove the hero video?"
-                                    class="inline-flex items-center border border-red-900 px-2 py-1 text-xs font-semibold text-red-400 hover:bg-red-900/30 transition"
-                                >
-                                    {{ __('Remove') }}
-                                </button>
-                            </div>
-                        @else
-                            <p class="text-sm text-zinc-500 mb-3">{{ __('No hero video set. The homepage will show the logo placeholder.') }}</p>
-                        @endif
+                    {{-- Left: Media (Video + Image) --}}
+                    <div class="space-y-6">
+                        {{-- Video --}}
+                        <div>
+                            <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Video') }}</h3>
+                            @if ($heroVideo?->video_path)
+                                <div class="mb-3">
+                                    <video class="w-full max-h-48 rounded-sm bg-black" controls>
+                                        <source src="{{ Storage::url($heroVideo->video_path) }}" type="video/mp4">
+                                    </video>
+                                </div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-xs text-zinc-500">{{ __('Current hero video') }}</span>
+                                    <button
+                                        wire:click="removeVideo"
+                                        wire:confirm="Are you sure you want to remove the hero video?"
+                                        class="inline-flex items-center border border-red-900 px-2 py-1 text-xs font-semibold text-red-400 hover:bg-red-900/30 transition"
+                                    >
+                                        {{ __('Remove') }}
+                                    </button>
+                                </div>
+                            @else
+                                <p class="text-sm text-zinc-500 mb-3">{{ __('No hero video set.') }}</p>
+                            @endif
 
-                        <form wire:submit="uploadVideo">
-                            <label class="block text-xs font-medium text-zinc-500 mb-1">
-                                {{ $heroVideo ? __('Replace video') : __('Upload video') }}
-                            </label>
-                            <input type="file" wire:model="video" accept="video/mp4,video/webm,video/quicktime" class="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-3 file:rounded-sm file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700">
-                            @error('video') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
+                            <form wire:submit="uploadVideo">
+                                <label class="block text-xs font-medium text-zinc-500 mb-1">
+                                    {{ $heroVideo?->video_path ? __('Replace video') : __('Upload video') }}
+                                </label>
+                                <input type="file" wire:model="video" accept="video/mp4,video/webm,video/quicktime" class="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-3 file:rounded-sm file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700">
+                                @error('video') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
 
-                            <div class="mt-3 flex items-center gap-3">
-                                <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90" wire:loading.attr="disabled">
-                                    <span wire:loading.remove wire:target="uploadVideo">{{ __('Upload') }}</span>
-                                    <span wire:loading wire:target="uploadVideo">{{ __('Uploading...') }}</span>
-                                </button>
-                                <div wire:loading wire:target="video" class="text-sm text-zinc-500">{{ __('Processing file...') }}</div>
-                            </div>
-                        </form>
+                                <div class="mt-3 flex items-center gap-3">
+                                    <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90" wire:loading.attr="disabled">
+                                        <span wire:loading.remove wire:target="uploadVideo">{{ __('Upload') }}</span>
+                                        <span wire:loading wire:target="uploadVideo">{{ __('Uploading...') }}</span>
+                                    </button>
+                                    <div wire:loading wire:target="video" class="text-sm text-zinc-500">{{ __('Processing file...') }}</div>
+                                </div>
+                            </form>
+                        </div>
+
+                        {{-- Image --}}
+                        <div>
+                            <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Image') }}</h3>
+                            @if ($heroVideo?->image_path)
+                                <div class="mb-3">
+                                    <img src="{{ Storage::url($heroVideo->image_path) }}" alt="Hero image" class="w-full max-h-48 object-contain rounded-sm bg-black">
+                                </div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-xs text-zinc-500">{{ __('Current hero image') }}</span>
+                                    <button
+                                        wire:click="removeImage"
+                                        wire:confirm="Are you sure you want to remove the hero image?"
+                                        class="inline-flex items-center border border-red-900 px-2 py-1 text-xs font-semibold text-red-400 hover:bg-red-900/30 transition"
+                                    >
+                                        {{ __('Remove') }}
+                                    </button>
+                                </div>
+                            @else
+                                <p class="text-sm text-zinc-500 mb-3">{{ __('No hero image set.') }}</p>
+                            @endif
+
+                            <form wire:submit="uploadImage">
+                                <label class="block text-xs font-medium text-zinc-500 mb-1">
+                                    {{ $heroVideo?->image_path ? __('Replace image') : __('Upload image') }}
+                                </label>
+                                <input type="file" wire:model="heroImage" accept="image/jpeg,image/png,image/webp,image/gif" class="block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-3 file:rounded-sm file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700">
+                                @error('heroImage') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
+
+                                <div class="mt-3 flex items-center gap-3">
+                                    <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90" wire:loading.attr="disabled">
+                                        <span wire:loading.remove wire:target="uploadImage">{{ __('Upload') }}</span>
+                                        <span wire:loading wire:target="uploadImage">{{ __('Uploading...') }}</span>
+                                    </button>
+                                    <div wire:loading wire:target="heroImage" class="text-sm text-zinc-500">{{ __('Processing file...') }}</div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <p class="text-[10px] text-zinc-600">{{ __('If both are set, the video takes priority. The image is shown as fallback.') }}</p>
                     </div>
 
                     {{-- Right: Copy --}}

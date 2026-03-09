@@ -81,3 +81,41 @@
 .character-animated-layer {
     pointer-events: none;
 }
+
+/* Content block rich text */
+.content-block-text p {
+    margin-bottom: 0.4em;
+}
+.content-block-text p:last-child {
+    margin-bottom: 0;
+}
+.content-block-text h2 {
+    color: #fff;
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-bottom: 0.3em;
+}
+.content-block-text h3 {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-bottom: 0.3em;
+}
+.content-block-text strong {
+    color: #fff;
+    font-weight: 600;
+}
+.content-block-text ul,
+.content-block-text ol {
+    padding-left: 1.4em;
+    margin-bottom: 0.4em;
+}
+.content-block-text ul {
+    list-style-type: disc;
+}
+.content-block-text ol {
+    list-style-type: decimal;
+}
+.content-block-text li {
+    margin-bottom: 0.15em;
+}

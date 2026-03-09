@@ -8,5 +8,6 @@ class HeroVideo extends Model
 {
     protected $fillable = [
         'video_path',
+        'image_path',
     ];
 }

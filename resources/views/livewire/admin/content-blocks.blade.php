@@ -70,9 +70,37 @@
                             @error('title') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
                         </div>
                     </div>
-                    <div>
+                    <div wire:ignore
+                         x-data="{
+                             quill: null,
+                             init() {
+                                 this.quill = new Quill(this.$refs.editor, {
+                                     theme: 'snow',
+                                     placeholder: 'Optionele tekst...',
+                                     modules: {
+                                         toolbar: [
+                                             [{ 'header': [2, 3, false] }],
+                                             ['bold', 'italic', 'underline'],
+                                             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                             ['clean']
+                                         ]
+                                     }
+                                 });
+                                 // Set initial content
+                                 const initial = @this.get('text');
+                                 if (initial) {
+                                     this.quill.root.innerHTML = initial;
+                                 }
+                                 // Sync changes to Livewire
+                                 this.quill.on('text-change', () => {
+                                     const html = this.quill.root.innerHTML;
+                                     @this.set('text', html === '<p><br></p>' ? '' : html);
+                                 });
+                             }
+                         }"
+                    >
                         <label class="block text-xs font-medium text-zinc-500 mb-1">{{ __('Tekst') }}</label>
-                        <textarea wire:model="text" rows="4" class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm" placeholder="Optionele tekst"></textarea>
+                        <div x-ref="editor" class="quill-editor-dark"></div>
                         @error('text') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
                     </div>
 
@@ -261,4 +289,87 @@
             @endif
         </div>
     </div>
+
+    <style>
+        /* Quill dark theme overrides */
+        .quill-editor-dark {
+            font-family: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+        }
+        .quill-editor-dark .ql-editor {
+            min-height: 120px;
+            color: #e4e4e7;
+            font-size: 14px;
+            line-height: 1.6;
+            font-family: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+        }
+        .quill-editor-dark .ql-editor p {
+            margin-bottom: 0.4em;
+        }
+        .quill-editor-dark .ql-editor h2 {
+            color: #fff;
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 0.3em;
+        }
+        .quill-editor-dark .ql-editor h3 {
+            color: #fff;
+            font-size: 1.15em;
+            font-weight: 600;
+            margin-bottom: 0.3em;
+        }
+        .quill-editor-dark .ql-editor ul,
+        .quill-editor-dark .ql-editor ol {
+            margin-bottom: 0.4em;
+            padding-left: 1.2em;
+        }
+        .quill-editor-dark .ql-editor li {
+            margin-bottom: 0.15em;
+        }
+        .quill-editor-dark .ql-editor.ql-blank::before {
+            color: #52525b;
+            font-style: normal;
+        }
+        .ql-toolbar.ql-snow {
+            background: #27272a !important;
+            border-color: #3f3f46 !important;
+            border-radius: 2px 2px 0 0;
+        }
+        .ql-toolbar .ql-stroke {
+            stroke: #a1a1aa !important;
+        }
+        .ql-toolbar .ql-fill {
+            fill: #a1a1aa !important;
+        }
+        .ql-toolbar .ql-picker-label {
+            color: #a1a1aa !important;
+        }
+        .ql-toolbar button:hover .ql-stroke,
+        .ql-toolbar button.ql-active .ql-stroke {
+            stroke: #E7FF57 !important;
+        }
+        .ql-toolbar button:hover .ql-fill,
+        .ql-toolbar button.ql-active .ql-fill {
+            fill: #E7FF57 !important;
+        }
+        .ql-toolbar .ql-picker-label:hover,
+        .ql-toolbar .ql-picker-label.ql-active {
+            color: #E7FF57 !important;
+        }
+        .ql-toolbar .ql-picker-options {
+            background: #27272a !important;
+            border-color: #3f3f46 !important;
+        }
+        .ql-toolbar .ql-picker-item {
+            color: #a1a1aa !important;
+        }
+        .ql-toolbar .ql-picker-item:hover,
+        .ql-toolbar .ql-picker-item.ql-selected {
+            color: #E7FF57 !important;
+        }
+        .ql-container.ql-snow {
+            background: #18181b !important;
+            border-color: #3f3f46 !important;
+            border-radius: 0 0 2px 2px;
+        }
+    </style>
 </div>

@@ -10,6 +10,11 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=bebas-neue:400&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=montserrat:400,500,600,700&display=swap" rel="stylesheet" />
+
+        <!-- Quill Editor -->
+        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
