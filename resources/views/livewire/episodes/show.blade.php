@@ -78,10 +78,15 @@
                                     characters: {{ Js::from($episode->characters->map(fn($c) => [
                                         'name' => $c->full_name,
                                         'nickname' => $c->nick_name,
+                                        'age' => $c->age,
                                         'job' => $c->job?->title,
                                         'bio' => $c->bio,
-                                        'image' => $c->profile_image_path ? Storage::url($c->profile_image_path) : null,
+                                        'image' => ($c->profile_photo_path ?? $c->profile_image_path) ? Storage::url($c->profile_photo_path ?? $c->profile_image_path) : null,
+                                        'imageHover' => ($c->profile_photo_path ? $c->profile_photo_hover_path : $c->profile_image_hover_path) ? Storage::url($c->profile_photo_path ? $c->profile_photo_hover_path : $c->profile_image_hover_path) : null,
                                         'fullBody' => $c->full_body_image_path ? Storage::url($c->full_body_image_path) : null,
+                                        'fullBodyHover' => $c->full_body_image_hover_path ? Storage::url($c->full_body_image_hover_path) : null,
+                                        'background' => $c->background_image_path ? Storage::url($c->background_image_path) : null,
+                                        'links' => $c->socialLinks->map(fn($l) => ['title' => $l->title, 'url' => $l->url]),
                                     ])) }},
                                     instagram: {{ Js::from($episode->instagram_url) }},
                                     youtube: {{ Js::from($episode->youtube_link) }},
@@ -269,27 +274,51 @@
                 @click.stop
             >
                 <div class="grid grid-cols-1 md:grid-cols-2">
-                    <div class="aspect-square bg-zinc-800 overflow-hidden">
-                        <template x-if="char?.fullBody || char?.image">
-                            <img :src="char?.fullBody || char?.image" :alt="char?.name" class="w-full h-full object-cover object-top">
+                    {{-- Left: Image --}}
+                    <div class="aspect-square bg-zinc-800 overflow-hidden relative group/modal"
+                        :style="char?.background ? 'background-image: url(\'' + char.background + '\'); background-size: cover; background-position: center;' : ''"
+                    >
+                        <template x-if="char?.image || char?.fullBody">
+                            <div class="w-full h-full relative">
+                                <img :src="char?.image || char?.fullBody" :alt="char?.name"
+                                    class="w-full h-full object-cover object-top relative z-[1] transition duration-300"
+                                    :class="(char?.image ? char?.imageHover : char?.fullBodyHover) ? 'group-hover/modal:opacity-0' : ''">
+                                <template x-if="char?.image ? char?.imageHover : char?.fullBodyHover">
+                                    <img :src="char?.image ? char?.imageHover : char?.fullBodyHover" :alt="char?.name"
+                                        class="absolute inset-0 w-full h-full object-cover object-top z-[2] opacity-0 transition duration-300 group-hover/modal:opacity-100">
+                                </template>
+                            </div>
                         </template>
-                        <template x-if="!char?.fullBody && !char?.image">
+                        <template x-if="!char?.image && !char?.fullBody && !char?.background">
                             <div class="w-full h-full flex items-center justify-center text-zinc-700">
                                 <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             </div>
                         </template>
                     </div>
 
+                    {{-- Right: Info --}}
                     <div class="p-6 md:p-8 flex flex-col justify-center">
                         <h2 class="text-3xl md:text-4xl font-bold uppercase tracking-wider text-white mb-1" x-text="char?.name"></h2>
                         <template x-if="char?.nickname">
                             <p class="text-accent text-sm uppercase tracking-wider mb-2">"<span x-text="char?.nickname"></span>"</p>
                         </template>
-                        <template x-if="char?.job">
-                            <p class="text-zinc-500 text-lg uppercase tracking-wider mb-6" x-text="char?.job"></p>
-                        </template>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mb-6">
+                            <template x-if="char?.job">
+                                <span class="text-white text-lg uppercase tracking-wider" x-text="char?.job"></span>
+                            </template>
+                            <template x-if="char?.age">
+                                <span class="text-zinc-500 text-lg uppercase tracking-wider">Leeftijd : <span class="text-accent" x-text="char?.age"></span></span>
+                            </template>
+                        </div>
                         <template x-if="char?.bio">
                             <p class="text-zinc-400 text-sm leading-relaxed font-description" x-text="char?.bio"></p>
+                        </template>
+                        <template x-if="char?.links?.length > 0">
+                            <div class="flex flex-wrap gap-2 mt-6">
+                                <template x-for="(link, i) in char.links" :key="i">
+                                    <a :href="link.url" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 bg-accent text-black px-3 py-1.5 text-xs font-semibold uppercase tracking-wider hover:brightness-90 transition" x-text="link.title"></a>
+                                </template>
+                            </div>
                         </template>
                     </div>
                 </div>
