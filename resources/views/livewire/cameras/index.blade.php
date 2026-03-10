@@ -214,6 +214,8 @@
                                             </div>
                                         </template>
                                     </div>
+                                    {{-- Rain canvas (above clouds, behind video) --}}
+                                    <canvas class="absolute inset-0 w-full h-full rain-canvas"></canvas>
                                 </div>
 
                                 {{-- Video element (relative so it drives container size) --}}
@@ -238,9 +240,6 @@
                                 {{-- Color overlay --}}
                                 <div class="absolute inset-0 z-[3] pointer-events-none"
                                     :style="{ backgroundColor: overlayColor }"></div>
-
-                                {{-- Rain effect (in front of video) --}}
-                                <canvas class="absolute inset-0 w-full h-full rain-canvas pointer-events-none z-[4]" x-show="weatherEnabled" x-cloak></canvas>
 
                                 {{-- Offline --}}
                                 <div x-show="!popup.id || getCameraStatus(popup.id) !== 'online' || !getCameraVideoUrl(popup.id)"
@@ -434,8 +433,8 @@ Alpine.data('cameraFeed', () => ({
                         y: -10 - Math.random() * 30,
                         speed: 10 + Math.random() * 10 + intensity * 8,
                         length: 12 + Math.random() * 16 + intensity * 10,
-                        opacity: 0.15 + Math.random() * 0.25 + intensity * 0.15,
-                        width: 0.5 + Math.random() * 0.8,
+                        opacity: 0.3 + Math.random() * 0.3 + intensity * 0.2,
+                        width: 1 + Math.random() * 1.2,
                     });
                 }
 
