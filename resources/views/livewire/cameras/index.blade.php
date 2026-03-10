@@ -90,6 +90,9 @@
                                 <p class="text-zinc-600 text-[10px] uppercase tracking-wider">Geen signaal</p>
                             </div>
 
+                            {{-- Rain effect on card --}}
+                            <canvas class="absolute inset-0 w-full h-full rain-canvas pointer-events-none z-[4]" data-type="card"></canvas>
+
                             {{-- Camera static effect --}}
                             <div class="absolute inset-0 pointer-events-none z-[5]" x-show="getCameraStaticEnabled({{ $camera->id }})" x-cloak>
                                 <div class="camera-scanlines absolute inset-0" :style="{ opacity: getCameraStaticIntensity({{ $camera->id }}) / 200 }"></div>
@@ -493,12 +496,17 @@ Alpine.data('cameraFeed', () => ({
             return;
         }
         try {
-            const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=50.8278&longitude=3.2644&current=cloud_cover,rain,temperature_2m,weather_code,wind_speed_10m');
+            const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=50.8278&longitude=3.2644&current=cloud_cover,rain,showers,precipitation,temperature_2m,weather_code,wind_speed_10m');
             if (!res.ok) return;
             const data = await res.json();
+            // Use precipitation (rain + showers + snowfall) for the rain effect
+            const totalRain = Math.max(
+                data.current?.precipitation ?? 0,
+                (data.current?.rain ?? 0) + (data.current?.showers ?? 0)
+            );
             this.weatherData = {
                 cloud_cover: data.current?.cloud_cover ?? 0,
-                rain: data.current?.rain ?? 0,
+                rain: totalRain,
                 wind_speed: data.current?.wind_speed_10m ?? 0,
                 temperature: data.current?.temperature_2m ?? null,
                 weather_code: data.current?.weather_code ?? 0,
