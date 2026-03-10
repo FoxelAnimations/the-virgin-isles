@@ -41,18 +41,14 @@
                             <span class="text-sm font-medium text-white">{{ __('Actief') }}</span>
                         </label>
                         <div class="flex items-center gap-4">
-                            <span class="text-xs font-medium text-zinc-500">{{ __('Tonen op:') }}</span>
+                            <span class="text-xs font-medium text-zinc-500">{{ __('Positie:') }}</span>
                             <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" wire:model="placement" value="home" class="border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
-                                <span class="text-sm text-white">{{ __('Home') }}</span>
+                                <input type="radio" wire:model="placement" value="above_episodes" class="border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
+                                <span class="text-sm text-white">{{ __('Boven afleveringen') }}</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" wire:model="placement" value="blog" class="border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
-                                <span class="text-sm text-white">{{ __('Blog') }}</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" wire:model="placement" value="both" class="border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
-                                <span class="text-sm text-white">{{ __('Beide') }}</span>
+                                <input type="radio" wire:model="placement" value="below_episodes" class="border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
+                                <span class="text-sm text-white">{{ __('Onder afleveringen') }}</span>
                             </label>
                         </div>
                     </div>
@@ -219,7 +215,7 @@
                                 <th class="w-10 px-3 py-3"></th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Titel') }}</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Media') }}</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Pagina') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Positie') }}</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Status') }}</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Acties') }}</th>
                             </tr>
@@ -258,10 +254,7 @@
                                     </td>
                                     <td class="px-6 py-4 text-sm">
                                         <span class="text-zinc-400">
-                                            @if($block->placement === 'home') Home
-                                            @elseif($block->placement === 'blog') Blog
-                                            @else Beide
-                                            @endif
+                                            {{ $block->placement === 'above_episodes' ? __('Boven afleveringen') : __('Onder afleveringen') }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">

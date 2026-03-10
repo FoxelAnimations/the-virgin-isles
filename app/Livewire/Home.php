@@ -31,7 +31,8 @@ class Home extends Component
             'latestShorts' => ($settings?->show_shorts ?? true) ? Episode::with('characters')->where('category', 'short')->where('visible', true)->latest()->take(5)->get() : collect(),
             'latestMinis' => ($settings?->show_minis ?? true) ? Episode::with('characters')->where('category', 'mini')->where('visible', true)->latest()->take(5)->get() : collect(),
             'socialLinks' => SocialLink::whereNotNull('url')->where('url', '!=', '')->orderBy('sort_order')->get(),
-            'contentBlocks' => ContentBlock::active()->forHome()->get(),
+            'blocksAbove' => ContentBlock::active()->aboveEpisodes()->get(),
+            'blocksBelow' => ContentBlock::active()->belowEpisodes()->get(),
             'ageGate' => AgeGate::first(),
         ])->layoutData(['bgClass' => 'bg-black']);
     }

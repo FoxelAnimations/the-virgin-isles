@@ -25,7 +25,7 @@ class ContentBlocks extends Component
     public string $button_url = '';
     public bool $button_new_tab = false;
     public bool $is_active = true;
-    public string $placement = 'home';
+    public string $placement = 'below_episodes';
 
     public ?string $existing_image_path = null;
     public ?string $existing_video_path = null;
@@ -44,7 +44,7 @@ class ContentBlocks extends Component
             'button_url' => ['nullable', 'url', 'max:500'],
             'button_new_tab' => ['boolean'],
             'is_active' => ['boolean'],
-            'placement' => ['required', 'string', 'in:home,blog,both'],
+            'placement' => ['required', 'string', 'in:above_episodes,below_episodes'],
         ];
     }
 
@@ -67,7 +67,7 @@ class ContentBlocks extends Component
         $this->button_url = $block->button_url ?? '';
         $this->button_new_tab = $block->button_new_tab;
         $this->is_active = $block->is_active;
-        $this->placement = $block->placement ?? 'home';
+        $this->placement = $block->placement ?? 'below_episodes';
         $this->existing_image_path = $block->image_path;
         $this->existing_video_path = $block->video_path;
         $this->showForm = true;
@@ -189,7 +189,7 @@ class ContentBlocks extends Component
             'existing_image_path', 'existing_video_path',
         ]);
         $this->is_active = true;
-        $this->placement = 'home';
+        $this->placement = 'below_episodes';
     }
 
     public function render()

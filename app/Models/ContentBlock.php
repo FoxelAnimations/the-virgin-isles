@@ -38,14 +38,14 @@ class ContentBlock extends Model
         return $query->where('is_active', true)->orderBy('sort_order');
     }
 
-    public function scopeForHome($query)
+    public function scopeAboveEpisodes($query)
     {
-        return $query->whereIn('placement', ['home', 'both']);
+        return $query->where('placement', 'above_episodes');
     }
 
-    public function scopeForBlog($query)
+    public function scopeBelowEpisodes($query)
     {
-        return $query->whereIn('placement', ['blog', 'both']);
+        return $query->where('placement', 'below_episodes');
     }
 
     public function hasMedia(): bool
