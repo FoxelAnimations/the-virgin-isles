@@ -9,10 +9,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Convert existing placement values to new position values
-        DB::table('content_blocks')->update(['placement' => 'below_episodes']);
-
-        // Change the enum values
         Schema::table('content_blocks', function (Blueprint $table) {
             $table->dropColumn('placement');
         });
