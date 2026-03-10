@@ -58,12 +58,16 @@ class CameraPlanner extends Component
     public int $rainVolume = 50;
     public int $windVolume = 50;
 
+    // Description (Quill HTML)
+    public string $description = '';
+
     // Default sound uploads per slot
     public array $defaultSoundUploads = [];
 
     public function mount(Camera $camera): void
     {
         $this->camera = $camera;
+        $this->description = $camera->description ?? '';
         $this->staticEnabled = $camera->static_enabled ?? true;
         $this->staticIntensity = $camera->static_intensity ?? 15;
         $this->rainVolume = $camera->rain_volume ?? 50;
@@ -246,7 +250,16 @@ class CameraPlanner extends Component
 
     public function saveAllSettings(): void
     {
+        // Sanitize description HTML
+        $cleanDescription = $this->description
+            ? strip_tags($this->description, '<p><br><strong><em><u><h2><h3><ul><ol><li>')
+            : null;
+        if ($cleanDescription && trim(strip_tags($cleanDescription)) === '') {
+            $cleanDescription = null;
+        }
+
         $this->camera->update([
+            'description' => $cleanDescription,
             'static_enabled' => $this->staticEnabled,
             'static_intensity' => max(0, min(100, $this->staticIntensity)),
             'rain_volume' => max(0, min(100, $this->rainVolume)),

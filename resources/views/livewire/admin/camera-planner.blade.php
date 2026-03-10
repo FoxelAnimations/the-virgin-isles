@@ -172,6 +172,45 @@
                     </div>
                 </div>
 
+                {{-- Description --}}
+                <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
+                    <div class="px-4 py-3 border-b border-zinc-800">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Beschrijving</h3>
+                    </div>
+                    <div class="p-3">
+                        <div wire:ignore
+                             x-data="{
+                                 quill: null,
+                                 init() {
+                                     this.quill = new Quill(this.$refs.descEditor, {
+                                         theme: 'snow',
+                                         placeholder: 'Optionele beschrijving voor deze camera...',
+                                         modules: {
+                                             toolbar: [
+                                                 [{ 'header': [2, 3, false] }],
+                                                 ['bold', 'italic', 'underline'],
+                                                 [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                 [{ 'align': [] }],
+                                                 ['clean']
+                                             ]
+                                         }
+                                     });
+                                     const initial = @this.get('description');
+                                     if (initial) {
+                                         this.quill.root.innerHTML = initial;
+                                     }
+                                     this.quill.on('text-change', () => {
+                                         @this.set('description', this.quill.root.innerHTML);
+                                     });
+                                 }
+                             }"
+                        >
+                            <div x-ref="descEditor" class="quill-editor-dark bg-zinc-800 border border-zinc-700 text-white rounded-sm"></div>
+                        </div>
+                        <p class="text-[10px] text-zinc-600 mt-2">Wordt getoond onder de camera feed in de popup en op de camerapagina.</p>
+                    </div>
+                </div>
+
                 {{-- Static Effect --}}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                     <div class="px-4 py-3 border-b border-zinc-800">

@@ -10,6 +10,7 @@ class Camera extends Model
 {
     protected $fillable = [
         'name',
+        'description',
         'is_offline',
         'is_hidden',
         'sort_order',

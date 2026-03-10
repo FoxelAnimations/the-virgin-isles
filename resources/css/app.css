@@ -4,6 +4,72 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== iOS Safari / iPhone Compatibility ===== */
+
+/* Fix 100vh on iOS Safari (dynamic toolbar) */
+@supports (-webkit-touch-callout: none) {
+    .min-h-screen {
+        min-height: -webkit-fill-available;
+    }
+    .h-screen {
+        height: -webkit-fill-available;
+    }
+}
+
+/* Backdrop-filter Safari prefix */
+.backdrop-blur-sm {
+    -webkit-backdrop-filter: blur(4px);
+}
+.backdrop-blur {
+    -webkit-backdrop-filter: blur(8px);
+}
+.backdrop-blur-md {
+    -webkit-backdrop-filter: blur(12px);
+}
+.backdrop-blur-lg {
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* Smooth momentum scrolling on iOS for overflow containers */
+.overflow-y-auto,
+.overflow-y-scroll,
+.overflow-auto,
+.overflow-scroll {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent iOS tap highlight and double-tap zoom delay */
+a, button, [role="button"], input, select, textarea, [tabindex] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* Prevent iOS text size adjustment on orientation change */
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+/* Safe area padding for notched iPhones */
+body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+/* Prevent iOS overscroll bounce on fixed overlays */
+.fixed.inset-0 {
+    overscroll-behavior: contain;
+}
+
+/* Fix iOS Safari not rendering position:fixed inside overflow containers */
+@supports (-webkit-touch-callout: none) {
+    .fixed {
+        -webkit-transform: translateZ(0);
+    }
+}
+
+/* ===== End iOS fixes ===== */
+
 [class~="font-description"] {
     font-family: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 }

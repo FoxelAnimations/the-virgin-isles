@@ -90,7 +90,7 @@
         </div>
 
         <!-- Bottom Actions -->
-        <div class="px-6 pb-10 space-y-3">
+        <div class="px-6 pb-10 space-y-3" style="padding-bottom: max(2.5rem, env(safe-area-inset-bottom))">
             @auth
                 <a href="{{ route('dashboard') }}" class="block bg-[#E7FF57] text-black text-lg tracking-widest px-6 py-3 text-center transition hover:opacity-90">DASHBOARD</a>
                 <form method="POST" action="{{ route('logout') }}">

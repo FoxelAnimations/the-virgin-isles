@@ -27,6 +27,17 @@ function setupCarouselClick(el) {
     };
 }
 
+function updateSlideA11y(slide, absProgress, visibleThreshold) {
+    const isVisible = absProgress < visibleThreshold;
+    if (isVisible) {
+        slide.removeAttribute('aria-hidden');
+        slide.removeAttribute('tabindex');
+    } else {
+        slide.setAttribute('aria-hidden', 'true');
+        slide.setAttribute('tabindex', '-1');
+    }
+}
+
 function setupAnimatedLayer(slide, absProgress) {
     const animatedEl = slide.querySelector('.character-animated-layer');
     if (!animatedEl) return;
@@ -180,6 +191,7 @@ function initMobileCarousel() {
                         slide.style.transform = `scale(${scale})`;
                         slide.style.opacity = opacity;
                         setupAnimatedLayer(slide, absProgress);
+                        updateSlideA11y(slide, absProgress, 3);
                         updateCenterLabel(swiper.slides);
                     } else {
                         slide.dataset.targetScale = scale;
@@ -247,6 +259,7 @@ function initDesktopCarousel() {
                         slide.style.transform = `scale(${scale})`;
                         slide.style.opacity = opacity;
                         setupAnimatedLayer(slide, absProgress);
+                        updateSlideA11y(slide, absProgress, 6);
                         updateCenterLabel(swiper.slides);
                     } else {
                         slide.dataset.targetScale = scale;

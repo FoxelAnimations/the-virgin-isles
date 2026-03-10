@@ -269,6 +269,12 @@
                                     <span class="text-[10px] font-bold text-red-500/80 tracking-wider">REC</span>
                                 </div>
                             </div>
+
+                            {{-- Description --}}
+                            <div x-show="popup.id && getCameraDescription(popup.id)"
+                                 class="bg-zinc-900 border border-zinc-800 border-t-0 px-4 py-3">
+                                <div class="prose prose-invert prose-sm prose-zinc font-description max-w-none content-block-text" x-html="getCameraDescription(popup.id)"></div>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -770,6 +776,10 @@ Alpine.data('cameraFeed', () => ({
 
     getCameraStaticIntensity(id) {
         return this.cameras[id]?.static_intensity ?? 15;
+    },
+
+    getCameraDescription(id) {
+        return this.cameras[id]?.description ?? '';
     },
 
     // Weather audio helpers

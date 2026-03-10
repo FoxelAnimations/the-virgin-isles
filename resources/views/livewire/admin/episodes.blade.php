@@ -180,6 +180,7 @@
                                                  [{ 'header': [2, 3, false] }],
                                                  ['bold', 'italic', 'underline'],
                                                  [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                 [{ 'align': [] }],
                                                  ['clean']
                                              ]
                                          }

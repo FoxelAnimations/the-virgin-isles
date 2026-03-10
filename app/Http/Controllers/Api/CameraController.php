@@ -32,6 +32,7 @@ class CameraController extends Controller
                 return [
                     'id' => $camera->id,
                     'name' => $camera->name,
+                    'description' => $camera->description,
                     'status' => 'offline',
                     'video_url' => null,
                     'audio_url' => null,
@@ -116,6 +117,7 @@ class CameraController extends Controller
             return [
                 'id' => $camera->id,
                 'name' => $camera->name,
+                'description' => $camera->description,
                 'status' => 'online',
                 'video_url' => $videoUrl,
                 'audio_url' => $audioUrl,

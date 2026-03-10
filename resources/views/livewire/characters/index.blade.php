@@ -151,7 +151,7 @@
                             </template>
                         </div>
                         <template x-if="char?.bio">
-                            <p class="text-zinc-400 text-sm leading-relaxed" x-text="char?.bio"></p>
+                            <p class="text-zinc-400 text-sm leading-relaxed font-description" x-text="char?.bio"></p>
                         </template>
                         <template x-if="char?.links?.length > 0">
                             <div class="flex flex-wrap gap-2 mt-6">
