@@ -570,7 +570,7 @@
                 'links' => $qChar->socialLinks->map(fn($l) => ['title' => $l->title, 'url' => $l->url]),
             ]);
         @endphp
-        <section class="bg-accent py-8 md:py-10 my-10">
+        <section class="bg-accent py-8 md:py-10 my-16 md:my-20">
             <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 <blockquote class="relative">
                     <p class="text-black text-2xl md:text-3xl lg:text-4xl leading-snug" style="font-family: 'Bebas Neue', cursive;">
