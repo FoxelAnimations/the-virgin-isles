@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             \App\Http\Middleware\RejectBlockedUsers::class,
+            \App\Http\Middleware\TrackAdminActivity::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

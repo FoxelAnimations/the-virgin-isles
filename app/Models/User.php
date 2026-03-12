@@ -31,6 +31,7 @@ class User extends Authenticatable
         'password',
         'is_admin',
         'is_blocked',
+        'last_active_at',
     ];
 
     /**
@@ -66,6 +67,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'is_blocked' => 'boolean',
+            'last_active_at' => 'datetime',
         ];
     }
 }

@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ChatOfflineNotification;
 use App\Models\Character;
 use App\Models\ChatConversation;
 use App\Models\ChatMessage;
 use App\Models\ChatBlock;
 use App\Models\SiteSetting;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 use OpenAI\Laravel\Facades\OpenAI;
 
 class ChatController extends Controller
@@ -149,6 +152,9 @@ class ChatController extends Controller
             'last_message_at' => now(),
             'unread_count' => $conversation->unread_count + 1,
         ]);
+
+        // Notify via email if no admin has been active recently
+        $this->sendOfflineNotification($validated['message'], $character, $visitorIp);
 
         // AI mode: auto-respond via OpenAI
         if ($character->isAiChat()) {
@@ -311,6 +317,39 @@ class ChatController extends Controller
                 'mode' => 'manual',
                 'message' => null,
             ]);
+        }
+    }
+
+    protected function sendOfflineNotification(string $message, Character $character, string $visitorIp): void
+    {
+        $notificationEmail = config('mail.notification_address');
+        if (!$notificationEmail) {
+            return;
+        }
+
+        // Rate limit: max 1 notification email per 10 minutes
+        $cacheKey = 'chat_offline_email_sent';
+        if (Cache::has($cacheKey)) {
+            return;
+        }
+
+        // Check if any admin has been active in the last 5 minutes
+        $recentlyActiveAdmin = User::where('is_admin', true)
+            ->where('last_active_at', '>=', now()->subMinutes(5))
+            ->exists();
+
+        if ($recentlyActiveAdmin) {
+            return;
+        }
+
+        Cache::put($cacheKey, true, 600); // 10 minutes
+
+        try {
+            Mail::to($notificationEmail)->send(
+                new ChatOfflineNotification($message, $character, $visitorIp)
+            );
+        } catch (\Exception $e) {
+            report($e);
         }
     }
 }
