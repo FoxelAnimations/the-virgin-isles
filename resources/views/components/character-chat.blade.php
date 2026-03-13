@@ -236,8 +236,19 @@
         startPolling() {
             this.stopPolling();
             this.pollInterval = setInterval(() => this.pollForMessages(), 2000);
-            // Refresh character online status every 30s (separate from message polling)
-            this.statusInterval = setInterval(() => this.refreshCharacterStatus(), 30000);
+            this.startStatusPolling();
+        },
+
+        startStatusPolling() {
+            if (this.statusInterval) return;
+            this.statusInterval = setInterval(() => this.refreshCharacterStatus(), 5000);
+        },
+
+        stopStatusPolling() {
+            if (this.statusInterval) {
+                clearInterval(this.statusInterval);
+                this.statusInterval = null;
+            }
         },
 
         stopPolling() {
@@ -245,10 +256,7 @@
                 clearInterval(this.pollInterval);
                 this.pollInterval = null;
             }
-            if (this.statusInterval) {
-                clearInterval(this.statusInterval);
-                this.statusInterval = null;
-            }
+            this.stopStatusPolling();
         },
 
         async refreshCharacterStatus() {
@@ -257,9 +265,16 @@
                 if (!res.ok) return;
                 const data = await res.json();
                 this.characters = data.characters || [];
+                const wasOnline = this.chatOnline;
                 this.chatOnline = this.activeCharacter?.chat_online ?? true;
+                this.chatMode = this.activeCharacter?.chat_mode || 'manual';
                 this.notificationSoundUrl = data.notification_sound_url || null;
                 this.blockedSoundUrl = data.blocked_sound_url || null;
+
+                // Auto-focus input when character comes online
+                if (!wasOnline && this.chatOnline && this.open) {
+                    this.$nextTick(() => this.$refs.chatInput?.focus());
+                }
             } catch (e) {}
         },
 
@@ -413,9 +428,11 @@
                     this.scrollToBottom();
                     this.$refs.chatInput?.focus();
                 });
+                this.startStatusPolling();
                 this.startPollingIfNeeded();
             } else {
                 document.body.style.overflow = '';
+                this.stopStatusPolling();
             }
         }
     }"
@@ -438,14 +455,20 @@
             >
                 {{-- Header --}}
                 <div class="bg-zinc-800 border-b border-zinc-700 px-4 py-3 flex items-center gap-3 shrink-0">
-                    <template x-if="activeCharacter?.profile_image_url">
-                        <img :src="activeCharacter.profile_image_url" class="w-8 h-8 rounded-full object-cover border border-zinc-600" :alt="activeCharacter.name">
-                    </template>
-                    <template x-if="!activeCharacter?.profile_image_url">
-                        <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">
-                            <span x-text="activeCharacter?.name?.charAt(0) || '?'"></span>
-                        </div>
-                    </template>
+                    <div class="relative shrink-0">
+                        <template x-if="activeCharacter?.profile_image_url">
+                            <img :src="activeCharacter.profile_image_url" class="w-8 h-8 rounded-full object-cover border border-zinc-600" :alt="activeCharacter.name">
+                        </template>
+                        <template x-if="!activeCharacter?.profile_image_url">
+                            <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold">
+                                <span x-text="activeCharacter?.name?.charAt(0) || '?'"></span>
+                            </div>
+                        </template>
+                        <div
+                            class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-zinc-800 transition-colors duration-300"
+                            :class="chatOnline ? 'bg-green-500' : 'bg-zinc-600'"
+                        ></div>
+                    </div>
 
                     <div class="flex-1 min-w-0">
                         <select
