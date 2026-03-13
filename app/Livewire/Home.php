@@ -16,6 +16,30 @@ use Livewire\Component;
 
 class Home extends Component
 {
+    protected function getRandomQuote()
+    {
+        $lastQuoteId = session('last_quote_id');
+
+        $query = Quote::with(['character.job', 'character.socialLinks'])->active();
+
+        if ($lastQuoteId) {
+            $quote = $query->where('id', '!=', $lastQuoteId)->inRandomOrder()->first();
+
+            // Fall back to the last quote if it's the only active one
+            if (!$quote) {
+                $quote = Quote::with(['character.job', 'character.socialLinks'])->active()->inRandomOrder()->first();
+            }
+        } else {
+            $quote = $query->inRandomOrder()->first();
+        }
+
+        if ($quote) {
+            session(['last_quote_id' => $quote->id]);
+        }
+
+        return $quote;
+    }
+
     public function render()
     {
         $settings = SiteSetting::first();
@@ -38,7 +62,7 @@ class Home extends Component
             'blocksBelow' => ContentBlock::active()->belowEpisodes()->get(),
             'collabLogos' => ($settings?->show_collabs ?? false) ? Collab::where('show_on_homepage', true)->where('is_published', true)->where('is_visible', true)->whereNotNull('logo_image')->orderBy('sort_order')->get() : collect(),
             'showCollabs' => $settings?->show_collabs ?? false,
-            'randomQuote' => ($settings?->show_quotes ?? true) ? Quote::with(['character.job', 'character.socialLinks'])->active()->inRandomOrder()->first() : null,
+            'randomQuote' => ($settings?->show_quotes ?? true) ? $this->getRandomQuote() : null,
             'ageGate' => AgeGate::first(),
         ])->layoutData(['bgClass' => 'bg-black']);
     }
