@@ -51,6 +51,10 @@
                                 <span>&middot;</span>
                                 <span class="font-mono text-zinc-600">{{ $conversation->visitor_ip }}</span>
                             @endif
+                            @if ($conversation->parsed_user_agent)
+                                <span>&middot;</span>
+                                <x-user-agent-icons :parsed="$conversation->parsed_user_agent" :raw="$conversation->user_agent" />
+                            @endif
                         </div>
                     </div>
                 </div>

@@ -124,6 +124,7 @@ class ChatController extends Controller
         }
 
         // Find or create conversation
+        $userAgent = $request->userAgent();
         $conversation = ChatConversation::firstOrCreate(
             [
                 'visitor_uuid' => $validated['visitor_uuid'],
@@ -133,12 +134,20 @@ class ChatController extends Controller
             [
                 'last_message_at' => now(),
                 'visitor_ip' => $visitorIp,
+                'user_agent' => $userAgent,
             ]
         );
 
-        // Keep IP up to date
+        // Keep IP and user agent up to date
+        $updates = [];
         if ($conversation->visitor_ip !== $visitorIp) {
-            $conversation->update(['visitor_ip' => $visitorIp]);
+            $updates['visitor_ip'] = $visitorIp;
+        }
+        if ($conversation->user_agent !== $userAgent) {
+            $updates['user_agent'] = $userAgent;
+        }
+        if ($updates) {
+            $conversation->update($updates);
         }
 
         // Store visitor message
