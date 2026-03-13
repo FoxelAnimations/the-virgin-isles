@@ -345,17 +345,19 @@ class ChatController extends Controller
 
         $mailable = new ChatOfflineNotification($message, $character, $visitorIp);
 
-        // Try primary address first
+        // Send to primary (Gmail) via Resend shared domain
         if ($primaryEmail) {
             try {
-                Mail::to($primaryEmail)->send(clone $mailable);
-                return; // Success — no need for fallback
+                $primaryMailable = clone $mailable;
+                $primaryMailable->from('onboarding@resend.dev', config('app.name', 'IN-CC'));
+                Mail::to($primaryEmail)->send($primaryMailable);
+                return;
             } catch (\Exception $e) {
                 report($e);
             }
         }
 
-        // Fallback: send from Resend's shared domain to the fallback address
+        // Fallback
         if ($fallbackEmail) {
             try {
                 $fallbackMailable = clone $mailable;
