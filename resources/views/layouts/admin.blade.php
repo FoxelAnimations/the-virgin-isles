@@ -79,11 +79,6 @@
                         </a>
                         <a href="{{ route('admin.users') }}" class="{{ request()->routeIs('admin.users') ? 'text-accent' : 'text-zinc-400' }} text-xs tracking-widest transition hover:text-accent">USERS</a>
 
-                        <button @click="$dispatch('open-scanner')" class="text-zinc-400 text-xs tracking-widest transition hover:text-accent flex items-center gap-1" title="Scan beacon QR code">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2M5 21H3a2 2 0 01-2-2v-2m7-9h4m-4 4h4"/></svg>
-                            SCAN
-                        </button>
-
                         <div class="h-5 w-px bg-zinc-700 mx-1"></div>
 
                         <span class="text-zinc-500 text-xs tracking-wider">{{ Auth::user()->name }}</span>
@@ -125,10 +120,6 @@
                         @endif
                     </a>
                     <a href="{{ route('admin.users') }}" class="block px-4 py-2 {{ request()->routeIs('admin.users') ? 'text-accent' : 'text-zinc-400' }} text-sm tracking-widest hover:text-accent transition">USERS</a>
-                    <button @click="$dispatch('open-scanner'); open = false" class="w-full text-left px-4 py-2 text-zinc-400 text-sm tracking-widest hover:text-accent transition flex items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2M5 21H3a2 2 0 01-2-2v-2m7-9h4m-4 4h4"/></svg>
-                        SCAN
-                    </button>
                     <div class="mx-4 my-1 border-t border-zinc-800"></div>
                     <form method="POST" action="{{ route('logout') }}" class="px-4 mt-2">
                         @csrf
