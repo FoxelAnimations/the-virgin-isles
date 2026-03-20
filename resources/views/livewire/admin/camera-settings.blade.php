@@ -41,7 +41,7 @@
             <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                 <div class="px-5 py-4 flex items-center justify-between">
                     <div>
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Weer effecten</h3>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-accent">Weer effecten</h2>
                         <p class="text-xs text-zinc-500 mt-1">Toon wolken en regen op basis van het actuele weer in Kortrijk.</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
@@ -54,7 +54,7 @@
             {{-- Manual Weather Controls --}}
             <div class="bg-zinc-900 border border-zinc-800 rounded-sm" x-data="{ mode: @entangle('rainMode') }">
                 <div class="px-5 py-4">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-accent mb-1">Weer besturing</h3>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-accent mb-1">Weer besturing</h2>
                     <p class="text-xs text-zinc-500 mb-4">Kies of regen, wolken en wind automatisch worden bepaald door het weer in Kortrijk, of handmatig met onderstaande schuifregelaars.</p>
 
                     {{-- Auto / Manual toggle --}}
@@ -125,7 +125,7 @@
 
             <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                 <div class="px-5 py-3 border-b border-zinc-800">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Dagdelen</h3>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-accent">Dagdelen</h2>
                     <p class="text-xs text-zinc-500 mt-1">Pas de eindtijden aan — starttijden worden automatisch overgenomen van het vorige dagdeel.</p>
                 </div>
 
@@ -276,7 +276,7 @@
             {{-- Visual Timeline Preview --}}
             <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                 <div class="px-5 py-3 border-b border-zinc-800">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Preview (24 uur)</h3>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-accent">Preview (24 uur)</h2>
                 </div>
                 <div class="p-5 space-y-2">
                     {{-- Background color bar --}}

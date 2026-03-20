@@ -66,7 +66,7 @@
             }"
         >
             <div class="px-4 py-2 border-b border-zinc-800 flex items-center justify-between">
-                <h3 class="text-xs font-semibold uppercase tracking-wider text-accent">Huidige tijd</h3>
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-accent">Huidige tijd</h2>
                 <span class="text-xs font-mono text-white" x-text="nowLabel"></span>
             </div>
             <div class="p-4">
@@ -133,7 +133,7 @@
                 {{-- Background --}}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                     <div class="px-4 py-3 border-b border-zinc-800">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Achtergrond</h3>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-accent">Achtergrond</h2>
                     </div>
                     <div class="p-3">
                         @if ($camera->background_path)
@@ -175,7 +175,7 @@
                 {{-- Description --}}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                     <div class="px-4 py-3 border-b border-zinc-800">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Beschrijving</h3>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-accent">Beschrijving</h2>
                     </div>
                     <div class="p-3">
                         <div wire:ignore
@@ -215,7 +215,7 @@
                 {{-- Static Effect --}}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                     <div class="px-4 py-3 border-b border-zinc-800">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Camera effect</h3>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-accent">Camera effect</h2>
                     </div>
                     <div class="p-3">
                         <div class="flex items-center justify-between mb-3">
@@ -277,7 +277,7 @@
                 {{-- Video Library --}}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                     <div class="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Videobibliotheek</h3>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-accent">Videobibliotheek</h2>
                         <button wire:click="openAddVideoModal"
                             class="flex items-center gap-1 bg-accent text-black px-2 py-1 text-[10px] font-semibold uppercase tracking-wider transition hover:brightness-90 rounded-sm">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
@@ -346,7 +346,7 @@
                 {{-- Default Videos --}}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                     <div class="px-4 py-3 border-b border-zinc-800">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-accent">Standaard video's</h3>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-accent">Standaard video's</h2>
                     </div>
                     <div class="p-3">
                         @foreach (\App\Models\CameraDefaultBlock::slots() as $slot => $bounds)
@@ -368,7 +368,7 @@
                 {{-- Default Sounds --}}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                     <div class="px-4 py-3 border-b border-zinc-800">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-purple-400">Standaard geluid</h3>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-purple-400">Standaard geluid</h2>
                         <p class="text-[10px] text-zinc-600 mt-0.5">Achtergrondgeluid per dagdeel. Blijft altijd spelen, ook tijdens geplande video's.</p>
                     </div>
                     <div class="p-3">

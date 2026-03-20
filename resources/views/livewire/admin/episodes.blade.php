@@ -23,7 +23,7 @@
             <div class="px-4 py-4 border-b border-zinc-800 flex items-center justify-between">
                 <div>
                     <p class="text-xs uppercase tracking-[0.3em] text-zinc-500">Resource</p>
-                    <h3 class="text-lg font-semibold uppercase tracking-wider">{{ __('All Episodes') }}</h3>
+                    <h2 class="text-lg font-semibold uppercase tracking-wider">{{ __('All Episodes') }}</h2>
                 </div>
                 <button wire:click="openCreate" class="inline-flex items-center bg-zinc-800 text-white px-3 py-2 text-sm font-semibold tracking-wider uppercase transition hover:bg-zinc-700">
                     {{ __('New Episode') }}

@@ -29,9 +29,9 @@
                             </div>
                             {{-- Text --}}
                             <div class="p-5">
-                                <h3 class="text-xl font-bold uppercase tracking-wider mb-2 group-hover:text-accent transition">
+                                <h2 class="text-xl font-bold uppercase tracking-wider mb-2 group-hover:text-accent transition">
                                     {{ $post->title }}
-                                </h3>
+                                </h2>
                                 @if ($post->excerpt)
                                     <p class="text-zinc-400 text-sm leading-relaxed font-description line-clamp-3">
                                         {{ $post->excerpt }}

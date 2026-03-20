@@ -104,7 +104,7 @@
 
                     {{-- Media section --}}
                     <div class="rounded-sm bg-zinc-800/50 border border-zinc-700 p-4 space-y-4">
-                        <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{{ __('Media (optioneel)') }}</h3>
+                        <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{{ __('Media (optioneel)') }}</h2>
                         <div>
                             <label class="block text-xs font-medium text-zinc-500 mb-1">{{ __('Media type') }}</label>
                             <select wire:model.live="media_type" class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm">
@@ -151,7 +151,7 @@
 
                     {{-- Buttons section --}}
                     <div class="rounded-sm bg-zinc-800/50 border border-zinc-700 p-4 space-y-4">
-                        <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{{ __('Knoppen (optioneel)') }}</h3>
+                        <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{{ __('Knoppen (optioneel)') }}</h2>
 
                         {{-- Button 1 --}}
                         <div>
@@ -222,7 +222,7 @@
         <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
             <div class="px-4 py-4 border-b border-zinc-800">
                 <p class="text-xs uppercase tracking-[0.3em] text-zinc-500">Overzicht</p>
-                <h3 class="text-lg font-semibold uppercase tracking-wider">{{ __('Content Blocks') }}</h3>
+                <h2 class="text-lg font-semibold uppercase tracking-wider">{{ __('Content Blocks') }}</h2>
             </div>
 
             @if($blocks->isEmpty())

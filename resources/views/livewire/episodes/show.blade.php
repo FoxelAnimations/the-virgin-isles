@@ -124,7 +124,7 @@
 
                                 {{-- Info --}}
                                 <div class="p-4">
-                                    <h3 class="text-lg font-bold uppercase tracking-wider mb-1">{{ $episode->title }}</h3>
+                                    <h2 class="text-lg font-bold uppercase tracking-wider mb-1">{{ $episode->title }}</h2>
                                     @if ($episode->ratings_avg_rating)
                                         <div class="flex items-center gap-1 mb-2">
                                             @for ($i = 1; $i <= 5; $i++)

@@ -51,7 +51,7 @@
             <form wire:submit="save" class="space-y-6">
                 {{-- Basic Info --}}
                 <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Basic Information</h3>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Basic Information</h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -94,7 +94,7 @@
 
                 {{-- Main Image --}}
                 <div id="image-section" class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Main Image</h3>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Main Image</h2>
 
                     @if ($beacon->image_path)
                         <div class="flex items-start gap-4">
@@ -116,7 +116,7 @@
                 <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4"
                     x-data="{ editing: false, lightbox: { open: false, src: '', index: 0 }, images: {{ Js::from($beacon->images->map(fn($img) => ['id' => $img->id, 'url' => Storage::url($img->image_path)])) }} }">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400">Additional Images</h3>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400">Additional Images</h2>
                         <button type="button" @click="editing = !editing"
                             class="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-semibold rounded-sm transition uppercase tracking-wider"
                             :class="editing ? 'bg-accent text-black' : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:text-white hover:border-zinc-500'">
@@ -193,7 +193,7 @@
 
                 {{-- Coordinates --}}
                 <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Coordinates</h3>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Coordinates</h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -219,7 +219,7 @@
 
                 {{-- Status --}}
                 <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Status</h3>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Status</h2>
 
                     <div class="flex items-center gap-6">
                         <label class="flex items-center gap-2 text-sm">
@@ -235,7 +235,7 @@
 
                 {{-- Collectible / Badge --}}
                 <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Collectible Reward</h3>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Collectible Reward</h2>
 
                     <label class="flex items-center gap-2 text-sm">
                         <input type="checkbox" wire:model.live="isCollectible" class="rounded-sm border-zinc-700 bg-zinc-800 text-accent focus:ring-accent">
@@ -267,7 +267,7 @@
 
                 {{-- Out of Action Configuration --}}
                 <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Out of Action Behavior</h3>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Out of Action Behavior</h2>
 
                     <div>
                         <label class="block text-sm font-medium text-zinc-400 mb-1">Mode</label>
@@ -395,7 +395,7 @@
         @if ($tab === 'qr')
             <div class="space-y-6">
                 <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-6">
-                    <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-4">QR Code Preview</h3>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-4">QR Code Preview</h2>
                     <p class="text-sm text-zinc-500 mb-4">Scan URL: <code class="font-mono text-accent">{{ $beacon->public_url }}</code></p>
 
                     <div class="flex flex-col items-center gap-4"

@@ -126,7 +126,7 @@
 
                     {{-- Button section --}}
                     <div class="rounded-sm bg-zinc-800/50 border border-zinc-700 p-4 space-y-4">
-                        <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{{ __('Knop (optioneel)') }}</h3>
+                        <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{{ __('Knop (optioneel)') }}</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-medium text-zinc-500 mb-1">{{ __('Knop label') }}</label>
@@ -164,7 +164,7 @@
         <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
             <div class="px-4 py-4 border-b border-zinc-800">
                 <p class="text-xs uppercase tracking-[0.3em] text-zinc-500">Overzicht</p>
-                <h3 class="text-lg font-semibold uppercase tracking-wider">{{ __('Blog Posts') }}</h3>
+                <h2 class="text-lg font-semibold uppercase tracking-wider">{{ __('Blog Posts') }}</h2>
             </div>
 
             @if($posts->isEmpty())

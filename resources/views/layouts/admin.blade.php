@@ -15,6 +15,7 @@
         <!-- Quill Editor -->
         <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -78,6 +79,11 @@
                         </a>
                         <a href="{{ route('admin.users') }}" class="{{ request()->routeIs('admin.users') ? 'text-accent' : 'text-zinc-400' }} text-xs tracking-widest transition hover:text-accent">USERS</a>
 
+                        <button @click="$dispatch('open-scanner')" class="text-zinc-400 text-xs tracking-widest transition hover:text-accent flex items-center gap-1" title="Scan beacon QR code">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2M5 21H3a2 2 0 01-2-2v-2m7-9h4m-4 4h4"/></svg>
+                            SCAN
+                        </button>
+
                         <div class="h-5 w-px bg-zinc-700 mx-1"></div>
 
                         <span class="text-zinc-500 text-xs tracking-wider">{{ Auth::user()->name }}</span>
@@ -119,6 +125,10 @@
                         @endif
                     </a>
                     <a href="{{ route('admin.users') }}" class="block px-4 py-2 {{ request()->routeIs('admin.users') ? 'text-accent' : 'text-zinc-400' }} text-sm tracking-widest hover:text-accent transition">USERS</a>
+                    <button @click="$dispatch('open-scanner'); open = false" class="w-full text-left px-4 py-2 text-zinc-400 text-sm tracking-widest hover:text-accent transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2M5 21H3a2 2 0 01-2-2v-2m7-9h4m-4 4h4"/></svg>
+                        SCAN
+                    </button>
                     <div class="mx-4 my-1 border-t border-zinc-800"></div>
                     <form method="POST" action="{{ route('logout') }}" class="px-4 mt-2">
                         @csrf
@@ -157,6 +167,100 @@
             }
         }" @chat-ping.window="playPing()"></div>
         <livewire:admin.chat-notifier />
+
+        {{-- QR Scanner Modal --}}
+        <div x-data="{
+            show: false,
+            scanning: false,
+            error: null,
+            result: null,
+            scanner: null,
+
+            async openScanner() {
+                this.show = true;
+                this.error = null;
+                this.result = null;
+                await this.$nextTick();
+                setTimeout(() => this.startCamera(), 150);
+            },
+
+            async closeScanner() {
+                await this.stopCamera();
+                this.show = false;
+            },
+
+            async startCamera() {
+                try {
+                    this.scanner = new Html5Qrcode('qr-reader');
+                    await this.scanner.start(
+                        { facingMode: 'environment' },
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        (decodedText) => this.onScan(decodedText),
+                        () => {}
+                    );
+                    this.scanning = true;
+                } catch (err) {
+                    this.error = 'Camera access denied or unavailable. Please allow camera permissions.';
+                    this.scanning = false;
+                }
+            },
+
+            async stopCamera() {
+                if (this.scanner) {
+                    try {
+                        if (this.scanning) await this.scanner.stop();
+                        this.scanner.clear();
+                    } catch (e) {}
+                }
+                this.scanner = null;
+                this.scanning = false;
+            },
+
+            onScan(text) {
+                this.stopCamera();
+                let guid = null;
+                try {
+                    const url = new URL(text);
+                    const match = url.pathname.match(/\/beacon\/([A-Za-z0-9]+)/);
+                    if (match) guid = match[1];
+                } catch {
+                    if (/^[A-Za-z0-9]{10}$/.test(text)) guid = text;
+                }
+                if (guid) {
+                    this.result = 'Beacon found! Redirecting\u2026';
+                    window.location.href = '{{ route('admin.scan-goto', '') }}/' + encodeURIComponent(guid);
+                } else {
+                    this.error = 'Not a valid beacon QR code.';
+                    setTimeout(() => { this.error = null; this.startCamera(); }, 1500);
+                }
+            }
+        }" @open-scanner.window="openScanner()" @keydown.escape.window="if (show) closeScanner()"
+           x-show="show" x-cloak
+           class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+
+            <div class="bg-zinc-900 border border-zinc-700 rounded-lg w-full max-w-md mx-4 overflow-hidden" @click.outside="closeScanner()">
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
+                    <h3 class="text-white text-sm font-semibold tracking-widest uppercase">Scan Beacon</h3>
+                    <button @click="closeScanner()" class="text-zinc-400 hover:text-white transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Camera area --}}
+                <div class="p-5">
+                    <div id="qr-reader" class="w-full rounded overflow-hidden bg-black"></div>
+
+                    <p x-show="error" x-text="error" x-cloak class="mt-3 text-red-400 text-sm text-center"></p>
+                    <p x-show="result" x-text="result" x-cloak class="mt-3 text-accent text-sm text-center font-semibold"></p>
+                    <p x-show="scanning && !error && !result" x-cloak class="mt-3 text-zinc-400 text-sm text-center">
+                        Point your camera at a beacon QR code
+                    </p>
+                </div>
+            </div>
+        </div>
 
         @livewireScripts
     </body>

@@ -134,7 +134,7 @@
                     {{-- Character selector popup --}}
                     @if($showCharacterSelector)
                         <div class="rounded-sm bg-zinc-800/50 border border-zinc-700 p-4">
-                            <h4 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Kies een personage') }}</h4>
+                            <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Kies een personage') }}</h2>
                             <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 max-h-64 overflow-y-auto">
                                 @foreach($characters as $char)
                                     <button type="button" wire:click="selectCharacter({{ $char->id }})"
@@ -189,7 +189,7 @@
 
                     {{-- Links section --}}
                     <div class="rounded-sm bg-zinc-800/50 border border-zinc-700 p-4 space-y-4">
-                        <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{{ __('Links (optioneel)') }}</h3>
+                        <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{{ __('Links (optioneel)') }}</h2>
 
                         {{-- Link 1 --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -249,7 +249,7 @@
         <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
             <div class="px-4 py-4 border-b border-zinc-800">
                 <p class="text-xs uppercase tracking-[0.3em] text-zinc-500">Overzicht</p>
-                <h3 class="text-lg font-semibold uppercase tracking-wider">{{ __('Collabs') }}</h3>
+                <h2 class="text-lg font-semibold uppercase tracking-wider">{{ __('Collabs') }}</h2>
             </div>
 
             @if($collabs->isEmpty())

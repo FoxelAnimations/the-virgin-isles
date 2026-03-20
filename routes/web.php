@@ -82,5 +82,14 @@ Route::middleware([
         Route::get('/admin/beacons/logs', BeaconLogs::class)->name('admin.beacon-logs');
         Route::get('/admin/beacons/analytics', BeaconAnalytics::class)->name('admin.beacon-analytics');
         Route::get('/admin/beacons/{beacon}', BeaconDetail::class)->name('admin.beacon-detail');
+
+        // Admin beacon scan lookup — redirects to detail page without registering a scan
+        Route::get('/admin/scan/goto/{guid}', function (string $guid) {
+            $beacon = \App\Models\Beacon::where('guid', $guid)->first();
+            if (! $beacon) {
+                return redirect()->route('admin.beacons');
+            }
+            return redirect()->route('admin.beacon-detail', $beacon);
+        })->name('admin.scan-goto');
     });
 });

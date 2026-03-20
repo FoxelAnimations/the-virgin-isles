@@ -111,7 +111,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {{-- Top 10 Beacons --}}
             <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5">
-                <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-4">Top 10 Beacons (30 days)</h3>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-4">Top 10 Beacons (30 days)</h2>
                 @if ($topBeacons->isEmpty())
                     <p class="text-zinc-600 text-sm">No data yet.</p>
                 @else
@@ -136,7 +136,7 @@
 
             {{-- Top Referrers --}}
             <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5">
-                <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-4">Top Referrers (30 days)</h3>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-4">Top Referrers (30 days)</h2>
                 @if ($topReferrers->isEmpty())
                     <p class="text-zinc-600 text-sm">No referrer data yet.</p>
                 @else
@@ -155,7 +155,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {{-- Device Breakdown --}}
             <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5">
-                <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-4">Device Breakdown (30 days)</h3>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-4">Device Breakdown (30 days)</h2>
                 @php $deviceTotal = max(1, array_sum($devices)); @endphp
                 <div class="space-y-3">
                     @foreach ($devices as $device => $count)
@@ -174,7 +174,7 @@
 
             {{-- Known vs Unknown --}}
             <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5">
-                <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-4">Known vs Unknown (30 days)</h3>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-4">Known vs Unknown (30 days)</h2>
                 @php $knownTotal = max(1, $knownCount + $unknownCount); @endphp
                 <div class="space-y-3">
                     <div>

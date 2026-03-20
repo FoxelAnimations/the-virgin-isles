@@ -21,7 +21,7 @@
         <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
             <div class="px-4 py-4 border-b border-zinc-800">
                 <p class="text-xs uppercase tracking-[0.3em] text-zinc-500">Management</p>
-                <h3 class="text-lg font-semibold uppercase tracking-wider">{{ __('All Users') }}</h3>
+                <h2 class="text-lg font-semibold uppercase tracking-wider">{{ __('All Users') }}</h2>
             </div>
 
             @if($users->isEmpty())

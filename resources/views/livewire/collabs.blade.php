@@ -33,9 +33,9 @@
                             </div>
                             {{-- Text --}}
                             <div class="p-5">
-                                <h3 class="text-xl font-bold uppercase tracking-wider mb-2 group-hover:text-accent transition">
+                                <h2 class="text-xl font-bold uppercase tracking-wider mb-2 group-hover:text-accent transition">
                                     {{ $collab->title }}
-                                </h3>
+                                </h2>
                                 @if ($collab->character)
                                     <p class="text-accent text-xs font-semibold uppercase tracking-wider mb-2">
                                         {{ $collab->character->full_name }}

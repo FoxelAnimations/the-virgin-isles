@@ -3,7 +3,7 @@
 
         {{-- Welcome --}}
         <div class="border border-zinc-800 bg-zinc-900 rounded-sm p-8 mb-10">
-            <h3 class="text-2xl font-bold uppercase tracking-wider">{{ __('Welcome back!') }}</h3>
+            <h1 class="text-2xl font-bold uppercase tracking-wider">{{ __('Welcome back!') }}</h1>
             <p class="mt-2 text-zinc-400">{{ __('This is your user dashboard.') }}</p>
         </div>
 

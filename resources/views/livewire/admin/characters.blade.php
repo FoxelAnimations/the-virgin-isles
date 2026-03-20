@@ -28,7 +28,7 @@
             <div class="px-4 py-4 border-b border-zinc-800 flex items-center justify-between">
                 <div>
                     <p class="text-xs uppercase tracking-[0.3em] text-zinc-500">Resource</p>
-                    <h3 class="text-lg font-semibold uppercase tracking-wider">{{ __('Characters') }}</h3>
+                    <h2 class="text-lg font-semibold uppercase tracking-wider">{{ __('Characters') }}</h2>
                 </div>
                 <a href="{{ route('characters.create') }}" class="inline-flex items-center bg-zinc-800 text-white px-3 py-2 text-sm font-semibold tracking-wider uppercase transition hover:bg-zinc-700">
                     {{ __('New Character') }}
@@ -104,7 +104,7 @@
             <button @click="open = !open" class="w-full px-4 py-4 flex items-center justify-between hover:bg-zinc-800/50 transition">
                 <div class="text-left">
                     <p class="text-xs uppercase tracking-[0.3em] text-zinc-500">Resource</p>
-                    <h3 class="text-lg font-semibold uppercase tracking-wider">{{ __('Jobs') }}</h3>
+                    <h2 class="text-lg font-semibold uppercase tracking-wider">{{ __('Jobs') }}</h2>
                 </div>
                 <div class="flex items-center gap-3">
                     <a href="{{ route('jobs.create') }}" @click.stop class="inline-flex items-center bg-zinc-800 text-white px-3 py-2 text-sm font-semibold tracking-wider uppercase transition hover:bg-zinc-700">

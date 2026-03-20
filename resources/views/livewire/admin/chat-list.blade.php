@@ -238,7 +238,7 @@
 
             {{-- Notification Sound --}}
             <div>
-                <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">{{ __('Notificatiegeluid') }}</h3>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">{{ __('Notificatiegeluid') }}</h2>
                 <p class="text-xs text-zinc-500 mb-3">{{ __('Dit geluid wordt afgespeeld wanneer een bezoeker een nieuw bericht stuurt.') }}</p>
 
                 @if ($settings?->chat_notification_sound)
@@ -276,7 +276,7 @@
 
             {{-- Blocked Sound --}}
             <div>
-                <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">{{ __('Geblokkeerd geluid') }}</h3>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">{{ __('Geblokkeerd geluid') }}</h2>
                 <p class="text-xs text-zinc-500 mb-3">{{ __('Dit geluid wordt afgespeeld wanneer een geblokkeerde bezoeker op "verstuur" klikt.') }}</p>
 
                 @if ($settings?->chat_blocked_sound)

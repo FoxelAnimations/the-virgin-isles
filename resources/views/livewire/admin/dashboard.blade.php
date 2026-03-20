@@ -22,7 +22,7 @@
                     <div class="space-y-6">
                         {{-- Video --}}
                         <div>
-                            <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Video') }}</h3>
+                            <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Video') }}</h2>
                             @if ($heroVideo?->video_path)
                                 <div class="mb-3">
                                     <video class="w-full max-h-48 rounded-sm bg-black" controls>
@@ -62,7 +62,7 @@
 
                         {{-- Image --}}
                         <div>
-                            <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Image') }}</h3>
+                            <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Image') }}</h2>
                             @if ($heroVideo?->image_path)
                                 <div class="mb-3">
                                     <img src="{{ Storage::url($heroVideo->image_path) }}" alt="Hero image" class="w-full max-h-48 object-contain rounded-sm bg-black">
@@ -103,7 +103,7 @@
 
                     {{-- Right: Copy --}}
                     <div>
-                        <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Copy') }}</h3>
+                        <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Copy') }}</h2>
                         <form wire:submit="saveHeroContent" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-medium text-zinc-500 mb-1">{{ __('Pre-title') }}</label>
