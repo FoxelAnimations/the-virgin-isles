@@ -228,7 +228,7 @@
                 }
                 if (guid) {
                     this.result = 'Beacon found! Redirecting\u2026';
-                    window.location.href = '{{ route('admin.scan-goto', '') }}/' + encodeURIComponent(guid);
+                    window.location.href = '{{ url('/admin/scan/goto') }}/' + encodeURIComponent(guid);
                 } else {
                     this.error = 'Not a valid beacon QR code.';
                     setTimeout(() => { this.error = null; this.startCamera(); }, 1500);
