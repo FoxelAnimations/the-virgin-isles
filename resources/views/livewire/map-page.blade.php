@@ -117,8 +117,8 @@
 
                     L.control.zoom({ position: 'topright' }).addTo(this.map);
 
-                    // CartoDB Positron — clean, minimal, simplified cartoonish look
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+                    // CartoDB Positron — clean minimal style WITH labels (street names)
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
                         subdomains: 'abcd',
                         maxZoom: 19,
@@ -128,11 +128,11 @@
                     if (!this.stylesAdded) {
                         const style = document.createElement('style');
                         style.textContent = `
-                            .map-tiles { filter: grayscale(100%) brightness(0.35) contrast(1.2) !important; }
+                            .map-tiles { filter: grayscale(100%) brightness(0.85) contrast(1.1) !important; }
                             .custom-marker { background: none !important; border: none !important; }
                             .custom-marker svg { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); transition: transform 0.15s ease; }
                             .custom-marker:hover svg { transform: scale(1.18) translateY(-3px); }
-                            #location-map { background: #111 !important; }
+                            #location-map { background: #d4d4d8 !important; }
                             .leaflet-control-zoom a { background: #18181b !important; color: #a1a1aa !important; border-color: #27272a !important; }
                             .leaflet-control-zoom a:hover { color: #fff !important; }
                             .leaflet-control-attribution { background: rgba(0,0,0,0.6) !important; color: #52525b !important; font-size: 9px !important; }
