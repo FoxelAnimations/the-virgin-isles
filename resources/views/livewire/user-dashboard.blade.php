@@ -1,45 +1,39 @@
 <div class="bg-black min-h-screen -mt-16 pt-16 text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
 
+        {{-- User Name Title --}}
+        <div class="mb-6">
+            @if ($editingName)
+                <form wire:submit="saveName" class="flex items-center gap-3">
+                    <input type="text" wire:model="userName"
+                        class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-3xl font-bold uppercase tracking-wider focus:border-accent focus:ring-accent rounded-sm w-auto"
+                        placeholder="{{ __('Je naam') }}">
+                    <button type="submit"
+                        class="px-3 py-1.5 text-xs font-semibold bg-accent text-black uppercase tracking-wider transition hover:brightness-90">
+                        {{ __('Opslaan') }}
+                    </button>
+                    <button type="button" wire:click="cancelEditingName"
+                        class="px-3 py-1.5 text-xs font-semibold border border-zinc-700 text-zinc-400 uppercase tracking-wider transition hover:text-white hover:border-zinc-500">
+                        {{ __('Annuleren') }}
+                    </button>
+                </form>
+                @error('userName') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+            @else
+                <h1 class="text-3xl font-bold uppercase tracking-wider flex items-center gap-3">
+                    {{ auth()->user()->name }}
+                    <button wire:click="startEditingName" class="text-accent text-xs uppercase tracking-wider hover:brightness-90 transition">
+                        {{ __('Bewerken') }}
+                    </button>
+                </h1>
+            @endif
+        </div>
+
         {{-- Welcome --}}
         <div class="border border-zinc-800 bg-zinc-900 rounded-sm p-8 mb-10">
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold uppercase tracking-wider">{{ $welcomeTitle ?? __('Welkom terug!') }}</h1>
-                    @if($welcomeText)
-                        <p class="mt-2 text-zinc-400 text-sm">{{ $welcomeText }}</p>
-                    @endif
-                    @if ($editingName)
-                        <form wire:submit="saveName" class="mt-3 flex items-center gap-3">
-                            <input type="text" wire:model="userName"
-                                class="bg-zinc-800 border border-zinc-700 text-white px-3 py-1.5 text-sm focus:border-accent focus:ring-accent rounded-sm w-64"
-                                placeholder="{{ __('Je naam') }}">
-                            <button type="submit"
-                                class="px-3 py-1.5 text-xs font-semibold bg-accent text-black uppercase tracking-wider transition hover:brightness-90">
-                                {{ __('Opslaan') }}
-                            </button>
-                            <button type="button" wire:click="cancelEditingName"
-                                class="px-3 py-1.5 text-xs font-semibold border border-zinc-700 text-zinc-400 uppercase tracking-wider transition hover:text-white hover:border-zinc-500">
-                                {{ __('Annuleren') }}
-                            </button>
-                        </form>
-                        @error('userName') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-                    @else
-                        <p class="mt-2 text-zinc-400 flex items-center gap-2">
-                            {{ auth()->user()->name }}
-                            <button wire:click="startEditingName" class="text-accent text-xs uppercase tracking-wider hover:brightness-90 transition">
-                                {{ __('Bewerken') }}
-                            </button>
-                        </p>
-                    @endif
-                </div>
-                {{-- Scan Button --}}
-                <button @click="$dispatch('open-scanner')"
-                    class="inline-flex items-center gap-2 bg-accent text-black px-5 py-3 text-sm font-semibold uppercase tracking-wider transition hover:brightness-90 shrink-0 self-start">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-                    {{ __('Scan') }}
-                </button>
-            </div>
+            <h2 class="text-2xl font-bold uppercase tracking-wider">{{ $welcomeTitle ?? __('Welkom terug!') }}</h2>
+            @if($welcomeText)
+                <p class="mt-2 text-zinc-400 text-sm">{{ $welcomeText }}</p>
+            @endif
         </div>
 
         {{-- Nieuwtjes --}}
@@ -62,8 +56,17 @@
         {{-- Earned Badges (new Badge model) --}}
         <div class="border border-zinc-800 bg-zinc-900 rounded-sm p-8 mb-10">
             <div class="mb-6">
-                <p class="text-sm tracking-[0.3em] uppercase text-zinc-500 mb-1">{{ $badgeSectionLabel ?? __('Collectie') }}</p>
-                <h2 class="text-3xl font-bold uppercase tracking-wider">{{ $badgeSectionTitle ?? __('Jouw Badges') }}</h2>
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p class="text-sm tracking-[0.3em] uppercase text-zinc-500 mb-1">{{ $badgeSectionLabel ?? __('Collectie') }}</p>
+                        <h2 class="text-3xl font-bold uppercase tracking-wider">{{ $badgeSectionTitle ?? __('Jouw Badges') }}</h2>
+                    </div>
+                    <button @click="$dispatch('open-scanner')"
+                        class="inline-flex items-center gap-2 bg-accent text-black px-5 py-3 text-sm font-semibold uppercase tracking-wider transition hover:brightness-90 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                        {{ __('Scannen') }}
+                    </button>
+                </div>
                 @if($badgeSectionText ?? null)
                     <p class="mt-2 text-zinc-400 text-sm">{{ $badgeSectionText }}</p>
                 @else

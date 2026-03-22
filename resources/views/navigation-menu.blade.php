@@ -30,9 +30,6 @@
             <!-- Right Side -->
             @auth
                 <div class="hidden sm:flex sm:items-center sm:space-x-4">
-                    <button @click="$dispatch('open-scanner')" class="border border-[#E7FF57] text-[#E7FF57] px-3 py-2 transition hover:bg-[#E7FF57] hover:text-black" title="Scan Beacon">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-                    </button>
                     <a href="{{ route('dashboard') }}" class="bg-[#E7FF57] text-black text-lg tracking-widest px-6 py-2 transition hover:opacity-90">DASHBOARD</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -103,10 +100,6 @@
         <!-- Bottom Actions -->
         <div class="px-6 pb-10 space-y-3" style="padding-bottom: max(2.5rem, env(safe-area-inset-bottom))">
             @auth
-                <button @click="open = false; $dispatch('open-scanner')" class="w-full flex items-center justify-center gap-2 border border-[#E7FF57] text-[#E7FF57] text-lg tracking-widest px-6 py-3 transition hover:bg-[#E7FF57] hover:text-black">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-                    SCAN
-                </button>
                 <a href="{{ route('dashboard') }}" class="block bg-[#E7FF57] text-black text-lg tracking-widest px-6 py-3 text-center transition hover:opacity-90">DASHBOARD</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

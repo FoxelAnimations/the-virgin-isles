@@ -104,7 +104,7 @@ class BeaconController extends Controller
         $badgePopups = $this->badgeScanService->processNewBeaconScan($user, $beacon);
 
         if (!empty($badgePopups)) {
-            session()->flash('badge_popups', $badgePopups);
+            session()->put('badge_popups', $badgePopups);
         }
     }
 }

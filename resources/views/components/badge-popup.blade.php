@@ -1,5 +1,5 @@
 @php
-    $badgePopups = session('badge_popups', []);
+    $badgePopups = session()->pull('badge_popups', []);
 @endphp
 
 @if (!empty($badgePopups))

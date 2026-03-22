@@ -1,4 +1,4 @@
-@props(['redirectUrl' => '/beacon', 'readerId' => 'qr-reader'])
+@props(['redirectUrl' => '/beacon', 'readerId' => 'qr-reader', 'mode' => 'redirect'])
 
 <div x-data="{
     show: false,
@@ -6,13 +6,18 @@
     error: null,
     result: null,
     scanner: null,
+    badgePopups: [],
+    currentPopup: 0,
+    showingBadge: false,
 
     async openScanner() {
         this.show = true;
         this.error = null;
         this.result = null;
+        this.badgePopups = [];
+        this.currentPopup = 0;
+        this.showingBadge = false;
         await this.$nextTick();
-        // Lazy-load html5-qrcode on first use
         if (typeof Html5Qrcode === 'undefined') {
             await new Promise((resolve, reject) => {
                 const s = document.createElement('script');
@@ -28,6 +33,7 @@
     async closeScanner() {
         await this.stopCamera();
         this.show = false;
+        this.showingBadge = false;
     },
 
     async startCamera() {
@@ -67,12 +73,65 @@
         } catch {
             if (/^[A-Za-z0-9]{10}$/.test(text)) guid = text;
         }
-        if (guid) {
-            this.result = '{{ __('Beacon gevonden! Even geduld…') }}';
-            window.location.href = '{{ url($redirectUrl) }}/' + encodeURIComponent(guid);
-        } else {
+        if (!guid) {
             this.error = '{{ __('Geen geldige beacon QR-code.') }}';
             setTimeout(() => { this.error = null; this.startCamera(); }, 1500);
+            return;
+        }
+
+        @if($mode === 'api')
+            this.handleApiScan(guid);
+        @else
+            this.result = '{{ __('Beacon gevonden! Even geduld…') }}';
+            window.location.href = '{{ url($redirectUrl) }}/' + encodeURIComponent(guid);
+        @endif
+    },
+
+    async handleApiScan(guid) {
+        this.result = '{{ __('Beacon gevonden! Verwerken…') }}';
+        try {
+            const res = await fetch('/api/beacon/' + encodeURIComponent(guid) + '/scan', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '',
+                    'Accept': 'application/json',
+                },
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                this.result = null;
+                this.error = data.error || '{{ __('Er ging iets mis.') }}';
+                setTimeout(() => { this.error = null; this.startCamera(); }, 2000);
+                return;
+            }
+
+            if (data.badge_popups && data.badge_popups.length > 0) {
+                this.badgePopups = data.badge_popups;
+                this.currentPopup = 0;
+                this.showingBadge = true;
+                this.result = null;
+            } else if (data.is_new) {
+                this.result = '{{ __('Beacon verzameld!') }}';
+                setTimeout(() => { this.result = null; this.startCamera(); }, 2000);
+            } else {
+                this.result = '{{ __('Deze beacon heb je al gescand.') }}';
+                setTimeout(() => { this.result = null; this.startCamera(); }, 2000);
+            }
+        } catch (e) {
+            this.result = null;
+            this.error = '{{ __('Verbindingsfout. Probeer opnieuw.') }}';
+            setTimeout(() => { this.error = null; this.startCamera(); }, 2000);
+        }
+    },
+
+    nextBadge() {
+        if (this.currentPopup < this.badgePopups.length - 1) {
+            this.currentPopup++;
+        } else {
+            this.showingBadge = false;
+            this.badgePopups = [];
+            this.startCamera();
         }
     }
 }" @open-scanner.window="openScanner()" @keydown.escape.window="if (show) closeScanner()"
@@ -89,7 +148,8 @@
             </button>
         </div>
 
-        <div class="p-5">
+        {{-- Camera view --}}
+        <div class="p-5" x-show="!showingBadge">
             <div id="{{ $readerId }}" class="w-full rounded overflow-hidden bg-black"></div>
 
             <p x-show="error" x-text="error" x-cloak class="mt-3 text-red-400 text-sm text-center"></p>
@@ -97,6 +157,34 @@
             <p x-show="scanning && !error && !result" x-cloak class="mt-3 text-zinc-400 text-sm text-center">
                 {{ __('Richt je camera op een beacon QR-code') }}
             </p>
+        </div>
+
+        {{-- Badge popup (inline) --}}
+        <div x-show="showingBadge" x-cloak class="p-6 text-center">
+            <template x-if="badgePopups[currentPopup]?.image">
+                <img :src="badgePopups[currentPopup].image" :alt="badgePopups[currentPopup].title"
+                    class="w-28 h-28 mx-auto mb-4 object-contain rounded-full border-2 border-accent/30 bg-zinc-800 p-1">
+            </template>
+
+            <h3 class="text-xl font-bold uppercase tracking-wider text-white mb-3"
+                x-text="badgePopups[currentPopup]?.title"></h3>
+
+            <p class="text-sm text-zinc-400 mb-4"
+                x-text="badgePopups[currentPopup]?.popup_text"></p>
+
+            <template x-if="badgePopups.length > 1">
+                <div class="flex justify-center gap-1.5 mb-4">
+                    <template x-for="(_, i) in badgePopups" :key="i">
+                        <div class="w-2 h-2 rounded-full transition"
+                            :class="i === currentPopup ? 'bg-accent' : 'bg-zinc-700'"></div>
+                    </template>
+                </div>
+            </template>
+
+            <button @click="nextBadge()"
+                class="px-6 py-2 text-sm font-semibold bg-accent text-black uppercase tracking-wider transition hover:brightness-90">
+                <span x-text="currentPopup < badgePopups.length - 1 ? '{{ __('Volgende') }}' : '{{ __('Verder scannen') }}'"></span>
+            </button>
         </div>
     </div>
 </div>

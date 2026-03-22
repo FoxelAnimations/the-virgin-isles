@@ -58,7 +58,7 @@
         @endif
 
         @auth
-            <x-qr-scanner-modal redirect-url="/beacon" reader-id="user-qr-reader" />
+            <x-qr-scanner-modal mode="api" reader-id="user-qr-reader" />
         @endauth
 
         @livewireScripts
