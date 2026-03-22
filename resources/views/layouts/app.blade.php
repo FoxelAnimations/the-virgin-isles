@@ -53,7 +53,9 @@
 
         <x-badge-popup />
         <x-age-gate />
-        <x-character-chat />
+        @if (!request()->routeIs('map'))
+            <x-character-chat />
+        @endif
 
         @livewireScripts
     </body>
