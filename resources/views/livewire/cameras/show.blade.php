@@ -41,11 +41,11 @@
     </div>
 
     {{-- Main content: feed + chat --}}
-    <div class="max-w-[1800px] mx-auto flex flex-col lg:flex-row" style="height: calc(100vh - 7rem);">
+    <div class="max-w-[1800px] mx-auto flex flex-col lg:flex-row min-h-0" style="height: calc(100vh - 7rem);">
 
         {{-- Camera Feed --}}
-        <div class="flex-1 relative overflow-hidden min-h-0 flex items-center justify-center bg-black">
-          <div class="relative w-full h-full" style="max-width: min(100%, calc((100vh - 7rem))); aspect-ratio: 1 / 1; margin: 0 auto;">
+        <div class="flex-1 min-h-0 min-w-0 flex items-center justify-center bg-black p-2 sm:p-4">
+          <div class="relative aspect-square w-full max-w-full" style="max-height: calc(100vh - 9rem); max-width: calc(100vh - 9rem);">
             {{-- Sky background layer --}}
             <div class="absolute inset-0 z-[0]" :style="{ backgroundColor: skyColor }">
                 <template x-if="backgroundIsVideo && backgroundUrl">
@@ -85,7 +85,7 @@
 
             {{-- Video element --}}
             <video x-ref="mainVideo" autoplay playsinline muted
-                class="relative z-[2] w-full h-full object-contain"
+                class="absolute inset-0 z-[2] w-full h-full object-cover"
                 x-show="status === 'online' && videoUrl"
                 style="display: none;"></video>
 
