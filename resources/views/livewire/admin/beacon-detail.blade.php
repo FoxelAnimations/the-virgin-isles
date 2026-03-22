@@ -231,6 +231,22 @@
                             <span class="text-zinc-300">Out of Action</span>
                         </label>
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-400 mb-1">Activation Date</label>
+                        <div class="flex items-center gap-3">
+                            <input type="date" wire:model="activationDate"
+                                class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm">
+                            @if ($activationDate)
+                                <button type="button" wire:click="$set('activationDate', null)" class="text-xs text-zinc-500 hover:text-zinc-300 transition">Clear</button>
+                            @endif
+                        </div>
+                        @error('activationDate') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                        <p class="mt-1 text-[10px] text-zinc-600">Beacon will not be scannable before this date. Leave empty for immediate activation.</p>
+                        @if ($beacon->activation_date && $beacon->isBeforeActivation())
+                            <p class="mt-1 text-xs text-yellow-400">Not yet active — activates {{ $beacon->activation_date->format('d M Y') }}.</p>
+                        @endif
+                    </div>
                 </div>
 
                 {{-- Collectible / Badge --}}
@@ -263,6 +279,51 @@
                             @error('badgeImage') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                         </div>
                     @endif
+                </div>
+
+                {{-- Linked Badges --}}
+                <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Linked Badges</h2>
+                    <p class="text-xs text-zinc-600">Badges that users earn when scanning this beacon.</p>
+                    <div class="max-h-48 overflow-y-auto bg-zinc-800 border border-zinc-700 rounded-sm p-2 space-y-1">
+                        @forelse ($allBadges as $badge)
+                            <label class="flex items-center gap-2 py-1 px-2 hover:bg-zinc-700/50 rounded-sm cursor-pointer">
+                                <input type="checkbox" wire:model="selectedBadgeIds" value="{{ $badge->id }}"
+                                    class="rounded-sm bg-zinc-700 border-zinc-600 text-accent focus:ring-accent">
+                                <div class="flex items-center gap-2 flex-1 min-w-0">
+                                    @if ($badge->image_path)
+                                        <img src="{{ Storage::url($badge->image_path) }}" class="w-6 h-6 rounded-full object-cover flex-shrink-0">
+                                    @endif
+                                    <span class="text-sm text-zinc-300 truncate">{{ $badge->title }}</span>
+                                    @if (!$badge->is_active)
+                                        <span class="text-xs text-zinc-500">(inactive)</span>
+                                    @endif
+                                </div>
+                            </label>
+                        @empty
+                            <p class="text-xs text-zinc-600 p-2">No badges created yet.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- Linked Locations --}}
+                <div class="rounded-sm bg-zinc-900 border border-zinc-800 p-5 space-y-4">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400 mb-3">Linked Locations</h2>
+                    <p class="text-xs text-zinc-600">Locations revealed when a user scans this beacon.</p>
+                    <div class="max-h-48 overflow-y-auto bg-zinc-800 border border-zinc-700 rounded-sm p-2 space-y-1">
+                        @forelse ($allLocations as $loc)
+                            <label class="flex items-center gap-2 py-1 px-2 hover:bg-zinc-700/50 rounded-sm cursor-pointer">
+                                <input type="checkbox" wire:model="selectedLocationIds" value="{{ $loc->id }}"
+                                    class="rounded-sm bg-zinc-700 border-zinc-600 text-accent focus:ring-accent">
+                                <span class="text-sm text-zinc-300">{{ $loc->title }}</span>
+                                @if (!$loc->is_visible)
+                                    <span class="text-xs text-zinc-500">(hidden)</span>
+                                @endif
+                            </label>
+                        @empty
+                            <p class="text-xs text-zinc-600 p-2">No locations created yet.</p>
+                        @endforelse
+                    </div>
                 </div>
 
                 {{-- Out of Action Configuration --}}

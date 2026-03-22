@@ -27,19 +27,19 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Page Title --}}
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center justify-between mb-6 sm:mb-8">
             <div>
                 <p class="text-sm uppercase tracking-[0.3em] text-zinc-500">CMS</p>
-                <h1 class="text-4xl font-bold uppercase tracking-wider">
+                <h1 class="text-2xl sm:text-4xl font-bold uppercase tracking-wider">
                     {{ __('Chats') }}
                     @if ($totalUnread > 0)
-                        <span class="inline-flex items-center justify-center ml-2 px-2 py-0.5 text-sm font-bold bg-red-500 text-white rounded-full">{{ $totalUnread }}</span>
+                        <span class="inline-flex items-center justify-center ml-1 sm:ml-2 px-2 py-0.5 text-xs sm:text-sm font-bold bg-red-500 text-white rounded-full">{{ $totalUnread }}</span>
                     @endif
                 </h1>
             </div>
-            <a href="{{ route('admin.chats.blocked') }}" class="inline-flex items-center gap-2 border border-yellow-900 text-yellow-400 px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:bg-yellow-900/30">
+            <a href="{{ route('admin.chats.blocked') }}" class="inline-flex items-center gap-1 sm:gap-2 border border-yellow-900 text-yellow-400 px-2 sm:px-4 py-2 text-xs sm:text-sm font-semibold tracking-wider uppercase transition hover:bg-yellow-900/30">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"/></svg>
-                {{ __('Geblokkeerd') }}
+                <span class="hidden sm:inline">{{ __('Geblokkeerd') }}</span>
             </a>
         </div>
 
@@ -78,8 +78,8 @@
 
         {{-- Character Online/Offline Bar --}}
         @if ($chatCharacters->count() > 0)
-            <div class="mb-6 rounded-sm bg-zinc-900 border border-zinc-800 p-4">
-                <div class="flex flex-wrap gap-4">
+            <div class="mb-6 rounded-sm bg-zinc-900 border border-zinc-800 p-3 sm:p-4 overflow-x-auto">
+                <div class="flex gap-3 sm:gap-4 sm:flex-wrap">
                     @foreach ($chatCharacters as $char)
                         <button
                             wire:click="toggleOnline({{ $char->id }})"
@@ -110,8 +110,86 @@
             </div>
         @endif
 
-        {{-- Conversations Table --}}
-        <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
+        {{-- Mobile Card List --}}
+        <div class="md:hidden space-y-2">
+            @forelse ($conversations as $conversation)
+                <div class="rounded-sm bg-zinc-900 border border-zinc-800 {{ $conversation->unread_count > 0 && !$conversation->is_blocked ? 'border-l-2 border-l-accent' : '' }} {{ $conversation->is_blocked ? 'opacity-60' : '' }}" wire:key="conv-m-{{ $conversation->id }}">
+                    <a href="{{ route('admin.chats.view', $conversation) }}" class="block px-4 py-3">
+                        <div class="flex items-center gap-3">
+                            {{-- Character avatar --}}
+                            <div class="relative shrink-0">
+                                @if ($conversation->character?->profile_photo_path || $conversation->character?->profile_image_path)
+                                    <img src="{{ Storage::url($conversation->character->profile_photo_path ?? $conversation->character->profile_image_path) }}" class="w-10 h-10 rounded-full object-cover border border-zinc-700" alt="">
+                                @else
+                                    <div class="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-sm font-bold text-zinc-400">
+                                        {{ substr($conversation->character?->first_name ?? '?', 0, 1) }}
+                                    </div>
+                                @endif
+                                @if ($conversation->is_blocked && $conversation->blocked_attempt_at && $conversation->blocked_attempt_at->gt(now()->subSeconds(10)))
+                                    <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                    </span>
+                                @endif
+                            </div>
+
+                            {{-- Content --}}
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-white font-medium truncate">{{ $conversation->character?->full_name ?? 'Verwijderd' }}</span>
+                                    <span class="text-[10px] text-zinc-500 shrink-0">{{ $conversation->character?->chat_mode === 'manual' ? 'manueel' : 'AI' }}</span>
+                                    @if ($conversation->is_blocked)
+                                        <span class="text-[9px] font-semibold uppercase tracking-wider text-red-400 border border-red-900 px-1 py-0.5 shrink-0">Geblokkeerd</span>
+                                    @endif
+                                </div>
+                                <div class="flex items-center gap-1 mt-0.5">
+                                    @if ($conversation->visitor_name)
+                                        <span class="text-xs text-zinc-400 truncate">{{ $conversation->visitor_name }}</span>
+                                    @else
+                                        <span class="text-xs text-zinc-500 font-mono">{{ substr($conversation->visitor_uuid, 0, 8) }}...</span>
+                                    @endif
+                                </div>
+                                <div class="flex items-center gap-3 mt-1 text-[11px] text-zinc-500">
+                                    <span>{{ $conversation->messages_count }} berichten</span>
+                                    <span>{{ $conversation->last_message_at?->diffForHumans() ?? '-' }}</span>
+                                </div>
+                            </div>
+
+                            {{-- Unread badge + chevron --}}
+                            <div class="flex items-center gap-2 shrink-0">
+                                @if ($conversation->unread_count > 0)
+                                    <span class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold bg-accent text-black rounded-full">{{ $conversation->unread_count }}</span>
+                                @endif
+                                <svg class="w-4 h-4 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </div>
+                        </div>
+                    </a>
+
+                    {{-- Mobile action buttons --}}
+                    <div class="flex items-center gap-2 px-4 pb-3 pt-0">
+                        <button wire:click="openBlockModal({{ $conversation->id }})" class="text-[10px] text-yellow-400 border border-yellow-900 px-2 py-1 hover:bg-yellow-900/30 transition uppercase tracking-wider font-semibold">
+                            Blokkeren
+                        </button>
+                        <button wire:click="deleteConversation({{ $conversation->id }})" wire:confirm="Gesprek permanent verwijderen?" class="text-[10px] text-red-400 border border-red-900 px-2 py-1 hover:bg-red-900/30 transition uppercase tracking-wider font-semibold">
+                            Verwijderen
+                        </button>
+                        @if ($conversation->shared_ip_count > 0)
+                            <span class="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider text-orange-400 border border-orange-900 px-1.5 py-0.5" title="{{ $conversation->shared_ip_count }} sessies zelfde IP">
+                                <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                                {{ $conversation->shared_ip_count }} IP
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="rounded-sm bg-zinc-900 border border-zinc-800 px-4 py-8 text-center text-sm text-zinc-500">
+                    {{ __('Geen gesprekken gevonden.') }}
+                </div>
+            @endforelse
+        </div>
+
+        {{-- Desktop Conversations Table --}}
+        <div class="hidden md:block rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
             <table class="w-full text-left">
                 <thead class="bg-zinc-800 text-xs font-semibold uppercase tracking-wider text-zinc-400">
                     <tr>

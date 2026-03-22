@@ -115,16 +115,16 @@
                 x-transition:leave="transition ease-in duration-150"
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
-                class="fixed inset-0 z-50 flex items-start md:items-center justify-center bg-black/95 p-0 md:p-8 overflow-y-auto"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black md:bg-black/95 p-0 md:p-8"
                 @click.self="videoOpen = false"
                 @keydown.escape.window="videoOpen = false"
                 style="display: none;"
             >
-                <button @click="videoOpen = false" class="absolute top-2 right-2 md:top-4 md:right-4 z-10 text-white hover:text-accent transition">
+                <button @click="videoOpen = false" class="absolute top-2 right-2 md:top-4 md:right-4 z-20 text-white hover:text-accent transition">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
 
-                <div class="w-full max-w-5xl md:max-h-full" @click.stop>
+                <div class="w-full md:max-w-5xl md:max-h-full" @click.stop>
                     <div class="aspect-video bg-black rounded-none md:rounded-sm overflow-hidden">
                         @if ($collab->episode->isYoutube() && $collab->episode->youtubeEmbedUrl())
                             <template x-if="videoOpen">

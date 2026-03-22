@@ -64,6 +64,11 @@ class Camera extends Model
         return $this->hasMany(CameraDefaultSound::class);
     }
 
+    public function liveMessages(): HasMany
+    {
+        return $this->hasMany(CameraLiveMessage::class)->orderByDesc('created_at');
+    }
+
     public function backgroundUrl(): ?string
     {
         return $this->background_path ? Storage::url($this->background_path) : null;

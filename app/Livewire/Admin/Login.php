@@ -29,7 +29,7 @@ class Login extends Component
             return;
         }
 
-        if ($user->is_blocked) {
+        if ($user->isAccountBlocked()) {
             $this->addError('email', __('Your account has been blocked.'));
             return;
         }

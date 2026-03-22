@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Beacon;
+use App\Models\User;
+use App\Services\BadgeScanService;
 use App\Services\BeaconScanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +14,7 @@ class BeaconController extends Controller
 {
     public function __construct(
         private BeaconScanService $scanService,
+        private BadgeScanService $badgeScanService,
     ) {}
 
     public function scan(Request $request, string $guid)
@@ -27,20 +30,24 @@ class BeaconController extends Controller
         $beacon = Beacon::where('guid', $guid)->first();
 
         if (!$beacon) {
-            // Unknown GUID — log and redirect to homepage
             $redirectUrl = config('beacon.default_redirect', '/');
             $this->scanService->logScan($request, $guid, null, $redirectUrl, $isRateLimited);
             return redirect($redirectUrl);
         }
 
-        // Known beacon — always log
+        if ($beacon->isBeforeActivation()) {
+            $redirectUrl = config('beacon.default_redirect', '/');
+            $this->scanService->logScan($request, $guid, $beacon, $redirectUrl, $isRateLimited);
+            return redirect($redirectUrl);
+        }
+
         if ($beacon->is_out_of_action) {
             $behavior = $this->scanService->resolveOutOfActionBehavior($beacon);
             $redirectUrl = $behavior['url'] ?? '/';
 
             $this->scanService->logScan($request, $guid, $beacon, $redirectUrl, $isRateLimited);
 
-            $this->collectForUser($beacon);
+            $this->collectForUser(Auth::user(), $beacon);
 
             return match ($behavior['type']) {
                 'redirect' => redirect($redirectUrl),
@@ -56,24 +63,51 @@ class BeaconController extends Controller
             };
         }
 
-        // Collect beacon for logged-in user (unique, only collectible beacons)
-        $this->collectForUser($beacon);
+        $user = Auth::user();
+        $isNewCollection = $this->collectForUser($user, $beacon);
 
-        // Normal flow: online or offline — both redirect
+        if ($user) {
+            // Eager-load relations for badge/location processing
+            $beacon->load(['badges' => fn ($q) => $q->active(), 'locations']);
+            $this->processBadgesAndLocations($user, $beacon, $isNewCollection);
+        }
+
         $redirectUrl = $this->scanService->resolveRedirectUrl($beacon);
         $this->scanService->logScan($request, $guid, $beacon, $redirectUrl, $isRateLimited);
 
         return redirect($redirectUrl);
     }
 
-    private function collectForUser(Beacon $beacon): void
+    private function collectForUser(?User $user, Beacon $beacon): bool
     {
-        if (!$beacon->is_collectible || !Auth::check()) {
-            return;
+        if (!$user || !$beacon->is_collectible) {
+            return false;
         }
 
-        Auth::user()->collectedBeacons()->syncWithoutDetaching([
-            $beacon->id => ['collected_at' => now()],
-        ]);
+        $alreadyCollected = $user->collectedBeacons()->where('beacon_id', $beacon->id)->exists();
+
+        if (!$alreadyCollected) {
+            $user->collectedBeacons()->attach($beacon->id, ['collected_at' => now()]);
+            return true;
+        }
+
+        return false;
+    }
+
+    private function processBadgesAndLocations(User $user, Beacon $beacon, bool $isNewCollection): void
+    {
+        if ($isNewCollection) {
+            $badgePopups = $this->badgeScanService->processNewBeaconScan($user, $beacon);
+
+            if (!empty($badgePopups)) {
+                session()->flash('badge_popups', $badgePopups);
+            }
+        } else {
+            $locationPopup = $this->badgeScanService->getDuplicateScanLocationPopup($beacon);
+
+            if ($locationPopup) {
+                session()->flash('location_popup', $locationPopup);
+            }
+        }
     }
 }

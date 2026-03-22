@@ -212,6 +212,13 @@
                     </label>
                     <p class="text-sm text-zinc-500">{{ __('When unchecked, the public register page returns a 404.') }}</p>
 
+                    <div class="border-t border-zinc-800 pt-4 mt-4">
+                        <label class="block text-sm font-medium text-zinc-400 mb-1">{{ __('Badge Popup Timeout (seconds)') }}</label>
+                        <input type="number" wire:model="badgePopupTimeout" min="1" max="60"
+                            class="w-24 bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm">
+                        <p class="text-sm text-zinc-500 mt-1">{{ __('Auto-close duration for badge popups after scanning a beacon.') }}</p>
+                    </div>
+
                     <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
                         {{ __('Save Site Settings') }}
                     </button>
@@ -351,6 +358,83 @@
                         {{ __('Save Chat Settings') }}
                     </button>
                 </form>
+            </div>
+        </div>
+
+        {{-- User Dashboard CMS --}}
+        <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden mt-6" x-data="{ open: false }">
+            <button type="button" @click="open = !open" class="w-full bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between hover:bg-zinc-700/50 transition">
+                <span>{{ __('User Dashboard') }}</span>
+                <svg class="w-4 h-4 text-zinc-400 transition-transform" :class="open && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="p-4 space-y-6" x-show="open" x-transition>
+
+                {{-- Welcome Text --}}
+                <div>
+                    <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Welcome Text') }}</h3>
+                    <form wire:submit="saveDashboardWelcome" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-500 mb-1">{{ __('Title') }}</label>
+                            <input type="text" wire:model="dashboardWelcomeTitle" class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm" placeholder="Welcome back!">
+                            @error('dashboardWelcomeTitle') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-zinc-500 mb-1">{{ __('Text') }}</label>
+                            <textarea wire:model="dashboardWelcomeText" rows="3" class="w-full bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm" placeholder="This is your user dashboard."></textarea>
+                            @error('dashboardWelcomeText') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
+                        </div>
+                        <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
+                            {{ __('Save Welcome Text') }}
+                        </button>
+                    </form>
+                </div>
+
+                <div class="border-t border-zinc-800"></div>
+
+                {{-- Nieuwtjes --}}
+                <div>
+                    <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">{{ __('Nieuwtjes') }}</h3>
+                    <p class="text-xs text-zinc-500 mb-3">{{ __('Bullet items shown on the user dashboard. Saving resets the dismiss status for all users — they will see the updated news again.') }}</p>
+
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" wire:model="newNewsItem" wire:keydown.enter.prevent="addNewsItem" class="flex-1 bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm" placeholder="{{ __('Nieuw item...') }}">
+                        <button type="button" wire:click="addNewsItem" class="inline-flex items-center border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-300 hover:text-accent hover:border-accent transition">
+                            + {{ __('Toevoegen') }}
+                        </button>
+                    </div>
+
+                    @if(count($dashboardNewsItems) > 0)
+                        <div class="space-y-2 mb-4">
+                            @foreach($dashboardNewsItems as $index => $item)
+                                <div class="flex items-center gap-2 bg-zinc-800 rounded-sm p-2" wire:key="news-{{ $index }}">
+                                    <span class="text-accent text-sm mr-1">&bull;</span>
+                                    <span class="flex-1 text-sm text-white">{{ $item }}</span>
+                                    <div class="flex gap-1 shrink-0">
+                                        @if($index > 0)
+                                            <button type="button" wire:click="moveNewsItemUp({{ $index }})" class="text-zinc-500 hover:text-white transition p-1" title="Move up">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                                            </button>
+                                        @endif
+                                        @if($index < count($dashboardNewsItems) - 1)
+                                            <button type="button" wire:click="moveNewsItemDown({{ $index }})" class="text-zinc-500 hover:text-white transition p-1" title="Move down">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                            </button>
+                                        @endif
+                                        <button type="button" wire:click="removeNewsItem({{ $index }})" class="text-red-400 hover:text-red-300 transition p-1" title="Remove">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <button type="button" wire:click="saveDashboardNews" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
+                            {{ __('Save Nieuwtjes') }}
+                        </button>
+                    @else
+                        <p class="text-sm text-zinc-600">{{ __('No news items yet. Add one above.') }}</p>
+                    @endif
+                </div>
             </div>
         </div>
     </div>

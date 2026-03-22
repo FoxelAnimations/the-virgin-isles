@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Badge;
 use App\Models\Beacon;
 use App\Models\BeaconImage;
 use App\Models\BeaconScan;
 use App\Models\BeaconType;
+use App\Models\Location;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -30,6 +32,7 @@ class BeaconDetail extends Component
     public string $redirectUrl = '';
     public bool $isOnline = true;
     public bool $isOutOfAction = false;
+    public ?string $activationDate = null;
     public bool $isCollectible = false;
     public $badgeImage = null;
     public string $outOfActionMode = 'showPage';
@@ -37,6 +40,8 @@ class BeaconDetail extends Component
     public string $outOfActionMessage = '';
     public $image = null;
     public $newImages = [];
+    public array $selectedBadgeIds = [];
+    public array $selectedLocationIds = [];
 
     public function mount(Beacon $beacon): void
     {
@@ -46,6 +51,9 @@ class BeaconDetail extends Component
 
     private function loadFields(): void
     {
+        $this->beacon->load(['badges', 'locations']);
+        $this->selectedBadgeIds = $this->beacon->badges->pluck('id')->map(fn ($id) => (string) $id)->toArray();
+        $this->selectedLocationIds = $this->beacon->locations->pluck('id')->map(fn ($id) => (string) $id)->toArray();
         $this->title = $this->beacon->title;
         $this->description = $this->beacon->description ?? '';
         $this->typeId = $this->beacon->type_id;
@@ -55,6 +63,7 @@ class BeaconDetail extends Component
         $this->redirectUrl = $this->beacon->redirect_url ?? '';
         $this->isOnline = $this->beacon->is_online;
         $this->isOutOfAction = $this->beacon->is_out_of_action;
+        $this->activationDate = $this->beacon->activation_date?->format('Y-m-d');
         $this->isCollectible = $this->beacon->is_collectible;
         $this->outOfActionMode = $this->beacon->out_of_action_mode ?? 'showPage';
         $this->outOfActionRedirectUrl = $this->beacon->out_of_action_redirect_url ?? '';
@@ -73,6 +82,7 @@ class BeaconDetail extends Component
             'redirectUrl' => ['nullable', 'string', 'max:2048'],
             'isOnline' => ['boolean'],
             'isOutOfAction' => ['boolean'],
+            'activationDate' => ['nullable', 'date'],
             'isCollectible' => ['boolean'],
             'badgeImage' => ['nullable', 'image', 'max:4096'],
             'outOfActionMode' => ['required', 'in:redirect,redirectCustom,showPage,block'],
@@ -108,6 +118,7 @@ class BeaconDetail extends Component
             'redirect_url' => $this->redirectUrl ?: null,
             'is_online' => $this->isOnline,
             'is_out_of_action' => $this->isOutOfAction,
+            'activation_date' => $this->activationDate ?: null,
             'is_collectible' => $this->isCollectible,
             'badge_image_path' => $badgeImagePath,
             'out_of_action_mode' => $this->outOfActionMode,
@@ -126,6 +137,9 @@ class BeaconDetail extends Component
                 ]);
             }
         }
+
+        $this->beacon->badges()->sync($this->selectedBadgeIds);
+        $this->beacon->locations()->sync($this->selectedLocationIds);
 
         $this->beacon->refresh();
         $this->image = null;
@@ -185,6 +199,8 @@ class BeaconDetail extends Component
         $data = [
             'types' => BeaconType::orderBy('name')->get(),
             'outOfActionModes' => Beacon::OUT_OF_ACTION_MODES,
+            'allBadges' => $this->tab === 'details' ? Badge::orderBy('title')->get() : collect(),
+            'allLocations' => $this->tab === 'details' ? Location::orderBy('title')->get() : collect(),
         ];
 
         if ($this->tab === 'scans') {

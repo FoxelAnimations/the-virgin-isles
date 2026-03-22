@@ -37,6 +37,7 @@ class Character extends Model
         'background_image_path',
         'sort_order',
         'show_in_slider',
+        'color_code',
     ];
 
     protected function casts(): array

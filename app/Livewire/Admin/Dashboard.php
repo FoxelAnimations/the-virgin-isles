@@ -38,15 +38,23 @@ class Dashboard extends Component
     public bool $showCollabs = false;
     public bool $showQuotes = true;
     public string $carouselTitle = '';
+    public int $badgePopupTimeout = 5;
+    public string $dashboardWelcomeTitle = '';
+    public string $dashboardWelcomeText = '';
+    public array $dashboardNewsItems = [];
+    public string $newNewsItem = '';
 
     public function mount(): void
     {
         $this->loadSocialLinks();
         $this->loadHeroContent();
         $this->loadAgeGate();
-        $this->loadSiteSettings();
-        $this->loadChatSettings();
-        $this->loadHomepageSettings();
+
+        $settings = SiteSetting::first();
+        $this->loadSiteSettings($settings);
+        $this->loadChatSettings($settings);
+        $this->loadHomepageSettings($settings);
+        $this->loadDashboardSettings($settings);
     }
 
     protected function loadHeroContent(): void
@@ -171,12 +179,13 @@ class Dashboard extends Component
         $this->redirect(route('admin.dashboard'));
     }
 
-    protected function loadSiteSettings(): void
+    protected function loadSiteSettings(?SiteSetting $settings = null): void
     {
-        $settings = SiteSetting::first();
+        $settings ??= SiteSetting::first();
         if ($settings) {
             $this->loginEnabled = $settings->login_enabled;
             $this->registerEnabled = $settings->register_enabled;
+            $this->badgePopupTimeout = $settings->badge_popup_timeout ?? 5;
         }
     }
 
@@ -185,6 +194,7 @@ class Dashboard extends Component
         SiteSetting::first()?->update([
             'login_enabled' => $this->loginEnabled,
             'register_enabled' => $this->registerEnabled,
+            'badge_popup_timeout' => $this->badgePopupTimeout,
         ]);
 
         session()->flash('status', 'Site settings updated successfully.');
@@ -264,9 +274,9 @@ class Dashboard extends Component
         $this->redirect(route('admin.dashboard'));
     }
 
-    protected function loadChatSettings(): void
+    protected function loadChatSettings(?SiteSetting $settings = null): void
     {
-        $settings = SiteSetting::first();
+        $settings ??= SiteSetting::first();
         if ($settings) {
             $this->chatEnabled = $settings->chat_enabled ?? false;
             $this->defaultChatCharacterId = $settings->default_chat_character_id;
@@ -284,9 +294,9 @@ class Dashboard extends Component
         $this->redirect(route('admin.dashboard'));
     }
 
-    protected function loadHomepageSettings(): void
+    protected function loadHomepageSettings(?SiteSetting $settings = null): void
     {
-        $settings = SiteSetting::first();
+        $settings ??= SiteSetting::first();
         if ($settings) {
             $this->showEpisodes = $settings->show_episodes ?? true;
             $this->showShorts = $settings->show_shorts ?? true;
@@ -311,6 +321,84 @@ class Dashboard extends Component
         ]);
 
         session()->flash('status', 'Homepage settings updated successfully.');
+        $this->redirect(route('admin.dashboard'));
+    }
+
+    protected function loadDashboardSettings(?SiteSetting $settings = null): void
+    {
+        $settings ??= SiteSetting::first();
+        if ($settings) {
+            $this->dashboardWelcomeTitle = $settings->dashboard_welcome_title ?? '';
+            $this->dashboardWelcomeText = $settings->dashboard_welcome_text ?? '';
+            $this->dashboardNewsItems = $settings->dashboard_news_items ?? [];
+        }
+    }
+
+    public function saveDashboardWelcome(): void
+    {
+        $this->validate([
+            'dashboardWelcomeTitle' => ['nullable', 'string', 'max:255'],
+            'dashboardWelcomeText' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        SiteSetting::first()?->update([
+            'dashboard_welcome_title' => $this->dashboardWelcomeTitle ?: null,
+            'dashboard_welcome_text' => $this->dashboardWelcomeText ?: null,
+        ]);
+
+        session()->flash('status', 'Dashboard welcome text updated.');
+        $this->redirect(route('admin.dashboard'));
+    }
+
+    public function addNewsItem(): void
+    {
+        $item = trim($this->newNewsItem);
+        if ($item === '') {
+            return;
+        }
+
+        $this->dashboardNewsItems[] = $item;
+        $this->newNewsItem = '';
+    }
+
+    public function removeNewsItem(int $index): void
+    {
+        unset($this->dashboardNewsItems[$index]);
+        $this->dashboardNewsItems = array_values($this->dashboardNewsItems);
+    }
+
+    public function moveNewsItemUp(int $index): void
+    {
+        if ($index <= 0) {
+            return;
+        }
+        $items = $this->dashboardNewsItems;
+        [$items[$index - 1], $items[$index]] = [$items[$index], $items[$index - 1]];
+        $this->dashboardNewsItems = $items;
+    }
+
+    public function moveNewsItemDown(int $index): void
+    {
+        if ($index >= count($this->dashboardNewsItems) - 1) {
+            return;
+        }
+        $items = $this->dashboardNewsItems;
+        [$items[$index], $items[$index + 1]] = [$items[$index + 1], $items[$index]];
+        $this->dashboardNewsItems = $items;
+    }
+
+    public function saveDashboardNews(): void
+    {
+        $items = array_filter(array_map('trim', $this->dashboardNewsItems), fn ($i) => $i !== '');
+        $items = array_values($items);
+
+        SiteSetting::first()?->update([
+            'dashboard_news_items' => !empty($items) ? $items : null,
+            'dashboard_news_updated_at' => now(),
+        ]);
+
+        $this->dashboardNewsItems = $items;
+        session()->flash('status', 'Nieuwtjes updated. All users will see the updated news.');
         $this->redirect(route('admin.dashboard'));
     }
 

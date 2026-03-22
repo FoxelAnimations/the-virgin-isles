@@ -229,7 +229,7 @@ class Episodes extends Component
     public function render()
     {
         return view('livewire.admin.episodes', [
-            'episodes' => Episode::with('characters')->orderBy('sort_order')->get(),
+            'episodes' => Episode::with('characters')->withCount('views')->orderBy('sort_order')->get(),
             'characters' => Character::orderBy('first_name')->get(),
         ])->layout('layouts.admin');
     }

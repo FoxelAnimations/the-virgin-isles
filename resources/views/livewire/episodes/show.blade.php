@@ -13,6 +13,11 @@
             this.open = true;
             document.body.classList.add('overflow-hidden');
             Livewire.dispatch('open-episode-interactions', { id: ep.id });
+            // Track view
+            fetch('/api/episodes/' + ep.id + '/view', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content, 'Accept': 'application/json' },
+            }).catch(() => {});
         },
         close() {
             this.open = false;
@@ -164,15 +169,15 @@
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="fixed inset-0 z-50 flex items-start md:items-center justify-center bg-black/95 p-0 md:p-8 overflow-y-auto"
+            class="fixed inset-0 z-50 flex items-start md:items-center justify-center bg-black md:bg-black/95 p-0 md:p-8 overflow-y-auto"
             @click.self="close()"
             style="display: none;"
         >
-            <button @click="close()" class="absolute top-2 right-2 md:top-4 md:right-4 z-10 text-white hover:text-accent transition">
+            <button @click="close()" class="absolute top-2 right-2 md:top-4 md:right-4 z-20 text-white hover:text-accent transition">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
 
-            <div class="w-full max-w-5xl md:max-h-full" @click.stop>
+            <div class="w-full md:max-w-5xl md:max-h-full" @click.stop>
                 {{-- Age Gate Overlay --}}
                 <template x-if="episode?.ageRestricted && !ageConfirmed">
                     <div class="aspect-video bg-zinc-900 rounded-sm overflow-hidden mb-4 flex flex-col items-center justify-center text-center p-8">
@@ -191,7 +196,7 @@
 
                 {{-- Video Player (shown after age confirmation or if not restricted) --}}
                 <template x-if="!episode?.ageRestricted || ageConfirmed">
-                    <div class="aspect-video bg-black rounded-none md:rounded-sm overflow-hidden mb-0 md:mb-4">
+                    <div class="aspect-video bg-black rounded-none md:rounded-sm overflow-hidden mb-0 md:mb-4 w-full">
                         <template x-if="episode && episode.isYoutube && episode.embedUrl">
                             <iframe
                                 :src="episode.embedUrl"

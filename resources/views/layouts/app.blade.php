@@ -51,6 +51,7 @@
 
         @stack('modals')
 
+        <x-badge-popup />
         <x-age-gate />
         <x-character-chat />
 

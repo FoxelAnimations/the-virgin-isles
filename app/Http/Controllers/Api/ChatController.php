@@ -151,8 +151,9 @@ class ChatController extends Controller
             }
         }
 
-        // Find or create conversation
+        // Find or create conversation (limit UA length)
         $userAgent = $request->userAgent();
+        $userAgent = $userAgent ? \Illuminate\Support\Str::limit($userAgent, 500, '') : null;
         $conversation = ChatConversation::firstOrCreate(
             [
                 'visitor_uuid' => $validated['visitor_uuid'],
@@ -178,10 +179,12 @@ class ChatController extends Controller
             $conversation->update($updates);
         }
 
-        // Store visitor message
+        // Store visitor message (strip HTML to prevent stored XSS)
+        $sanitizedMessage = strip_tags($validated['message']);
+
         $conversation->messages()->create([
             'sender' => 'visitor',
-            'content' => $validated['message'],
+            'content' => $sanitizedMessage,
             'is_ai' => false,
         ]);
 
@@ -192,7 +195,7 @@ class ChatController extends Controller
 
         // Notify: email if first message in session and no admin online
         try {
-            $this->sendOfflineNotification($conversation, $validated['message'], $character, $visitorIp);
+            $this->sendOfflineNotification($conversation, $sanitizedMessage, $character, $visitorIp);
         } catch (\Exception $e) {
             report($e);
         }

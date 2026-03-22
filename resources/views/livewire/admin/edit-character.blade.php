@@ -99,6 +99,23 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-zinc-400">{{ __('Color Code') }}</label>
+                    <div class="mt-1 flex items-center gap-3">
+                        <input type="color" wire:model="color_code" value="{{ $color_code ?? '#888888' }}"
+                            class="h-10 w-14 rounded-sm border border-zinc-700 bg-zinc-800 cursor-pointer p-0.5">
+                        <input type="text" wire:model="color_code" placeholder="#FF0000" maxlength="7"
+                            class="w-28 rounded-sm border-zinc-700 bg-zinc-800 text-white shadow-sm focus:border-accent focus:ring-accent text-sm font-mono">
+                        @if ($color_code)
+                            <button type="button" wire:click="$set('color_code', null)" class="text-xs text-zinc-500 hover:text-zinc-300 transition">{{ __('Clear') }}</button>
+                        @endif
+                    </div>
+                    @error('color_code')
+                        <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-1 text-xs text-zinc-600">{{ __('Used as the block color in the camera planner.') }}</p>
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-zinc-400">{{ __('Biography') }}</label>
                     <textarea wire:model="bio" rows="5"
                         class="mt-1 block w-full rounded-sm border-zinc-700 bg-zinc-800 text-white shadow-sm focus:border-accent focus:ring-accent"></textarea>

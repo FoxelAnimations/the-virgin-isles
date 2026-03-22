@@ -332,7 +332,13 @@
                                 @if ($video->characters->isNotEmpty())
                                     <div class="px-2 pb-1.5 flex flex-wrap gap-1">
                                         @foreach ($video->characters as $char)
-                                            <span class="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-purple-900/40 text-purple-300 border border-purple-800/40">{{ $char->first_name }}</span>
+                                            <span class="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-sm border"
+                                                @if ($char->color_code)
+                                                    style="background-color: {{ $char->color_code }}22; color: {{ $char->color_code }}; border-color: {{ $char->color_code }}55;"
+                                                @else
+                                                    style="background-color: rgba(88,28,135,0.4); color: #d8b4fe; border-color: rgba(107,33,168,0.4);"
+                                                @endif
+                                            >{{ $char->first_name }}</span>
                                         @endforeach
                                     </div>
                                 @endif
@@ -490,16 +496,21 @@
                             <template x-for="block in getBlocksForDay({{ $day }})" :key="block.id">
                                 <div
                                     class="absolute left-1 right-1 rounded-sm cursor-pointer z-10 group overflow-hidden select-none"
-                                    :class="block.behaviour_type === 'realtime' ? 'bg-blue-500/80' : 'bg-accent/80'"
+                                    :class="!block.color && block.behaviour_type === 'realtime' ? 'bg-blue-500/80' : (!block.color ? 'bg-accent/80' : '')"
                                     :data-block-id="block.id"
-                                    :style="'top: ' + timeToPixels(block.start_time) + 'px; height: ' + Math.max(20, timeToPixels(block.end_time) - timeToPixels(block.start_time)) + 'px;'"
+                                    :style="'top: ' + timeToPixels(block.start_time) + 'px; height: ' + Math.max(20, timeToPixels(block.end_time) - timeToPixels(block.start_time)) + 'px;' + (block.color ? 'background-color: ' + block.color + 'cc;' : '')"
                                 >
                                     <div class="px-1.5 py-0.5 flex items-center gap-1">
                                         <span x-show="block.behaviour_type === 'realtime'"
-                                            class="text-[8px] font-bold bg-blue-900/50 text-blue-200 px-1 rounded-sm shrink-0">RT</span>
-                                        <span class="text-[10px] font-semibold text-black truncate" x-text="block.video_name || 'Video'"></span>
+                                            class="text-[8px] font-bold px-1 rounded-sm shrink-0"
+                                            :class="block.color ? 'bg-black/20 text-white/90' : 'bg-blue-900/50 text-blue-200'">RT</span>
+                                        <span class="text-[10px] font-semibold truncate"
+                                            :class="block.color ? 'text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]' : 'text-black'"
+                                            x-text="block.video_name || 'Video'"></span>
                                     </div>
-                                    <div class="px-1.5 text-[9px] text-black/70" x-text="block.start_time + ' – ' + block.end_time"></div>
+                                    <div class="px-1.5 text-[9px]"
+                                        :class="block.color ? 'text-white/80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]' : 'text-black/70'"
+                                        x-text="block.start_time + ' – ' + block.end_time"></div>
 
                                     {{-- Resize handle — hidden for realtime blocks --}}
                                     <div class="absolute bottom-0 left-0 right-0 h-3 cursor-s-resize bg-black/20 opacity-0 group-hover:opacity-100 transition"
@@ -650,6 +661,9 @@
                                     <label class="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-zinc-700/50 cursor-pointer transition">
                                         <input type="checkbox" wire:model="newVideoCharacters" value="{{ $character->id }}"
                                             class="accent-accent rounded-sm">
+                                        @if ($character->color_code)
+                                            <span class="w-3 h-3 rounded-full shrink-0 border border-white/20" style="background-color: {{ $character->color_code }};"></span>
+                                        @endif
                                         <span class="text-sm text-white">{{ $character->full_name }}</span>
                                     </label>
                                 @endforeach
@@ -767,6 +781,9 @@
                                     <label class="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-zinc-700/50 cursor-pointer transition">
                                         <input type="checkbox" wire:model="editVideoCharacters" value="{{ $character->id }}"
                                             class="accent-accent rounded-sm">
+                                        @if ($character->color_code)
+                                            <span class="w-3 h-3 rounded-full shrink-0 border border-white/20" style="background-color: {{ $character->color_code }};"></span>
+                                        @endif
                                         <span class="text-sm text-white">{{ $character->full_name }}</span>
                                     </label>
                                 @endforeach

@@ -27,6 +27,11 @@ class SiteSetting extends Model
         'show_collabs',
         'show_quotes',
         'carousel_title',
+        'badge_popup_timeout',
+        'dashboard_welcome_title',
+        'dashboard_welcome_text',
+        'dashboard_news_items',
+        'dashboard_news_updated_at',
     ];
 
     protected function casts(): array
@@ -42,6 +47,8 @@ class SiteSetting extends Model
             'show_specials' => 'boolean',
             'show_collabs' => 'boolean',
             'show_quotes' => 'boolean',
+            'dashboard_news_items' => 'array',
+            'dashboard_news_updated_at' => 'datetime',
         ];
     }
 

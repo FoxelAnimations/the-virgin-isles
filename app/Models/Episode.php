@@ -47,6 +47,11 @@ class Episode extends Model
         return $this->hasMany(EpisodeComment::class);
     }
 
+    public function views()
+    {
+        return $this->hasMany(EpisodeView::class);
+    }
+
     public function isYoutube(): bool
     {
         return $this->source_type === 'youtube';

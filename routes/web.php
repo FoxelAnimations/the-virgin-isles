@@ -32,7 +32,14 @@ use App\Livewire\Admin\BeaconDetail;
 use App\Livewire\Admin\BeaconTypes;
 use App\Livewire\Admin\BeaconLogs;
 use App\Livewire\Admin\BeaconAnalytics;
+use App\Livewire\Admin\EpisodeAnalytics;
+use App\Livewire\Admin\Badges as AdminBadges;
+use App\Livewire\Admin\BadgeTypes as AdminBadgeTypes;
+use App\Livewire\Admin\Locations as AdminLocations;
+use App\Livewire\Admin\LocationCategories as AdminLocationCategories;
+use App\Livewire\MapPage;
 use App\Livewire\Cameras\Index as CameraIndex;
+use App\Livewire\Cameras\Show as CameraShow;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Home::class)->name('home');
@@ -43,12 +50,19 @@ Route::get('/blog/{slug}', BlogShow::class)->name('blog.show');
 Route::get('/collabs', CollabIndex::class)->name('collabs');
 Route::get('/collabs/{slug}', CollabShow::class)->name('collabs.show');
 Route::get('/cameras', CameraIndex::class)->name('cameras.index');
+Route::get('/cameras/{camera}', CameraShow::class)->name('cameras.show');
+Route::get('/map', MapPage::class)->name('map');
 
 // Public beacon scan endpoint (rate limiting handled inside controller to allow logging with flag)
 Route::get('/beacon/{guid}', [BeaconController::class, 'scan'])
     ->name('beacon.scan');
 
 Route::get('/admin/login', AdminLogin::class)->middleware('guest')->name('admin.login');
+
+// Block Jetstream profile page — redirect to dashboard
+Route::get('/user/profile', fn () => redirect()->route('dashboard'))
+    ->middleware(['auth:sanctum'])
+    ->name('profile.show');
 
 Route::middleware([
     'auth:sanctum',
@@ -64,6 +78,7 @@ Route::middleware([
         Route::get('/admin/characters/{character}/edit', EditCharacter::class)->name('characters.edit');
         Route::get('/admin/jobs/create', CreateJob::class)->name('jobs.create');
         Route::get('/admin/episodes', AdminEpisodes::class)->name('admin.episodes');
+        Route::get('/admin/episodes/analytics', EpisodeAnalytics::class)->name('admin.episode-analytics');
         Route::get('/admin/users', AdminUsers::class)->name('admin.users');
         Route::get('/admin/chats', ChatList::class)->name('admin.chats');
         Route::get('/admin/chats/blocked', BlockedVisitors::class)->name('admin.chats.blocked');
@@ -82,6 +97,14 @@ Route::middleware([
         Route::get('/admin/beacons/logs', BeaconLogs::class)->name('admin.beacon-logs');
         Route::get('/admin/beacons/analytics', BeaconAnalytics::class)->name('admin.beacon-analytics');
         Route::get('/admin/beacons/{beacon}', BeaconDetail::class)->name('admin.beacon-detail');
+
+        // Badges
+        Route::get('/admin/badges', AdminBadges::class)->name('admin.badges');
+        Route::get('/admin/badges/types', AdminBadgeTypes::class)->name('admin.badge-types');
+
+        // Locations
+        Route::get('/admin/locations', AdminLocations::class)->name('admin.locations');
+        Route::get('/admin/locations/categories', AdminLocationCategories::class)->name('admin.location-categories');
 
         // Admin beacon scan lookup — redirects to detail page without registering a scan
         Route::get('/admin/scan/goto/{guid}', function (string $guid) {

@@ -562,9 +562,10 @@ class CameraPlanner extends Component
 
     protected function dispatchScheduleUpdate(): void
     {
-        $scheduled = $this->camera->scheduledVideos()->with('video')->get();
+        $scheduled = $this->camera->scheduledVideos()->with('video.characters')->get();
 
         $data = $scheduled->map(function ($item) {
+            $firstChar = $item->video?->characters->first();
             return [
                 'id' => $item->id,
                 'video_id' => $item->camera_video_id,
@@ -574,6 +575,7 @@ class CameraPlanner extends Component
                 'day_of_week' => $item->day_of_week,
                 'start_time' => substr($item->start_time, 0, 5),
                 'end_time' => substr($item->end_time, 0, 5),
+                'color' => $firstChar?->color_code,
             ];
         })->values()->toArray();
 
@@ -599,7 +601,7 @@ class CameraPlanner extends Component
     {
         $videos = $this->camera->videos()->with('characters')->orderBy('sort_order')->get();
         $defaults = $this->camera->defaultBlocks()->with('video')->get();
-        $scheduled = $this->camera->scheduledVideos()->with('video')->get();
+        $scheduled = $this->camera->scheduledVideos()->with('video.characters')->get();
         $defaultSounds = $this->camera->defaultSounds()->get()->keyBy('time_slot');
 
         $videosMeta = $videos->mapWithKeys(fn ($v) => [
@@ -607,6 +609,7 @@ class CameraPlanner extends Component
                 'id' => $v->id,
                 'behaviour_type' => $v->behaviour_type ?? 'loop',
                 'duration_seconds' => $v->duration_seconds,
+                'color' => $v->characters->first()?->color_code,
             ]
         ])->toArray();
 
@@ -623,6 +626,7 @@ class CameraPlanner extends Component
                 });
             }),
             'scheduled' => $scheduled->map(function ($item) {
+                $firstChar = $item->video?->characters->first();
                 return [
                     'id' => $item->id,
                     'video_id' => $item->camera_video_id,
@@ -632,13 +636,14 @@ class CameraPlanner extends Component
                     'day_of_week' => $item->day_of_week,
                     'start_time' => substr($item->start_time, 0, 5),
                     'end_time' => substr($item->end_time, 0, 5),
+                    'color' => $firstChar?->color_code,
                 ];
             })->values(),
             'slots' => CameraDefaultBlock::slots(),
             'days' => CameraDefaultBlock::DAY_LABELS,
         ];
 
-        $characters = Character::orderBy('sort_order')->get(['id', 'first_name', 'last_name']);
+        $characters = Character::orderBy('sort_order')->get(['id', 'first_name', 'last_name', 'color_code']);
 
         return view('livewire.admin.camera-planner', [
             'videos' => $videos,

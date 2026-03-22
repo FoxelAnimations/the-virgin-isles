@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Badge;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,19 @@ class Users extends Component
     public string $editingName = '';
     public string $editingEmail = '';
     public bool $editingIsAdmin = false;
+
+    // Block modal
+    public bool $showBlockModal = false;
+    public ?int $blockUserId = null;
+    public string $blockType = 'account';
+    public string $blockDuration = 'indefinite';
+    public string $blockReason = '';
+
+    // Badge management modal
+    public bool $showBadgeModal = false;
+    public ?int $badgeUserId = null;
+    public ?int $assignBadgeId = null;
+    public int $assignBadgeCount = 1;
 
     public bool $showCreateModal = false;
     public string $newName = '';
@@ -106,23 +120,91 @@ class Users extends Component
         session()->flash('status', $status);
     }
 
-    public function toggleBlock(int $id): void
+    public function openBlockModal(int $userId, string $type = 'account'): void
     {
-        $user = User::findOrFail($id);
+        $this->blockUserId = $userId;
+        $this->blockType = $type;
+        $this->blockDuration = 'indefinite';
+        $this->blockReason = '';
+        $this->showBlockModal = true;
+    }
+
+    public function closeBlockModal(): void
+    {
+        $this->showBlockModal = false;
+        $this->reset(['blockUserId', 'blockType', 'blockDuration', 'blockReason']);
+    }
+
+    public function blockUser(): void
+    {
+        $this->validate([
+            'blockReason' => ['required', 'string', 'max:500'],
+            'blockDuration' => ['required', 'in:day,indefinite'],
+            'blockType' => ['required', 'in:account,comment'],
+        ]);
+
+        $user = User::findOrFail($this->blockUserId);
 
         if ($user->id === Auth::id()) {
             session()->flash('status', 'You cannot block yourself.');
+            $this->closeBlockModal();
             return;
         }
 
-        $user->update(['is_blocked' => !$user->is_blocked]);
+        $expiresAt = $this->blockDuration === 'day' ? now()->addDay() : null;
 
-        if ($user->is_blocked) {
-            DB::table('sessions')->where('user_id', $user->id)->delete();
+        $reason = strip_tags($this->blockReason);
+
+        if ($this->blockType === 'account') {
+            DB::transaction(function () use ($user, $expiresAt, $reason) {
+                $user->update([
+                    'is_blocked' => true,
+                    'blocked_until' => $expiresAt,
+                    'block_reason' => $reason,
+                    'blocked_by' => Auth::id(),
+                ]);
+                // Revoke all API tokens
+                $user->tokens()->delete();
+                // Invalidate all sessions
+                DB::table('sessions')->where('user_id', $user->id)->delete();
+            });
+            $label = $expiresAt ? 'Account blocked for 24 hours.' : 'Account permanently blocked.';
+        } else {
+            $user->update([
+                'is_comment_blocked' => true,
+                'comment_blocked_until' => $expiresAt,
+                'comment_block_reason' => $reason,
+                'comment_blocked_by' => Auth::id(),
+            ]);
+            $label = $expiresAt ? 'Comments blocked for 24 hours.' : 'Comments permanently blocked.';
         }
 
-        $status = $user->is_blocked ? 'User blocked.' : 'User unblocked.';
-        session()->flash('status', $status);
+        $this->closeBlockModal();
+        session()->flash('status', $label);
+    }
+
+    public function unblockAccount(int $id): void
+    {
+        $user = User::findOrFail($id);
+        $user->update([
+            'is_blocked' => false,
+            'blocked_until' => null,
+            'block_reason' => null,
+            'blocked_by' => null,
+        ]);
+        session()->flash('status', 'Account unblocked.');
+    }
+
+    public function unblockComments(int $id): void
+    {
+        $user = User::findOrFail($id);
+        $user->update([
+            'is_comment_blocked' => false,
+            'comment_blocked_until' => null,
+            'comment_block_reason' => null,
+            'comment_blocked_by' => null,
+        ]);
+        session()->flash('status', 'Comments unblocked.');
     }
 
     public function delete(int $id): void
@@ -140,10 +222,91 @@ class Users extends Component
         session()->flash('status', 'User deleted successfully.');
     }
 
+    public function openBadges(int $id): void
+    {
+        $this->badgeUserId = $id;
+        $this->assignBadgeId = null;
+        $this->assignBadgeCount = 1;
+        $this->showBadgeModal = true;
+    }
+
+    public function closeBadges(): void
+    {
+        $this->showBadgeModal = false;
+        $this->reset(['badgeUserId', 'assignBadgeId', 'assignBadgeCount']);
+    }
+
+    public function assignBadge(): void
+    {
+        $this->validate([
+            'assignBadgeId' => ['required', 'exists:badges,id'],
+            'assignBadgeCount' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $user = User::findOrFail($this->badgeUserId);
+
+        $existing = DB::table('badge_user')
+            ->where('badge_id', $this->assignBadgeId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if ($existing) {
+            DB::table('badge_user')
+                ->where('badge_id', $this->assignBadgeId)
+                ->where('user_id', $user->id)
+                ->update(['count' => $this->assignBadgeCount, 'updated_at' => now()]);
+        } else {
+            DB::table('badge_user')->insert([
+                'badge_id' => $this->assignBadgeId,
+                'user_id' => $user->id,
+                'count' => $this->assignBadgeCount,
+                'collected_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $this->assignBadgeId = null;
+        $this->assignBadgeCount = 1;
+        session()->flash('status', 'Badge assigned.');
+    }
+
+    public function updateBadgeCount(int $badgeId, int $count): void
+    {
+        if ($count < 0) $count = 0;
+
+        DB::table('badge_user')
+            ->where('badge_id', $badgeId)
+            ->where('user_id', $this->badgeUserId)
+            ->update(['count' => $count, 'updated_at' => now()]);
+    }
+
+    public function removeBadge(int $badgeId): void
+    {
+        DB::table('badge_user')
+            ->where('badge_id', $badgeId)
+            ->where('user_id', $this->badgeUserId)
+            ->delete();
+
+        session()->flash('status', 'Badge removed from user.');
+    }
+
     public function render()
     {
-        return view('livewire.admin.users', [
+        $data = [
             'users' => User::orderBy('name')->get(),
-        ])->layout('layouts.admin');
+        ];
+
+        if ($this->showBadgeModal && $this->badgeUserId) {
+            $data['badgeUser'] = User::find($this->badgeUserId);
+            $data['userBadges'] = DB::table('badge_user')
+                ->join('badges', 'badges.id', '=', 'badge_user.badge_id')
+                ->where('badge_user.user_id', $this->badgeUserId)
+                ->whereNull('badges.deleted_at')
+                ->select('badges.id', 'badges.title', 'badges.image_path', 'badge_user.count', 'badge_user.collected_at')
+                ->get();
+            $data['allBadges'] = Badge::orderBy('title')->get();
+        }
+
+        return view('livewire.admin.users', $data)->layout('layouts.admin');
     }
 }

@@ -17,6 +17,10 @@
         <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
+        <!-- Leaflet (for admin map pickers) -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -71,6 +75,8 @@
                         <a href="{{ route('admin.quotes') }}" class="{{ request()->routeIs('admin.quotes') ? 'text-accent' : 'text-zinc-400' }} text-xs tracking-widest transition hover:text-accent">QUOTES</a>
                         <a href="{{ route('admin.cameras') }}" class="{{ request()->routeIs('admin.cameras*') ? 'text-accent' : 'text-zinc-400' }} text-xs tracking-widest transition hover:text-accent">CAMERAS</a>
                         <a href="{{ route('admin.beacons') }}" class="{{ request()->routeIs('admin.beacon*') ? 'text-accent' : 'text-zinc-400' }} text-xs tracking-widest transition hover:text-accent">BEACONS</a>
+                        <a href="{{ route('admin.badges') }}" class="{{ request()->routeIs('admin.badge*') ? 'text-accent' : 'text-zinc-400' }} text-xs tracking-widest transition hover:text-accent">BADGES</a>
+                        <a href="{{ route('admin.locations') }}" class="{{ request()->routeIs('admin.location*') ? 'text-accent' : 'text-zinc-400' }} text-xs tracking-widest transition hover:text-accent">LOCATIONS</a>
                         <a href="{{ route('admin.chats') }}" class="{{ request()->routeIs('admin.chats*') ? 'text-accent' : 'text-zinc-400' }} text-xs tracking-widest transition hover:text-accent relative">
                             CHATS
                             @if (($unreadChatCount ?? 0) > 0)
@@ -113,6 +119,8 @@
                     <div class="mx-4 my-1 border-t border-zinc-800"></div>
                     <a href="{{ route('admin.cameras') }}" class="block px-4 py-2 {{ request()->routeIs('admin.cameras*') ? 'text-accent' : 'text-zinc-400' }} text-sm tracking-widest hover:text-accent transition">CAMERAS</a>
                     <a href="{{ route('admin.beacons') }}" class="block px-4 py-2 {{ request()->routeIs('admin.beacon*') ? 'text-accent' : 'text-zinc-400' }} text-sm tracking-widest hover:text-accent transition">BEACONS</a>
+                    <a href="{{ route('admin.badges') }}" class="block px-4 py-2 {{ request()->routeIs('admin.badge*') ? 'text-accent' : 'text-zinc-400' }} text-sm tracking-widest hover:text-accent transition">BADGES</a>
+                    <a href="{{ route('admin.locations') }}" class="block px-4 py-2 {{ request()->routeIs('admin.location*') ? 'text-accent' : 'text-zinc-400' }} text-sm tracking-widest hover:text-accent transition">LOCATIONS</a>
                     <a href="{{ route('admin.chats') }}" class="block px-4 py-2 {{ request()->routeIs('admin.chats*') ? 'text-accent' : 'text-zinc-400' }} text-sm tracking-widest hover:text-accent transition">
                         CHATS
                         @if (($unreadChatCount ?? 0) > 0)

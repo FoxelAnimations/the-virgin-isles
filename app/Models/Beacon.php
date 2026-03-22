@@ -24,6 +24,7 @@ class Beacon extends Model
         'is_out_of_action',
         'is_collectible',
         'badge_image_path',
+        'activation_date',
         'out_of_action_mode',
         'out_of_action_redirect_url',
         'out_of_action_message',
@@ -38,6 +39,7 @@ class Beacon extends Model
             'is_online' => 'boolean',
             'is_out_of_action' => 'boolean',
             'is_collectible' => 'boolean',
+            'activation_date' => 'date',
         ];
     }
 
@@ -115,5 +117,20 @@ class Beacon extends Model
     public function scopeOutOfAction($query)
     {
         return $query->where('is_out_of_action', true);
+    }
+
+    public function badges(): BelongsToMany
+    {
+        return $this->belongsToMany(Badge::class, 'badge_beacon');
+    }
+
+    public function locations(): BelongsToMany
+    {
+        return $this->belongsToMany(Location::class, 'beacon_location');
+    }
+
+    public function isBeforeActivation(): bool
+    {
+        return $this->activation_date && $this->activation_date->isFuture();
     }
 }

@@ -37,7 +37,7 @@ class ChatView extends Component
             'visitorName' => ['nullable', 'string', 'max:100'],
         ]);
 
-        $name = trim($this->visitorName);
+        $name = strip_tags(trim($this->visitorName));
         $this->conversation->update(['visitor_name' => $name ?: null]);
         $this->editingName = false;
     }
@@ -54,7 +54,7 @@ class ChatView extends Component
 
         $this->conversation->messages()->create([
             'sender' => 'character',
-            'content' => $this->reply,
+            'content' => strip_tags($this->reply),
             'is_ai' => false,
         ]);
 
@@ -96,7 +96,7 @@ class ChatView extends Component
         ChatBlock::create([
             'ip_address' => $ip,
             'visitor_uuid' => $this->conversation->visitor_uuid,
-            'reason' => $this->blockReason,
+            'reason' => strip_tags($this->blockReason),
             'blocked_by' => auth()->id(),
             'expires_at' => $this->blockDuration === 'day' ? now()->addDay() : null,
         ]);

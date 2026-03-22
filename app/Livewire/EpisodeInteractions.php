@@ -47,6 +47,10 @@ class EpisodeInteractions extends Component
             return;
         }
 
+        if (Auth::user()->isCommentBlocked()) {
+            return;
+        }
+
         $rating = max(1, min(5, $rating));
 
         EpisodeRating::updateOrCreate(
@@ -60,6 +64,11 @@ class EpisodeInteractions extends Component
     public function addComment(): void
     {
         if (! Auth::check() || ! $this->episodeId) {
+            return;
+        }
+
+        if (Auth::user()->isCommentBlocked()) {
+            $this->addError('commentBody', 'Je bent geblokkeerd om reacties te plaatsen.');
             return;
         }
 
@@ -79,7 +88,7 @@ class EpisodeInteractions extends Component
         EpisodeComment::create([
             'user_id' => Auth::id(),
             'episode_id' => $this->episodeId,
-            'body' => $this->commentBody,
+            'body' => strip_tags($this->commentBody),
         ]);
 
         $this->commentBody = '';

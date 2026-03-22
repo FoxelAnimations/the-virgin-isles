@@ -63,9 +63,12 @@ class FortifyServiceProvider extends ServiceProvider
             $user = User::where('email', $request->email)->first();
 
             if ($user && Hash::check($request->password, $user->password)) {
-                if ($user->is_blocked) {
+                if ($user->isAccountBlocked()) {
+                    $msg = $user->blocked_until
+                        ? __('Your account has been temporarily blocked.')
+                        : __('Your account has been blocked.');
                     throw \Illuminate\Validation\ValidationException::withMessages([
-                        Fortify::username() => [__('Your account has been blocked.')],
+                        Fortify::username() => [$msg],
                     ]);
                 }
                 return $user;

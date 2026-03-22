@@ -140,17 +140,22 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-4 text-center">
-                                        <div class="flex items-center justify-center gap-2">
-                                            @if ($beacon->is_out_of_action)
-                                                <button wire:click="toggleOutOfAction({{ $beacon->id }})"
-                                                    class="inline-flex items-center px-2 py-1 text-xs font-semibold bg-orange-900/30 text-orange-400 border border-orange-800 rounded-sm transition hover:bg-orange-900/50">
-                                                    Out of Action
-                                                </button>
-                                            @else
-                                                <button wire:click="toggleOnline({{ $beacon->id }})"
-                                                    class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-sm transition {{ $beacon->is_online ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-red-900/30 text-red-400 border border-red-800' }}">
-                                                    {{ $beacon->is_online ? 'Online' : 'Offline' }}
-                                                </button>
+                                        <div class="flex flex-col items-center gap-1">
+                                            <div class="flex items-center gap-2">
+                                                @if ($beacon->is_out_of_action)
+                                                    <button wire:click="toggleOutOfAction({{ $beacon->id }})"
+                                                        class="inline-flex items-center px-2 py-1 text-xs font-semibold bg-orange-900/30 text-orange-400 border border-orange-800 rounded-sm transition hover:bg-orange-900/50">
+                                                        Out of Action
+                                                    </button>
+                                                @else
+                                                    <button wire:click="toggleOnline({{ $beacon->id }})"
+                                                        class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-sm transition {{ $beacon->is_online ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-red-900/30 text-red-400 border border-red-800' }}">
+                                                        {{ $beacon->is_online ? 'Online' : 'Offline' }}
+                                                    </button>
+                                                @endif
+                                            </div>
+                                            @if ($beacon->activation_date && $beacon->isBeforeActivation())
+                                                <span class="text-[10px] text-yellow-400 font-mono">{{ $beacon->activation_date->format('d M Y') }}</span>
                                             @endif
                                         </div>
                                     </td>

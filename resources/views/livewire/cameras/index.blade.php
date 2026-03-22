@@ -23,9 +23,9 @@
         @else
             <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($cameras as $camera)
-                    <div class="border border-zinc-800 bg-zinc-900/50 rounded-sm overflow-hidden cursor-pointer backdrop-blur-sm"
-                        data-camera-id="{{ $camera->id }}"
-                        @click="openPopup({{ $camera->id }}, '{{ $camera->name }}')">
+                    <a href="{{ route('cameras.show', $camera) }}"
+                        class="block border border-zinc-800 bg-zinc-900/50 rounded-sm overflow-hidden cursor-pointer backdrop-blur-sm hover:border-zinc-600 transition"
+                        data-camera-id="{{ $camera->id }}">
 
                         {{-- Camera Header --}}
                         <div class="flex items-center justify-between px-3 py-2 bg-zinc-800/80">
@@ -107,180 +107,12 @@
                                 <span class="text-[9px] font-bold text-red-500/80 tracking-wider">REC</span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
-
-                {{-- Popup Modal --}}
-                <template x-teleport="body">
-                    <div x-show="popup.open" x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
-                        @keydown.escape.window="closePopup()" style="display: none;">
-                        <div class="absolute inset-0" @click="closePopup()"></div>
-
-                        <div class="relative max-w-4xl max-h-[90vh]" @click.stop>
-                            {{-- Header --}}
-                            <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 border-b-0 px-4 py-3 rounded-t-sm">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-sm uppercase tracking-wider font-semibold text-white" x-text="popup.name"></span>
-                                    <span class="flex items-center gap-1.5"
-                                        :class="popup.id && getCameraStatus(popup.id) === 'online' ? 'text-green-400' : 'text-red-400'">
-                                        <span class="w-2 h-2 rounded-full"
-                                            :class="popup.id && getCameraStatus(popup.id) === 'online' ? 'bg-green-400 animate-pulse' : 'bg-red-500'"></span>
-                                        <span class="text-[10px] uppercase tracking-wider font-bold"
-                                            x-text="popup.id && getCameraStatus(popup.id) === 'online' ? 'LIVE' : 'OFFLINE'"></span>
-                                    </span>
-                                    {{-- Weather in popup header --}}
-                                    <span class="flex items-center gap-1.5 text-zinc-400 ml-2" x-show="weatherEnabled && weatherData.weather_code !== undefined" x-cloak>
-                                        <span class="text-sm" x-text="getWeatherIcon()"></span>
-                                        <span class="text-[10px] font-mono text-white/60" x-text="weatherData.temperature !== null ? Math.round(weatherData.temperature) + '°C' : ''"></span>
-                                        <span class="text-[10px] text-zinc-500" x-text="getWeatherDescription()"></span>
-                                        <span class="text-[10px] text-blue-400/70" x-show="weatherData.rain > 0" x-text="weatherData.rain.toFixed(1) + ' mm/u'"></span>
-                                    </span>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    {{-- Audio toggle --}}
-                                    <button @click="toggleMute()" class="text-zinc-400 hover:text-white transition" title="Audio aan/uit">
-                                        <svg x-show="!popup.muted" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M17.95 6.05a8 8 0 010 11.9M11 5L6 9H2v6h4l5 4V5z"/>
-                                        </svg>
-                                        <svg x-show="popup.muted" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
-                                        </svg>
-                                    </button>
-                                    {{-- Close --}}
-                                    <button @click="closePopup()" class="text-zinc-400 hover:text-white transition">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {{-- Video --}}
-                            <div class="relative border border-zinc-800 border-t-0 rounded-b-sm overflow-hidden">
-
-                                {{-- Sky background layer --}}
-                                <div class="absolute inset-0 z-[0]"
-                                    :style="{ backgroundColor: skyColor }">
-                                    <template x-if="popup.id && getCameraBackgroundIsVideo(popup.id)">
-                                        <video
-                                            x-ref="popupBgVideo"
-                                            :src="getCameraBackgroundUrl(popup.id)"
-                                            autoplay loop muted playsinline
-                                            class="absolute inset-0 w-full h-full object-cover opacity-90 mix-blend-soft-light"
-                                        ></video>
-                                    </template>
-                                    <template x-if="popup.id && !getCameraBackgroundIsVideo(popup.id) && getCameraBackgroundUrl(popup.id)">
-                                        <img
-                                            :src="getCameraBackgroundUrl(popup.id)"
-                                            class="absolute inset-0 w-full h-full object-cover opacity-90 mix-blend-soft-light"
-                                            alt=""
-                                        >
-                                    </template>
-                                </div>
-
-                                {{-- Popup weather effects --}}
-                                <div class="absolute inset-0 overflow-hidden pointer-events-none z-[1]" x-show="weatherEnabled" x-cloak>
-                                    {{-- Clouds --}}
-                                    <div class="absolute inset-0" :style="{ opacity: cloudOpacity, transition: 'opacity 5s ease' }">
-                                        <template x-for="cloud in popupClouds" :key="cloud.id">
-                                            <div class="cloud-shape absolute" :style="{
-                                                top: cloud.top + '%',
-                                                width: cloud.width + 'px',
-                                                height: cloud.height + 'px',
-                                                filter: 'blur(' + cloud.blur + 'px)',
-                                                animation: 'cloud-drift-card ' + cloud.speed + 's linear infinite',
-                                                animationDelay: cloud.delay + 's',
-                                                opacity: cloud.opacity,
-                                            }">
-                                                <div class="absolute rounded-full" :style="{
-                                                    width: '60%', height: '70%', bottom: '0', left: '10%',
-                                                    backgroundColor: scaleCloudAlpha(cloudColor, 0.4),
-                                                }"></div>
-                                                <div class="absolute rounded-full" :style="{
-                                                    width: '50%', height: '85%', bottom: '5%', left: '25%',
-                                                    backgroundColor: scaleCloudAlpha(cloudColor, 0.5),
-                                                }"></div>
-                                                <div class="absolute rounded-full" :style="{
-                                                    width: '45%', height: '65%', bottom: '0', left: '50%',
-                                                    backgroundColor: scaleCloudAlpha(cloudColor, 0.35),
-                                                }"></div>
-                                                <div class="absolute rounded-full" :style="{
-                                                    width: '35%', height: '50%', bottom: '10%', left: '5%',
-                                                    backgroundColor: scaleCloudAlpha(cloudColor, 0.3),
-                                                }"></div>
-                                                <div class="absolute rounded-full" :style="{
-                                                    width: '30%', height: '45%', bottom: '5%', left: '60%',
-                                                    backgroundColor: scaleCloudAlpha(cloudColor, 0.25),
-                                                }"></div>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    {{-- Rain canvas (above clouds, behind video) --}}
-                                    <canvas class="absolute inset-0 w-full h-full rain-canvas"></canvas>
-                                </div>
-
-                                {{-- Video element (relative so it drives container size) --}}
-                                <video
-                                    x-ref="popupVideo"
-                                    autoplay playsinline muted
-                                    class="relative z-[2] w-full"
-                                    x-show="popup.id && getCameraStatus(popup.id) === 'online' && getCameraVideoUrl(popup.id)"
-                                    style="display: none; max-height: 70vh;"
-                                ></video>
-
-                                {{-- Separate audio element --}}
-                                <audio x-ref="popupAudio" preload="none" style="display: none;"></audio>
-
-                                {{-- Default slot sound (ambient, loops continuously per time slot) --}}
-                                <audio x-ref="slotSound" preload="none" loop style="display: none;"></audio>
-
-                                {{-- Fallback aspect ratio when offline / no video --}}
-                                <div x-show="!popup.id || getCameraStatus(popup.id) !== 'online' || !getCameraVideoUrl(popup.id)"
-                                    class="w-[640px] max-w-full aspect-video"></div>
-
-                                {{-- Color overlay --}}
-                                <div class="absolute inset-0 z-[3] pointer-events-none"
-                                    :style="{ backgroundColor: overlayColor }"></div>
-
-                                {{-- Offline --}}
-                                <div x-show="!popup.id || getCameraStatus(popup.id) !== 'online' || !getCameraVideoUrl(popup.id)"
-                                    class="absolute inset-0 z-[4] flex flex-col items-center justify-center bg-zinc-900/80">
-                                    <svg class="w-16 h-16 text-zinc-700 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                        <line x1="3" y1="21" x2="21" y2="3" stroke-width="1.5" stroke-linecap="round"/>
-                                    </svg>
-                                    <p class="text-zinc-500 text-sm uppercase tracking-wider font-semibold">Camera offline</p>
-                                    <p class="text-zinc-600 text-xs uppercase tracking-wider">Geen signaal</p>
-                                </div>
-
-                                {{-- Camera static effect --}}
-                                <div class="absolute inset-0 pointer-events-none z-[5]" x-show="popup.id && getCameraStaticEnabled(popup.id)" x-cloak>
-                                    <div class="camera-scanlines absolute inset-0" :style="{ opacity: popup.id ? getCameraStaticIntensity(popup.id) / 200 : 0 }"></div>
-                                    <canvas class="camera-noise absolute inset-0 w-full h-full" :data-camera-id="popup.id" data-static-scope="popup" :style="{ opacity: popup.id ? getCameraStaticIntensity(popup.id) / 250 : 0 }"></canvas>
-                                </div>
-
-                                {{-- Timestamp --}}
-                                <div class="absolute bottom-2 right-3 text-[10px] font-mono text-white/40 tracking-wider z-[6]"
-                                    x-text="getCurrentTimestamp()"></div>
-
-                                {{-- REC --}}
-                                <div class="absolute top-3 left-3 flex items-center gap-1.5 z-[6]"
-                                    x-show="popup.id && getCameraStatus(popup.id) === 'online'">
-                                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                                    <span class="text-[10px] font-bold text-red-500/80 tracking-wider">REC</span>
-                                </div>
-                            </div>
-
-                            {{-- Description --}}
-                            <div x-show="popup.id && getCameraDescription(popup.id)"
-                                 class="bg-zinc-900 border border-zinc-800 border-t-0 px-4 py-3">
-                                <div class="prose prose-invert prose-sm prose-zinc font-description max-w-none content-block-text" x-html="getCameraDescription(popup.id)"></div>
-                            </div>
-                        </div>
-                    </div>
-                </template>
             </div>
         @endif
     </section>
+    {{-- POPUP_REMOVED --}}
 
     <style>
         @keyframes cloud-drift-card {

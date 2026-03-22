@@ -7,9 +7,14 @@
                 <p class="text-sm uppercase tracking-[0.3em] text-zinc-500">CMS</p>
                 <h1 class="text-4xl font-bold uppercase tracking-wider">{{ __('Episodes') }}</h1>
             </div>
-            <button wire:click="openCreate" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
-                {{ __('New Episode') }}
-            </button>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.episode-analytics') }}" class="inline-flex items-center border border-zinc-700 text-zinc-400 px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:text-white hover:border-zinc-500">
+                    {{ __('Analytics') }}
+                </a>
+                <button wire:click="openCreate" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
+                    {{ __('New Episode') }}
+                </button>
+            </div>
         </div>
 
         @if (session('status'))
@@ -55,6 +60,7 @@
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Category') }}</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Type') }}</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Characters') }}</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Views') }}</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-zinc-500 uppercase tracking-wider">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
@@ -94,6 +100,12 @@
                                                 <span class="inline-flex px-2 py-0.5 text-xs bg-zinc-800 text-zinc-300 rounded-sm">{{ $char->first_name }}</span>
                                             @endforeach
                                         </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <span class="inline-flex items-center gap-1 text-sm text-zinc-400" title="{{ $episode->views_count }} views">
+                                            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                            {{ number_format($episode->views_count) }}
+                                        </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                                         <button wire:click="edit({{ $episode->id }})" class="inline-flex items-center border border-zinc-700 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:border-accent hover:text-accent transition">

@@ -4,17 +4,25 @@
         <div class="mb-6">
             <div class="flex items-center gap-4">
                 @auth
-                    <div class="flex gap-1" x-data="{ hoverRating: 0 }">
-                        @for ($i = 1; $i <= 5; $i++)
-                            <button
-                                wire:click="rate({{ $i }})"
-                                @mouseenter="hoverRating = {{ $i }}"
-                                @mouseleave="hoverRating = 0"
-                                class="text-2xl transition cursor-pointer focus:outline-none"
-                                :class="(hoverRating > 0 ? hoverRating : {{ $userRating }}) >= {{ $i }} ? 'text-accent' : 'text-zinc-600 hover:text-zinc-400'"
-                            >&#9733;</button>
-                        @endfor
-                    </div>
+                    @if(auth()->user()->isCommentBlocked())
+                        <div class="flex gap-0.5">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <span class="text-2xl {{ $averageRating >= $i ? 'text-accent' : 'text-zinc-600' }}">&#9733;</span>
+                            @endfor
+                        </div>
+                    @else
+                        <div class="flex gap-1" x-data="{ hoverRating: 0 }">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <button
+                                    wire:click="rate({{ $i }})"
+                                    @mouseenter="hoverRating = {{ $i }}"
+                                    @mouseleave="hoverRating = 0"
+                                    class="text-2xl transition cursor-pointer focus:outline-none"
+                                    :class="(hoverRating > 0 ? hoverRating : {{ $userRating }}) >= {{ $i }} ? 'text-accent' : 'text-zinc-600 hover:text-zinc-400'"
+                                >&#9733;</button>
+                            @endfor
+                        </div>
+                    @endif
                 @else
                     <div class="flex gap-0.5">
                         @for ($i = 1; $i <= 5; $i++)
@@ -43,24 +51,28 @@
         <div class="border-t border-zinc-700/50 pt-4">
             {{-- Comment Form --}}
             @auth
-                <form wire:submit="addComment" class="mb-6">
-                    <textarea
-                        wire:model="commentBody"
-                        rows="3"
-                        maxlength="1000"
-                        placeholder="Schrijf een reactie..."
-                        class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-sm p-3 text-sm placeholder-zinc-500 focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none resize-none"
-                    ></textarea>
-                    @error('commentBody')
-                        <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="text-xs text-zinc-600" x-data x-text="$wire.commentBody.length + ' / 1000'"></span>
-                        <button type="submit" class="bg-accent text-black px-4 py-2 text-xs font-bold uppercase tracking-wider hover:brightness-90 transition">
-                            Reageer
-                        </button>
-                    </div>
-                </form>
+                @if(auth()->user()->isCommentBlocked())
+                    <p class="text-orange-400 text-sm mb-6">Je bent geblokkeerd om reacties te plaatsen.</p>
+                @else
+                    <form wire:submit="addComment" class="mb-6">
+                        <textarea
+                            wire:model="commentBody"
+                            rows="3"
+                            maxlength="1000"
+                            placeholder="Schrijf een reactie..."
+                            class="w-full bg-zinc-800 border border-zinc-700 text-white rounded-sm p-3 text-sm placeholder-zinc-500 focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none resize-none"
+                        ></textarea>
+                        @error('commentBody')
+                            <p class="text-red-400 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-zinc-600" x-data x-text="$wire.commentBody.length + ' / 1000'"></span>
+                            <button type="submit" class="bg-accent text-black px-4 py-2 text-xs font-bold uppercase tracking-wider hover:brightness-90 transition">
+                                Reageer
+                            </button>
+                        </div>
+                    </form>
+                @endif
             @else
                 <p class="text-zinc-400 text-sm mb-6">
                     <a href="{{ route('login') }}" class="text-accent hover:underline">Log in</a> om een reactie te plaatsen.
