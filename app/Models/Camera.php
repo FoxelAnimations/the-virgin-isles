@@ -19,6 +19,7 @@ class Camera extends Model
         'static_intensity',
         'rain_volume',
         'wind_volume',
+        'chat_enabled',
     ];
 
     protected function casts(): array
@@ -31,6 +32,7 @@ class Camera extends Model
             'static_intensity' => 'integer',
             'rain_volume' => 'integer',
             'wind_volume' => 'integer',
+            'chat_enabled' => 'boolean',
         ];
     }
 

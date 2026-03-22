@@ -62,6 +62,9 @@ class CameraPlanner extends Component
     public int $rainVolume = 50;
     public int $windVolume = 50;
 
+    // Chat
+    public bool $chatEnabled = true;
+
     // Description (Quill HTML)
     public string $description = '';
 
@@ -76,6 +79,7 @@ class CameraPlanner extends Component
         $this->staticIntensity = $camera->static_intensity ?? 15;
         $this->rainVolume = $camera->rain_volume ?? 50;
         $this->windVolume = $camera->wind_volume ?? 50;
+        $this->chatEnabled = $camera->chat_enabled ?? true;
         $this->loadDefaultSelections();
     }
 
@@ -277,6 +281,7 @@ class CameraPlanner extends Component
             'static_intensity' => max(0, min(100, $this->staticIntensity)),
             'rain_volume' => max(0, min(100, $this->rainVolume)),
             'wind_volume' => max(0, min(100, $this->windVolume)),
+            'chat_enabled' => $this->chatEnabled,
         ]);
 
         foreach ($this->defaultSelections as $slot => $videoId) {

@@ -53,7 +53,7 @@
 
         <x-badge-popup />
         <x-age-gate />
-        @if (!request()->routeIs('map'))
+        @if (!request()->routeIs('map') && !request()->routeIs('cameras.show'))
             <x-character-chat />
         @endif
 

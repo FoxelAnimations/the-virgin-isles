@@ -127,9 +127,11 @@
         </div>
 
         {{-- Chat Panel --}}
-        <div class="w-full lg:w-80 xl:w-96 shrink-0 border-t lg:border-t-0 lg:border-l border-zinc-800 flex flex-col max-h-[40vh] lg:max-h-none">
-            @livewire('cameras.live-chat', ['camera' => $camera])
-        </div>
+        @if ($camera->chat_enabled)
+            <div class="w-full lg:w-80 xl:w-96 shrink-0 border-t lg:border-t-0 lg:border-l border-zinc-800 flex flex-col max-h-[40vh] lg:max-h-none">
+                @livewire('cameras.live-chat', ['camera' => $camera])
+            </div>
+        @endif
     </div>
 
     {{-- Description --}}

@@ -274,6 +274,22 @@
                     </div>
                 </div>
 
+                {{-- Live Chat --}}
+                <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
+                    <div class="px-4 py-3 border-b border-zinc-800">
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-accent">Live Chat</h2>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs text-zinc-500">Chat tonen op camerapagina</p>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" wire:model.live="chatEnabled" class="sr-only peer">
+                                <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Video Library --}}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-sm">
                     <div class="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
