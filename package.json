@@ -20,6 +20,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "canvas-confetti": "^1.9.4",
         "jquery": "^3.7.1",
         "rollup": "^4.52.0",
         "sortablejs": "^1.15.7",

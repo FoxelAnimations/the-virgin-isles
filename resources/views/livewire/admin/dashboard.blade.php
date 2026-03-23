@@ -317,12 +317,6 @@
                     <p class="text-xs text-zinc-500 ml-8">{{ __('Shows the collab page link in the navigation and the logo slider on the homepage.') }}</p>
 
                     <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" wire:model.live="showMap" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
-                        <span class="text-sm font-medium text-white">{{ __('Show De Kaart') }}</span>
-                    </label>
-                    <p class="text-xs text-zinc-500 ml-8">{{ __('Shows the map page link in the navigation. When disabled, only admins can access the map.') }}</p>
-
-                    <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" wire:model.live="showQuotes" class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
                         <span class="text-sm font-medium text-white">{{ __('Show Quotes') }}</span>
                     </label>

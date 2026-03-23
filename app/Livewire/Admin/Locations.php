@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Beacon;
 use App\Models\Location;
 use App\Models\LocationCategory;
+use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -13,6 +14,12 @@ use Livewire\WithPagination;
 class Locations extends Component
 {
     use WithPagination, WithFileUploads;
+
+    // Tab
+    public string $tab = 'locations';
+
+    // Settings
+    public bool $showMap = false;
 
     // Filters
     public string $filterCategory = '';
@@ -40,10 +47,26 @@ class Locations extends Component
     public array $selectedBeaconIds = [];
 
     protected $queryString = [
+        'tab' => ['except' => 'locations'],
         'filterCategory' => ['except' => ''],
         'filterVisibility' => ['except' => ''],
         'search' => ['except' => ''],
     ];
+
+    public function mount(): void
+    {
+        $settings = SiteSetting::first();
+        $this->showMap = $settings?->show_map ?? false;
+    }
+
+    public function saveSettings(): void
+    {
+        SiteSetting::first()?->update([
+            'show_map' => $this->showMap,
+        ]);
+
+        session()->flash('status', 'Settings updated.');
+    }
 
     protected function rules(): array
     {

@@ -23,6 +23,40 @@
             </div>
         @endif
 
+        {{-- Tabs --}}
+        <div class="flex gap-0 mb-6 border-b border-zinc-800">
+            <button wire:click="$set('tab', 'locations')"
+                class="px-4 py-2 text-sm font-semibold uppercase tracking-wider transition {{ $tab === 'locations' ? 'text-accent border-b-2 border-accent' : 'text-zinc-500 hover:text-white' }}">
+                Locations
+            </button>
+            <button wire:click="$set('tab', 'settings')"
+                class="px-4 py-2 text-sm font-semibold uppercase tracking-wider transition {{ $tab === 'settings' ? 'text-accent border-b-2 border-accent' : 'text-zinc-500 hover:text-white' }}">
+                Settings
+            </button>
+        </div>
+
+        @if ($tab === 'settings')
+            {{-- Settings Tab --}}
+            <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
+                <div class="bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider">
+                    Map Settings
+                </div>
+                <div class="p-5 space-y-4">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" wire:model.live="showMap"
+                            class="rounded-sm border-zinc-600 bg-zinc-800 text-accent focus:ring-accent">
+                        <span class="text-sm font-medium text-white">Show De Kaart</span>
+                    </label>
+                    <p class="text-xs text-zinc-500 ml-8">Shows the map page link in the navigation. When disabled, only admins can access the map.</p>
+
+                    <button wire:click="saveSettings"
+                        class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        @else
+
         {{-- Filters --}}
         <div class="flex flex-wrap gap-3 mb-6">
             <input type="text" wire:model.live.debounce.300ms="search"
@@ -121,6 +155,8 @@
                 </div>
             @endif
         </div>
+
+        @endif
     </div>
 
     {{-- Create/Edit Modal --}}

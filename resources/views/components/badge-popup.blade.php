@@ -15,6 +15,14 @@
         init() {
             if (this.popups.length > 0) {
                 this.startTimer();
+                if (window.confetti) {
+                    window.confetti({
+                        particleCount: 60,
+                        spread: 55,
+                        origin: { y: 0.6 },
+                        disableForReducedMotion: true,
+                    });
+                }
             } else {
                 this.show = false;
             }

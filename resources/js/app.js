@@ -3,10 +3,12 @@ import $ from 'jquery'
 import Sortable from 'sortablejs'
 import Swiper from 'swiper'
 import { Autoplay } from 'swiper/modules'
+import confetti from 'canvas-confetti'
 
 window.$ = $
 window.jQuery = $
 window.Sortable = Sortable
+window.confetti = confetti
 
 // ─── Character Carousel (Swiper) ────────────────────────────────
 
