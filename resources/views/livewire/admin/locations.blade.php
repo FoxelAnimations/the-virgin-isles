@@ -168,7 +168,7 @@
             <div class="absolute inset-0" wire:click="closeModal"></div>
 
             <div class="relative bg-zinc-900 border border-zinc-800 w-full max-w-3xl my-8" @click.stop>
-                <div class="sticky top-0 z-10 bg-zinc-800 text-accent px-5 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between">
+                <div class="bg-zinc-800 text-accent px-5 py-3 text-sm font-semibold uppercase tracking-wider flex items-center justify-between">
                     <span>{{ $editingId ? 'Edit Location' : 'New Location' }}</span>
                     <button wire:click="closeModal" class="text-zinc-400 hover:text-white transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -236,7 +236,7 @@
                                     @error('longitude') <span class="text-red-400 text-xs mt-1">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-                            <div id="admin-map-picker" class="w-full h-64 rounded-sm border border-zinc-700 bg-zinc-800"
+                            <div id="admin-map-picker" class="w-full h-64 rounded-sm border border-zinc-700 bg-zinc-800" wire:ignore
                                 x-data="{
                                     map: null,
                                     marker: null,
