@@ -50,7 +50,7 @@ class MapPage extends Component
 
     public function loadLocations(): void
     {
-        $query = Location::with('categories');
+        $query = Location::active()->with('categories');
 
         if ($this->filterCategory) {
             $query->whereHas('categories', fn ($q) => $q->where('location_categories.id', $this->filterCategory));

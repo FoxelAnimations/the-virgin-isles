@@ -24,6 +24,7 @@ class Locations extends Component
     // Filters
     public string $filterCategory = '';
     public string $filterVisibility = '';
+    public string $filterStatus = '';
     public string $search = '';
 
     // Create/Edit modal
@@ -39,7 +40,8 @@ class Locations extends Component
     public string $button1Url = '';
     public string $button2Label = '';
     public string $button2Url = '';
-    public bool $isVisible = true;
+    public bool $isHidden = false;
+    public bool $isActive = true;
     public int $sortOrder = 0;
     public $image = null;
     public ?string $existingImage = null;
@@ -50,6 +52,7 @@ class Locations extends Component
         'tab' => ['except' => 'locations'],
         'filterCategory' => ['except' => ''],
         'filterVisibility' => ['except' => ''],
+        'filterStatus' => ['except' => ''],
         'search' => ['except' => ''],
     ];
 
@@ -81,7 +84,8 @@ class Locations extends Component
             'button1Url' => ['nullable', 'string', 'max:2048'],
             'button2Label' => ['nullable', 'string', 'max:255'],
             'button2Url' => ['nullable', 'string', 'max:2048'],
-            'isVisible' => ['boolean'],
+            'isHidden' => ['boolean'],
+            'isActive' => ['boolean'],
             'sortOrder' => ['integer', 'min:0'],
             'image' => ['nullable', 'image', 'max:4096'],
             'selectedCategoryIds' => ['array'],
@@ -100,6 +104,11 @@ class Locations extends Component
     }
 
     public function updatedFilterVisibility(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterStatus(): void
     {
         $this->resetPage();
     }
@@ -124,7 +133,8 @@ class Locations extends Component
         $this->button1Url = $location->button_1_url ?? '';
         $this->button2Label = $location->button_2_label ?? '';
         $this->button2Url = $location->button_2_url ?? '';
-        $this->isVisible = $location->is_visible;
+        $this->isHidden = !$location->is_visible;
+        $this->isActive = $location->is_active;
         $this->sortOrder = $location->sort_order;
         $this->existingImage = $location->image_path;
         $this->selectedCategoryIds = $location->categories->pluck('id')->map(fn ($id) => (string) $id)->toArray();
@@ -156,7 +166,8 @@ class Locations extends Component
             'button_1_url' => $this->button1Url ?: null,
             'button_2_label' => $this->button2Label ?: null,
             'button_2_url' => $this->button2Url ?: null,
-            'is_visible' => $this->isVisible,
+            'is_visible' => !$this->isHidden,
+            'is_active' => $this->isActive,
             'sort_order' => $this->sortOrder,
         ];
 
@@ -200,10 +211,11 @@ class Locations extends Component
             'editingId', 'title', 'description', 'hiddenDescription',
             'latitude', 'longitude', 'address',
             'button1Label', 'button1Url', 'button2Label', 'button2Url',
-            'isVisible', 'sortOrder', 'image', 'existingImage',
+            'isHidden', 'isActive', 'sortOrder', 'image', 'existingImage',
             'selectedCategoryIds', 'selectedBeaconIds',
         ]);
-        $this->isVisible = true;
+        $this->isHidden = false;
+        $this->isActive = true;
     }
 
     private function getFilteredQuery()
@@ -218,6 +230,12 @@ class Locations extends Component
             $query->where('is_visible', true);
         } elseif ($this->filterVisibility === 'hidden') {
             $query->where('is_visible', false);
+        }
+
+        if ($this->filterStatus === 'active') {
+            $query->where('is_active', true);
+        } elseif ($this->filterStatus === 'inactive') {
+            $query->where('is_active', false);
         }
 
         if ($this->search) {

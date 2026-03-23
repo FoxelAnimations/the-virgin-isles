@@ -78,6 +78,13 @@ body {
     display: none;
 }
 
+/* Leaflet z-index containment — prevent map internals (z-1000 controls)
+   from escaping above navigation (z-40) and modals (z-50). */
+.leaflet-container {
+    z-index: 0;
+    isolation: isolate;
+}
+
 /* Dark scrollbars */
 * {
     scrollbar-width: thin;

@@ -71,9 +71,15 @@
             </select>
             <select wire:model.live="filterVisibility"
                 class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm">
-                <option value="">All Visibility</option>
-                <option value="visible">Visible</option>
-                <option value="hidden">Hidden</option>
+                <option value="">Zichtbaar / Geheim</option>
+                <option value="visible">Zichtbaar</option>
+                <option value="hidden">Geheim</option>
+            </select>
+            <select wire:model.live="filterStatus"
+                class="bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm">
+                <option value="">Actief / Inactief</option>
+                <option value="active">Actief</option>
+                <option value="inactive">Inactief</option>
             </select>
         </div>
 
@@ -124,11 +130,13 @@
                                         @endforeach
                                     </div>
                                 </td>
-                                <td class="px-4 py-4 text-center">
-                                    @if ($location->is_visible)
-                                        <span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded-sm bg-green-900/30 text-green-400 border border-green-800">Visible</span>
+                                <td class="px-4 py-4 text-center space-y-1">
+                                    @if (!$location->is_active)
+                                        <span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded-sm bg-red-900/30 text-red-400 border border-red-800">Inactief</span>
+                                    @elseif ($location->is_visible)
+                                        <span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded-sm bg-green-900/30 text-green-400 border border-green-800">Zichtbaar</span>
                                     @else
-                                        <span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded-sm bg-zinc-800 text-zinc-500 border border-zinc-700">Hidden</span>
+                                        <span class="inline-flex px-2 py-0.5 text-xs font-semibold rounded-sm bg-amber-900/30 text-amber-400 border border-amber-800">Geheim</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-4 text-center text-zinc-400 text-sm">{{ $location->beacons_count }}</td>
@@ -309,15 +317,25 @@
                             </div>
                         </div>
 
-                        {{-- Visibility + Sort --}}
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-zinc-400 mb-1">Visibility</label>
-                                <label class="flex items-center gap-2 mt-2">
-                                    <input type="checkbox" wire:model="isVisible"
-                                        class="rounded-sm bg-zinc-800 border-zinc-700 text-accent focus:ring-accent">
-                                    <span class="text-sm text-zinc-300">Visible on map</span>
-                                </label>
+                        {{-- Status + Secret + Sort --}}
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-zinc-400 mb-1">Status</label>
+                                    <label class="flex items-center gap-2 mt-2">
+                                        <input type="checkbox" wire:model="isActive"
+                                            class="rounded-sm bg-zinc-800 border-zinc-700 text-accent focus:ring-accent">
+                                        <span class="text-sm text-zinc-300">Actief (zichtbaar op de kaart)</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-zinc-400 mb-1">Geheim / Verborgen</label>
+                                    <label class="flex items-center gap-2 mt-2">
+                                        <input type="checkbox" wire:model="isHidden"
+                                            class="rounded-sm bg-zinc-800 border-zinc-700 text-accent focus:ring-accent">
+                                        <span class="text-sm text-zinc-300">Geheime locatie (toont ? op de kaart)</span>
+                                    </label>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Sort Order</label>

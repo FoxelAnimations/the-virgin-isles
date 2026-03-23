@@ -30,7 +30,7 @@
         </div>
 
         {{-- Map Container --}}
-        <div class="rounded-sm border border-zinc-800 overflow-hidden"
+        <div class="relative z-0 rounded-sm border border-zinc-800 overflow-hidden"
             x-data="mapComponent()"
             x-init="initMap()"
             wire:ignore

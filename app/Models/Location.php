@@ -20,6 +20,7 @@ class Location extends Model
         'button_2_label',
         'button_2_url',
         'is_visible',
+        'is_active',
         'sort_order',
     ];
 
@@ -29,6 +30,7 @@ class Location extends Model
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'is_visible' => 'boolean',
+            'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
     }
@@ -58,5 +60,10 @@ class Location extends Model
     public function scopeHidden($query)
     {
         return $query->where('is_visible', false);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }
