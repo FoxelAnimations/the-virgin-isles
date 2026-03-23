@@ -438,7 +438,7 @@
                 <div class="w-full max-w-5xl md:max-h-full" @click.stop>
                     {{-- Age Gate Overlay --}}
                     <template x-if="ep?.ageRestricted && !ageConfirmed">
-                        <div class="aspect-video bg-zinc-900 rounded-sm overflow-hidden mb-4 flex flex-col items-center justify-center text-center p-8">
+                        <div class="h-[70vh] md:h-auto md:aspect-video bg-zinc-900 rounded-sm overflow-hidden mb-4 flex flex-col items-center justify-center text-center p-8">
                             <div class="text-5xl font-bold text-red-500 mb-4">18+</div>
                             <p class="text-white text-lg mb-6 max-w-md">{{ $ageGate?->message ?? 'Ben je 18 jaar of ouder?' }}</p>
                             <div class="flex gap-4">
@@ -454,12 +454,12 @@
 
                     {{-- Video Player (shown after age confirmation or if not restricted) --}}
                     <template x-if="!ep?.ageRestricted || ageConfirmed">
-                        <div class="aspect-video bg-black rounded-none md:rounded-sm overflow-hidden mb-0 md:mb-4">
+                        <div class="h-[70vh] md:h-auto md:aspect-video bg-black rounded-none md:rounded-sm overflow-hidden mb-0 md:mb-4">
                             <template x-if="ep && ep.isYoutube && ep.embedUrl">
                                 <iframe :src="ep.embedUrl" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                             </template>
                             <template x-if="ep && !ep.isYoutube && ep.videoUrl">
-                                <video controls autoplay class="w-full h-full" :src="ep.videoUrl"></video>
+                                <video controls autoplay class="w-full h-full object-contain" :src="ep.videoUrl"></video>
                             </template>
                         </div>
                     </template>

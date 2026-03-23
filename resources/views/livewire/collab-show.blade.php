@@ -125,14 +125,14 @@
                 </button>
 
                 <div class="w-full md:max-w-5xl md:max-h-full" @click.stop>
-                    <div class="aspect-video bg-black rounded-none md:rounded-sm overflow-hidden">
+                    <div class="h-[70vh] md:h-auto md:aspect-video bg-black rounded-none md:rounded-sm overflow-hidden">
                         @if ($collab->episode->isYoutube() && $collab->episode->youtubeEmbedUrl())
                             <template x-if="videoOpen">
                                 <iframe src="{{ $collab->episode->youtubeEmbedUrl() }}" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                             </template>
                         @elseif ($collab->episode->videoUrl())
                             <template x-if="videoOpen">
-                                <video controls autoplay class="w-full h-full" src="{{ $collab->episode->videoUrl() }}"></video>
+                                <video controls autoplay class="w-full h-full object-contain" src="{{ $collab->episode->videoUrl() }}"></video>
                             </template>
                         @endif
                     </div>

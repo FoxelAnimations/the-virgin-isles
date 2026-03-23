@@ -242,9 +242,18 @@
                                     marker: null,
                                     init() {
                                         if (typeof L === 'undefined') return;
-                                        this.$nextTick(() => {
-                                            setTimeout(() => this.initMap(), 100);
-                                        });
+                                        this.waitForVisible();
+                                    },
+                                    waitForVisible() {
+                                        const el = this.$el;
+                                        const check = () => {
+                                            if (el.offsetWidth > 0 && el.offsetHeight > 0) {
+                                                this.initMap();
+                                            } else {
+                                                requestAnimationFrame(check);
+                                            }
+                                        };
+                                        requestAnimationFrame(check);
                                     },
                                     initMap() {
                                         if (this.map) return;
@@ -265,7 +274,7 @@
                                             $wire.set('latitude', e.latlng.lat.toFixed(7));
                                             $wire.set('longitude', e.latlng.lng.toFixed(7));
                                         });
-                                        setTimeout(() => this.map.invalidateSize(), 150);
+                                        this.$nextTick(() => this.map.invalidateSize());
                                     }
                                 }"></div>
                         </div>
