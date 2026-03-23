@@ -212,13 +212,6 @@
                     </label>
                     <p class="text-sm text-zinc-500">{{ __('When unchecked, the public register page returns a 404.') }}</p>
 
-                    <div class="border-t border-zinc-800 pt-4 mt-4">
-                        <label class="block text-sm font-medium text-zinc-400 mb-1">{{ __('Badge Popup Timeout (seconds)') }}</label>
-                        <input type="number" wire:model="badgePopupTimeout" min="1" max="60"
-                            class="w-24 bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm">
-                        <p class="text-sm text-zinc-500 mt-1">{{ __('Auto-close duration for badge popups after scanning a beacon.') }}</p>
-                    </div>
-
                     <button type="submit" class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
                         {{ __('Save Site Settings') }}
                     </button>

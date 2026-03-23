@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Beacon;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class BadgeScanService
 {
@@ -47,11 +46,7 @@ class BadgeScanService
                 'updated_at' => now(),
             ];
 
-            $badgePopups[] = [
-                'title' => $badge->title,
-                'image' => $badge->image_path ? Storage::url($badge->image_path) : null,
-                'popup_text' => $badge->popup_text_first,
-            ];
+            $badgePopups[] = $badge->toPopupArray();
         }
 
         // Bulk insert new badge-user records

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Badge extends Model
 {
@@ -45,6 +46,16 @@ class Badge extends Model
         return $this->belongsToMany(User::class, 'badge_user')
             ->withPivot('count', 'collected_at', 'updated_at')
             ->withCasts(['collected_at' => 'datetime', 'updated_at' => 'datetime']);
+    }
+
+    public function toPopupArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'image' => $this->image_path ? Storage::url($this->image_path) : null,
+            'popup_text' => $this->popup_text_first,
+        ];
     }
 
     public function scopeActive($query)

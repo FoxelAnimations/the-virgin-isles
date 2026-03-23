@@ -127,7 +127,12 @@
         }
     },
 
-    nextBadge() {
+    async nextBadge() {
+        const badge = this.badgePopups[this.currentPopup];
+        if (badge?.id) {
+            await window.axios.post('{{ route('badge.seen') }}', { badge_id: badge.id }).catch(() => {});
+        }
+
         if (this.currentPopup < this.badgePopups.length - 1) {
             this.currentPopup++;
         } else {

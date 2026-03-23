@@ -23,6 +23,40 @@
             </div>
         @endif
 
+        {{-- Tabs --}}
+        <div class="flex gap-0 mb-6 border-b border-zinc-800">
+            <button wire:click="$set('tab', 'badges')"
+                class="px-4 py-2 text-sm font-semibold uppercase tracking-wider transition {{ $tab === 'badges' ? 'text-accent border-b-2 border-accent' : 'text-zinc-500 hover:text-white' }}">
+                Badges
+            </button>
+            <button wire:click="$set('tab', 'settings')"
+                class="px-4 py-2 text-sm font-semibold uppercase tracking-wider transition {{ $tab === 'settings' ? 'text-accent border-b-2 border-accent' : 'text-zinc-500 hover:text-white' }}">
+                Settings
+            </button>
+        </div>
+
+        @if ($tab === 'settings')
+            {{-- Settings Tab --}}
+            <div class="rounded-sm bg-zinc-900 border border-zinc-800 overflow-hidden">
+                <div class="bg-zinc-800 text-accent px-4 py-3 text-sm font-semibold uppercase tracking-wider">
+                    Badge Popup Settings
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-400 mb-1">Badge Popup Timeout (seconds)</label>
+                        <input type="number" wire:model="badgePopupTimeout" min="1" max="60"
+                            class="w-24 bg-zinc-800 border border-zinc-700 text-white px-3 py-2 text-sm focus:border-accent focus:ring-accent rounded-sm">
+                        <p class="text-xs text-zinc-500 mt-1">Auto-close duration for badge popups after scanning a beacon.</p>
+                    </div>
+
+                    <button wire:click="saveSettings"
+                        class="inline-flex items-center bg-accent text-black px-4 py-2 text-sm font-semibold tracking-wider uppercase transition hover:brightness-90">
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        @else
+
         {{-- Filters --}}
         <div class="flex flex-wrap gap-3 mb-6">
             <input type="text" wire:model.live.debounce.300ms="search"
@@ -116,6 +150,8 @@
                 </div>
             @endif
         </div>
+
+        @endif
     </div>
 
     {{-- Create/Edit Modal --}}

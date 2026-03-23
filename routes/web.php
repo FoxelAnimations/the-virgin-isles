@@ -72,6 +72,7 @@ Route::middleware([
 ])->group(function () {
     Route::get('/dashboard', UserDashboard::class)->name('dashboard');
     Route::post('/beacon/{guid}/scan', [BeaconScanApiController::class, 'scan'])->name('beacon.scan.api');
+    Route::post('/badge-seen', \App\Http\Controllers\BadgeSeenController::class)->name('badge.seen');
 
     Route::middleware('can:access-admin')->group(function () {
         Route::get('/admin', AdminDashboard::class)->name('admin.dashboard');

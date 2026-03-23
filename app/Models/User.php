@@ -95,8 +95,8 @@ class User extends Authenticatable
     public function badges(): BelongsToMany
     {
         return $this->belongsToMany(Badge::class, 'badge_user')
-            ->withPivot('count', 'collected_at', 'updated_at')
-            ->withCasts(['collected_at' => 'datetime', 'updated_at' => 'datetime']);
+            ->withPivot('count', 'collected_at', 'seen_at', 'updated_at')
+            ->withCasts(['collected_at' => 'datetime', 'seen_at' => 'datetime', 'updated_at' => 'datetime']);
     }
 
     public function revealedLocations(): BelongsToMany

@@ -68,9 +68,9 @@ class BeaconController extends Controller
 
         if ($user) {
             if ($isNewCollection) {
-                $this->processBadgesAndLocations($user, $beacon);
+                $earnedBadges = $this->badgeScanService->processNewBeaconScan($user, $beacon);
 
-                if (session()->has('badge_popups')) {
+                if (!empty($earnedBadges)) {
                     $dashboardUrl = route('dashboard');
                     $this->scanService->logScan($request, $guid, $beacon, $dashboardUrl, $isRateLimited);
                     return redirect($dashboardUrl);
@@ -105,12 +105,4 @@ class BeaconController extends Controller
         return false;
     }
 
-    private function processBadgesAndLocations(User $user, Beacon $beacon): void
-    {
-        $badgePopups = $this->badgeScanService->processNewBeaconScan($user, $beacon);
-
-        if (!empty($badgePopups)) {
-            session()->put('badge_popups', $badgePopups);
-        }
-    }
 }

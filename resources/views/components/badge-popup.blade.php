@@ -1,20 +1,23 @@
 @php
-    $badgePopups = session()->pull('badge_popups', []);
+    $badgePopups = [];
+    if (auth()->check()) {
+        $badgePopups = auth()->user()
+            ->badges()
+            ->wherePivotNull('seen_at')
+            ->get()
+            ->map(fn ($badge) => $badge->toPopupArray())
+            ->values()
+            ->toArray();
+    }
 @endphp
 
 @if (!empty($badgePopups))
-@php $popupTimeout = \App\Models\SiteSetting::first()?->badge_popup_timeout ?? 5; @endphp
 <div x-data="{
         popups: {{ Js::from($badgePopups) }},
         current: 0,
         show: true,
-        timeout: {{ $popupTimeout }} * 1000,
-        timer: null,
-        progress: 100,
-        progressInterval: null,
         init() {
             if (this.popups.length > 0) {
-                this.startTimer();
                 if (window.confetti) {
                     window.confetti({
                         particleCount: 60,
@@ -27,50 +30,27 @@
                 this.show = false;
             }
         },
-        startTimer() {
-            this.progress = 100;
-            clearInterval(this.progressInterval);
-            clearTimeout(this.timer);
-
-            const step = 50;
-            const decrement = (step / this.timeout) * 100;
-            this.progressInterval = setInterval(() => {
-                this.progress = Math.max(0, this.progress - decrement);
-            }, step);
-
-            this.timer = setTimeout(() => this.advance(), this.timeout);
-        },
-        advance() {
-            clearInterval(this.progressInterval);
-            clearTimeout(this.timer);
+        confirm() {
+            const badge = this.popups[this.current];
+            if (badge?.id) {
+                window.axios.post('{{ route('badge.seen') }}', { badge_id: badge.id }).catch(() => {});
+            }
 
             if (this.current < this.popups.length - 1) {
                 this.current++;
-                this.startTimer();
             } else {
                 this.show = false;
             }
-        },
-        close() {
-            clearInterval(this.progressInterval);
-            clearTimeout(this.timer);
-            this.show = false;
         }
     }"
     x-show="show"
     x-transition.opacity
     class="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4"
-    @click.self="advance()"
     style="display: none;"
 >
     {{-- Badge Popup --}}
     <template x-if="popups.length > 0">
         <div class="bg-zinc-900 border border-zinc-800 rounded-sm w-full max-w-sm text-center overflow-hidden" @click.stop>
-            {{-- Progress bar --}}
-            <div class="h-1 bg-zinc-800">
-                <div class="h-full bg-accent transition-all duration-100 ease-linear" :style="'width: ' + progress + '%'"></div>
-            </div>
-
             <div class="p-6">
                 {{-- Badge image --}}
                 <template x-if="popups[current]?.image">
@@ -94,8 +74,8 @@
                     </div>
                 </template>
 
-                {{-- Next/Close button --}}
-                <button @click="advance()"
+                {{-- Confirm button --}}
+                <button @click="confirm()"
                     class="px-6 py-2 text-sm font-semibold bg-accent text-black uppercase tracking-wider transition hover:brightness-90">
                     <span x-text="current < popups.length - 1 ? 'Volgende' : 'Sluiten'"></span>
                 </button>

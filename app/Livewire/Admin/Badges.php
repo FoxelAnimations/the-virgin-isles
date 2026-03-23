@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Badge;
 use App\Models\BadgeType;
 use App\Models\Beacon;
+use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -13,6 +14,12 @@ use Livewire\WithPagination;
 class Badges extends Component
 {
     use WithPagination, WithFileUploads;
+
+    // Tab
+    public string $tab = 'badges';
+
+    // Settings
+    public int $badgePopupTimeout = 5;
 
     // Filters
     public string $filterType = '';
@@ -34,10 +41,26 @@ class Badges extends Component
     public array $selectedBeaconIds = [];
 
     protected $queryString = [
+        'tab' => ['except' => 'badges'],
         'filterType' => ['except' => ''],
         'filterStatus' => ['except' => ''],
         'search' => ['except' => ''],
     ];
+
+    public function mount(): void
+    {
+        $settings = SiteSetting::first();
+        $this->badgePopupTimeout = $settings?->badge_popup_timeout ?? 5;
+    }
+
+    public function saveSettings(): void
+    {
+        SiteSetting::first()?->update([
+            'badge_popup_timeout' => $this->badgePopupTimeout,
+        ]);
+
+        session()->flash('status', 'Settings updated.');
+    }
 
     protected function rules(): array
     {

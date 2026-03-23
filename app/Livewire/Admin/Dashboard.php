@@ -38,7 +38,6 @@ class Dashboard extends Component
     public bool $showCollabs = false;
     public bool $showQuotes = true;
     public string $carouselTitle = '';
-    public int $badgePopupTimeout = 5;
     public string $dashboardWelcomeTitle = '';
     public string $dashboardWelcomeText = '';
     public array $dashboardNewsItems = [];
@@ -188,7 +187,6 @@ class Dashboard extends Component
         if ($settings) {
             $this->loginEnabled = $settings->login_enabled;
             $this->registerEnabled = $settings->register_enabled;
-            $this->badgePopupTimeout = $settings->badge_popup_timeout ?? 5;
         }
     }
 
@@ -197,7 +195,6 @@ class Dashboard extends Component
         SiteSetting::first()?->update([
             'login_enabled' => $this->loginEnabled,
             'register_enabled' => $this->registerEnabled,
-            'badge_popup_timeout' => $this->badgePopupTimeout,
         ]);
 
         session()->flash('status', 'Site settings updated successfully.');
